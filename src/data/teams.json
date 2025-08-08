@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "name": "MGC",
+    "division": "Trophy",
+    "color": "#e1a730",
+    "logo": "🏌️",
+    "description": "Mombasa Golf Club"
+  },
+  {
+    "id": 2,
+    "name": "Nyali",
+    "division": "Trophy",
+    "color": "#508fdb",
+    "logo": "⛳",
+    "description": "Nyali Golf Club"
+  },
+  {
+    "id": 3,
+    "name": "Railway",
+    "division": "Trophy",
+    "color": "#cde0d0",
+    "logo": "🚂",
+    "description": "Railway Golf Club"
+  },
+  {
+    "id": 4,
+    "name": "Vet Lab",
+    "division": "Plate",
+    "color": "#56687e",
+    "logo": "🔬",
+    "description": "Vet Lab Sports Club"
+  },
+  {
+    "id": 5,
+    "name": "Sigona",
+    "division": "Plate",
+    "color": "#8f9ba9",
+    "logo": "🎯",
+    "description": "Sigona Golf Club"
+  },
+  {
+    "id": 6,
+    "name": "Kiambu",
+    "division": "Plate",
+    "color": "#c7cdd4",
+    "logo": "🌿",
+    "description": "Kiambu Golf Club"
+  },
+  {
+    "id": 7,
+    "name": "Limuru",
+    "division": "Bowl",
+    "color": "#e1a730",
+    "logo": "🏆",
+    "description": "Limuru Country Club"
+  },
+  {
+    "id": 8,
+    "name": "Golf Park",
+    "division": "Bowl",
+    "color": "#508fdb",
+    "logo": "🎪",
+    "description": "Golf Park"
+  },
+  {
+    "id": 9,
+    "name": "Thika",
+    "division": "Bowl",
+    "color": "#cde0d0",
+    "logo": "🏭",
+    "description": "Thika Sports Club"
+  },
+  {
+    "id": 10,
+    "name": "Royal",
+    "division": "Mug",
+    "color": "#56687e",
+    "logo": "👑",
+    "description": "Royal Nairobi Golf Club"
+  },
+  {
+    "id": 11,
+    "name": "Karen",
+    "division": "Mug",
+    "color": "#8f9ba9",
+    "logo": "🌺",
+    "description": "Karen Country Club"
+  },
+  {
+    "id": 12,
+    "name": "Eldoret",
+    "division": "Mug",
+    "color": "#c7cdd4",
+    "logo": "🏃",
+    "description": "Eldoret Golf Club"
+  },
+  {
+    "id": 13,
+    "name": "Windsor",
+    "division": "Trophy",
+    "color": "#e1a730",
+    "logo": "🏰",
+    "description": "Windsor Golf Hotel & Country Club"
+  },
+  {
+    "id": 14,
+    "name": "Mombasa",
+    "division": "Trophy",
+    "color": "#508fdb",
+    "logo": "🌊",
+    "description": "Mombasa Golf Club"
+  },
+  {
+    "id": 15,
+    "name": "Ruiru",
+    "division": "Trophy",
+    "color": "#cde0d0",
+    "logo": "🏘️",
+    "description": "Ruiru Sports Club"
+  }
+] 

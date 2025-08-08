@@ -1,0 +1,410 @@
+[
+  {
+    "id": 11,
+    "name": "Ben Murimi",
+    "teamId": 1,
+    "handicap": 8,
+    "email": "ben.murimi@mgc.com",
+    "phone": "+254-700-123-456"
+  },
+  {
+    "id": 12,
+    "name": "Bhavnish Chandaria",
+    "teamId": 1,
+    "handicap": 12,
+    "email": "bhavnish.chandaria@mgc.com",
+    "phone": "+254-700-123-457"
+  },
+  {
+    "id": 13,
+    "name": "Bo Ciera",
+    "teamId": 1,
+    "handicap": 6,
+    "email": "bo.ciera@mgc.com",
+    "phone": "+254-700-123-458"
+  },
+  {
+    "id": 14,
+    "name": "Daniel Kiragu",
+    "teamId": 1,
+    "handicap": 10,
+    "email": "daniel.kiragu@mgc.com",
+    "phone": "+254-700-123-459"
+  },
+  {
+    "id": 15,
+    "name": "David Ombisi",
+    "teamId": 1,
+    "handicap": 4,
+    "email": "david.ombisi@mgc.com",
+    "phone": "+254-700-123-460"
+  },
+  {
+    "id": 16,
+    "name": "Greg Snow (Pro)",
+    "teamId": 1,
+    "handicap": 0,
+    "email": "greg.snow@mgc.com",
+    "phone": "+254-700-123-461"
+  },
+  {
+    "id": 17,
+    "name": "James Wass",
+    "teamId": 1,
+    "handicap": 9,
+    "email": "james.wass@mgc.com",
+    "phone": "+254-700-123-462"
+  },
+  {
+    "id": 18,
+    "name": "Jay Sandhu",
+    "teamId": 1,
+    "handicap": 7,
+    "email": "jay.sandhu@mgc.com",
+    "phone": "+254-700-123-463"
+  },
+  {
+    "id": 19,
+    "name": "John Koina (Ex)",
+    "teamId": 1,
+    "handicap": 5,
+    "email": "john.koina@mgc.com",
+    "phone": "+254-700-123-464"
+  },
+  {
+    "id": 110,
+    "name": "Kavit Bhakoo",
+    "teamId": 1,
+    "handicap": 11,
+    "email": "kavit.bhakoo@mgc.com",
+    "phone": "+254-700-123-465"
+  },
+  {
+    "id": 111,
+    "name": "Khushil Nathwani",
+    "teamId": 1,
+    "handicap": 13,
+    "email": "khushil.nathwani@mgc.com",
+    "phone": "+254-700-123-466"
+  },
+  {
+    "id": 112,
+    "name": "Maahir Patel (Jnr)",
+    "teamId": 1,
+    "handicap": 15,
+    "email": "maahir.patel@mgc.com",
+    "phone": "+254-700-123-467"
+  },
+  {
+    "id": 113,
+    "name": "Neer Chandaria",
+    "teamId": 1,
+    "handicap": 8,
+    "email": "neer.chandaria@mgc.com",
+    "phone": "+254-700-123-468"
+  },
+  {
+    "id": 114,
+    "name": "Quram Bhatti",
+    "teamId": 1,
+    "handicap": 10,
+    "email": "quram.bhatti@mgc.com",
+    "phone": "+254-700-123-469"
+  },
+  {
+    "id": 115,
+    "name": "Ronan Patel (Jnr)",
+    "teamId": 1,
+    "handicap": 14,
+    "email": "ronan.patel@mgc.com",
+    "phone": "+254-700-123-470"
+  },
+  {
+    "id": 116,
+    "name": "Shashwat Harish",
+    "teamId": 1,
+    "handicap": 12,
+    "email": "shashwat.harish@mgc.com",
+    "phone": "+254-700-123-471"
+  },
+  {
+    "id": 117,
+    "name": "Eric Malonza",
+    "teamId": 1,
+    "handicap": 6,
+    "email": "eric.malonza@mgc.com",
+    "phone": "+254710684391"
+  },
+  {
+    "id": 21,
+    "name": "Adel Balala",
+    "teamId": 2,
+    "handicap": 9,
+    "email": "adel.balala@nyali.com",
+    "phone": "+254-700-123-472"
+  },
+  {
+    "id": 22,
+    "name": "AJ Molu",
+    "teamId": 2,
+    "handicap": 7,
+    "email": "aj.molu@nyali.com",
+    "phone": "+254-700-123-473"
+  },
+  {
+    "id": 23,
+    "name": "Allan Mola",
+    "teamId": 2,
+    "handicap": 11,
+    "email": "allan.mola@nyali.com",
+    "phone": "+254-700-123-474"
+  },
+  {
+    "id": 24,
+    "name": "Charles Rob",
+    "teamId": 2,
+    "handicap": 8,
+    "email": "charles.rob@nyali.com",
+    "phone": "+254-700-123-475"
+  },
+  {
+    "id": 25,
+    "name": "Daniel Nduva (Pro)",
+    "teamId": 2,
+    "handicap": 0,
+    "email": "daniel.nduva@nyali.com",
+    "phone": "+254-700-123-476"
+  },
+  {
+    "id": 26,
+    "name": "Dickson Baraza",
+    "teamId": 2,
+    "handicap": 10,
+    "email": "dickson.baraza@nyali.com",
+    "phone": "+254-700-123-477"
+  },
+  {
+    "id": 27,
+    "name": "George Munyao",
+    "teamId": 2,
+    "handicap": 12,
+    "email": "george.munyao@nyali.com",
+    "phone": "+254-700-123-478"
+  },
+  {
+    "id": 28,
+    "name": "Gurbux Singh",
+    "teamId": 2,
+    "handicap": 6,
+    "email": "gurbux.singh@nyali.com",
+    "phone": "+254-700-123-479"
+  },
+  {
+    "id": 29,
+    "name": "John Timbe",
+    "teamId": 2,
+    "handicap": 9,
+    "email": "john.timbe@nyali.com",
+    "phone": "+254-700-123-480"
+  },
+  {
+    "id": 210,
+    "name": "Kalamu Hassan Choyo",
+    "teamId": 2,
+    "handicap": 13,
+    "email": "kalamu.choyo@nyali.com",
+    "phone": "+254-700-123-481"
+  },
+  {
+    "id": 211,
+    "name": "Mohdhar Abubakar",
+    "teamId": 2,
+    "handicap": 11,
+    "email": "mohdhar.abubakar@nyali.com",
+    "phone": "+254-700-123-482"
+  },
+  {
+    "id": 212,
+    "name": "Omar Lewa",
+    "teamId": 2,
+    "handicap": 8,
+    "email": "omar.lewa@nyali.com",
+    "phone": "+254720322926"
+  },
+  {
+    "id": 213,
+    "name": "Said Bajaber",
+    "teamId": 2,
+    "handicap": 7,
+    "email": "said.bajaber@nyali.com",
+    "phone": "+254-700-123-483"
+  },
+  {
+    "id": 214,
+    "name": "Solomon Majanga",
+    "teamId": 2,
+    "handicap": 10,
+    "email": "solomon.majanga@nyali.com",
+    "phone": "+254-700-123-484"
+  },
+  {
+    "id": 215,
+    "name": "Tahir Mohamed",
+    "teamId": 2,
+    "handicap": 12,
+    "email": "tahir.mohamed@nyali.com",
+    "phone": "+254-700-123-485"
+  },
+  {
+    "id": 216,
+    "name": "Vimal Ranpura",
+    "teamId": 2,
+    "handicap": 9,
+    "email": "vimal.ranpura@nyali.com",
+    "phone": "+254-700-123-486"
+  },
+  {
+    "id": 217,
+    "name": "William Odeck",
+    "teamId": 2,
+    "handicap": 11,
+    "email": "william.odeck@nyali.com",
+    "phone": "+254-700-123-487"
+  },
+  {
+    "id": 218,
+    "name": "Yobesh Oyaro",
+    "teamId": 2,
+    "handicap": 8,
+    "email": "yobesh.oyaro@nyali.com",
+    "phone": "+254-700-123-488"
+  },
+  {
+    "id": 31,
+    "name": "Aisha Duba",
+    "teamId": 3,
+    "handicap": 13,
+    "email": "aisha.duba@railway.com",
+    "phone": "+254-700-123-489"
+  },
+  {
+    "id": 32,
+    "name": "Edward Manywanda",
+    "teamId": 3,
+    "handicap": 9,
+    "email": "edward.manywanda@railway.com",
+    "phone": "+254-700-123-490"
+  },
+  {
+    "id": 33,
+    "name": "Edwin Murungi",
+    "teamId": 3,
+    "handicap": 7,
+    "email": "edwin.murungi@railway.com",
+    "phone": "+254-700-123-491"
+  },
+  {
+    "id": 34,
+    "name": "Eric Genga",
+    "teamId": 3,
+    "handicap": 11,
+    "email": "eric.genga@railway.com",
+    "phone": "+254-700-123-492"
+  },
+  {
+    "id": 35,
+    "name": "Fidhelis Kimanzi",
+    "teamId": 3,
+    "handicap": 10,
+    "email": "fidhelis.kimanzi@railway.com",
+    "phone": "+254-700-123-493"
+  },
+  {
+    "id": 36,
+    "name": "Geoffery Yego",
+    "teamId": 3,
+    "handicap": 8,
+    "email": "geoffery.yego@railway.com",
+    "phone": "+254-700-123-494"
+  },
+  {
+    "id": 37,
+    "name": "Isaac Makokha",
+    "teamId": 3,
+    "handicap": 12,
+    "email": "isaac.makokha@railway.com",
+    "phone": "+254-700-123-495"
+  },
+  {
+    "id": 38,
+    "name": "Jabari Ongwae",
+    "teamId": 3,
+    "handicap": 6,
+    "email": "jabari.ongwae@railway.com",
+    "phone": "+254-700-123-496"
+  },
+  {
+    "id": 39,
+    "name": "Jeff Momanyi",
+    "teamId": 3,
+    "handicap": 9,
+    "email": "jeff.momanyi@railway.com",
+    "phone": "+254-700-123-497"
+  },
+  {
+    "id": 310,
+    "name": "Jimmy Semenye",
+    "teamId": 3,
+    "handicap": 11,
+    "email": "jimmy.semenye@railway.com",
+    "phone": "+254-700-123-498"
+  },
+  {
+    "id": 311,
+    "name": "John Kamenyi",
+    "teamId": 3,
+    "handicap": 7,
+    "email": "john.kamenyi@railway.com",
+    "phone": "+254725787447"
+  },
+  {
+    "id": 312,
+    "name": "Jonathan Ndung'u",
+    "teamId": 3,
+    "handicap": 8,
+    "email": "jonathan.ndungu@railway.com",
+    "phone": "+254-700-123-499"
+  },
+  {
+    "id": 313,
+    "name": "Kaash Padema",
+    "teamId": 3,
+    "handicap": 10,
+    "email": "kaash.padema@railway.com",
+    "phone": "+254-700-123-500"
+  },
+  {
+    "id": 314,
+    "name": "Leigh Mbuthia",
+    "teamId": 3,
+    "handicap": 13,
+    "email": "leigh.mbuthia@railway.com",
+    "phone": "+254-700-123-501"
+  },
+  {
+    "id": 315,
+    "name": "Mike Kiasi",
+    "teamId": 3,
+    "handicap": 9,
+    "email": "mike.kiasi@railway.com",
+    "phone": "+254-700-123-502"
+  },
+  {
+    "id": 316,
+    "name": "Morgan Chirchir",
+    "teamId": 3,
+    "handicap": 11,
+    "email": "morgan.chirchir@railway.com",
+    "phone": "+254-700-123-503"
+  }
+] 

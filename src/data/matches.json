@@ -1,0 +1,209 @@
+[
+  {
+    "id": 1001,
+    "teamAId": 1,
+    "teamBId": 2,
+    "division": "Trophy",
+    "date": "2024-01-19",
+    "teeTime": "07:30",
+    "course": "Front Nine",
+    "type": "4BBB",
+    "session": "AM",
+    "status": "completed",
+    "players": {
+      "teamA": ["Ben Murimi", "Bhavnish Chandaria"],
+      "teamB": ["Adel Balala", "AJ Molu"]
+    },
+    "holes": [
+      { "number": 1, "teamAScore": 6, "teamBScore": 5, "status": "completed" },
+      { "number": 2, "teamAScore": 4, "teamBScore": 4, "status": "completed" },
+      { "number": 3, "teamAScore": 5, "teamBScore": 5, "status": "completed" },
+      { "number": 4, "teamAScore": 6, "teamBScore": 6, "status": "completed" },
+      { "number": 5, "teamAScore": 6, "teamBScore": 5, "status": "completed" },
+      { "number": 6, "teamAScore": 3, "teamBScore": 3, "status": "completed" },
+      { "number": 7, "teamAScore": 5, "teamBScore": 6, "status": "completed" },
+      { "number": 8, "teamAScore": 3, "teamBScore": 6, "status": "completed" },
+      { "number": 9, "teamAScore": 3, "teamBScore": 6, "status": "completed" }
+    ]
+  },
+  {
+    "id": 1002,
+    "teamAId": 3,
+    "teamBId": 4,
+    "division": "Trophy",
+    "date": "2024-01-19",
+    "teeTime": "07:40",
+    "course": "Back Nine",
+    "type": "4BBB",
+    "session": "AM",
+    "status": "completed",
+    "players": {
+      "teamA": ["Aisha Duba", "Edward Manywanda"],
+      "teamB": ["Carl Wambasi", "Dr. P. Okemwa"]
+    },
+    "holes": [
+      { "number": 10, "teamAScore": 5, "teamBScore": 4, "status": "completed" },
+      { "number": 11, "teamAScore": 4, "teamBScore": 5, "status": "completed" },
+      { "number": 12, "teamAScore": 5, "teamBScore": 4, "status": "completed" },
+      { "number": 13, "teamAScore": 4, "teamBScore": 6, "status": "completed" },
+      { "number": 14, "teamAScore": 6, "teamBScore": 4, "status": "completed" },
+      { "number": 15, "teamAScore": 5, "teamBScore": 4, "status": "completed" },
+      { "number": 16, "teamAScore": 3, "teamBScore": 4, "status": "completed" },
+      { "number": 17, "teamAScore": 6, "teamBScore": 3, "status": "completed" },
+      { "number": 18, "teamAScore": 4, "teamBScore": 6, "status": "completed" }
+    ]
+  },
+  {
+    "id": 1003,
+    "teamAId": 5,
+    "teamBId": 6,
+    "division": "Plate",
+    "date": "2024-01-19",
+    "teeTime": "13:30",
+    "course": "Front Nine",
+    "type": "Foursomes",
+    "session": "PM",
+    "status": "completed",
+    "players": {
+      "teamA": ["Adam Tayebjee", "Akshay Chandaria"],
+      "teamB": ["A Kamau", "Apha Ndungu (Jnr)"]
+    },
+    "holes": [
+      { "number": 1, "teamAScore": 4, "teamBScore": 4, "status": "completed" },
+      { "number": 2, "teamAScore": 3, "teamBScore": 5, "status": "completed" },
+      { "number": 3, "teamAScore": 4, "teamBScore": 6, "status": "completed" },
+      { "number": 4, "teamAScore": 6, "teamBScore": 4, "status": "completed" },
+      { "number": 5, "teamAScore": 5, "teamBScore": 5, "status": "completed" },
+      { "number": 6, "teamAScore": 4, "teamBScore": 5, "status": "completed" },
+      { "number": 7, "teamAScore": 4, "teamBScore": 6, "status": "completed" },
+      { "number": 8, "teamAScore": 3, "teamBScore": 6, "status": "completed" },
+      { "number": 9, "teamAScore": 4, "teamBScore": 3, "status": "completed" }
+    ]
+  },
+  {
+    "id": 1004,
+    "teamAId": 7,
+    "teamBId": 8,
+    "division": "Bowl",
+    "date": "2024-01-20",
+    "teeTime": "07:30",
+    "course": "Front Nine",
+    "type": "4BBB",
+    "session": "AM",
+    "status": "completed",
+    "players": {
+      "teamA": ["Aziz Mussaji", "Bianca Ngecu"],
+      "teamB": ["Ali Bharmal", "Daniel Kiprono"]
+    },
+    "holes": [
+      { "number": 1, "teamAScore": 5, "teamBScore": 4, "status": "completed" },
+      { "number": 2, "teamAScore": 3, "teamBScore": 6, "status": "completed" },
+      { "number": 3, "teamAScore": 4, "teamBScore": 4, "status": "completed" },
+      { "number": 4, "teamAScore": 5, "teamBScore": 6, "status": "completed" },
+      { "number": 5, "teamAScore": 3, "teamBScore": 5, "status": "completed" },
+      { "number": 6, "teamAScore": 4, "teamBScore": 4, "status": "completed" },
+      { "number": 7, "teamAScore": 6, "teamBScore": 5, "status": "completed" },
+      { "number": 8, "teamAScore": 4, "teamBScore": 4, "status": "completed" },
+      { "number": 9, "teamAScore": 3, "teamBScore": 6, "status": "completed" }
+    ]
+  },
+  {
+    "id": 1005,
+    "teamAId": 10,
+    "teamBId": 11,
+    "division": "Mug",
+    "date": "2024-01-20",
+    "teeTime": "13:30",
+    "course": "Back Nine",
+    "type": "Foursomes",
+    "session": "PM",
+    "status": "completed",
+    "players": {
+      "teamA": ["James Mwangi", "George Kariuki"],
+      "teamB": ["Patrick Kamau", "Peter Njoroge"]
+    },
+    "holes": [
+      { "number": 10, "teamAScore": 4, "teamBScore": 5, "status": "completed" },
+      { "number": 11, "teamAScore": 5, "teamBScore": 4, "status": "completed" },
+      { "number": 12, "teamAScore": 3, "teamBScore": 6, "status": "completed" },
+      { "number": 13, "teamAScore": 6, "teamBScore": 4, "status": "completed" },
+      { "number": 14, "teamAScore": 4, "teamBScore": 5, "status": "completed" },
+      { "number": 15, "teamAScore": 4, "teamBScore": 3, "status": "completed" },
+      { "number": 16, "teamAScore": 6, "teamBScore": 4, "status": "completed" },
+      { "number": 17, "teamAScore": 3, "teamBScore": 5, "status": "completed" },
+      { "number": 18, "teamAScore": 5, "teamBScore": 4, "status": "completed" }
+    ]
+  },
+  {
+    "id": 1006,
+    "teamAId": 1,
+    "teamBId": 2,
+    "division": "Trophy",
+    "date": "2024-01-21",
+    "teeTime": "07:30",
+    "course": "Full Course",
+    "type": "Singles",
+    "session": "AM",
+    "status": "completed",
+    "players": {
+      "teamA": ["Ben Murimi"],
+      "teamB": ["Adel Balala"]
+    },
+    "holes": [
+      { "number": 1, "teamAScore": 4, "teamBScore": 4, "status": "completed" },
+      { "number": 2, "teamAScore": 5, "teamBScore": 3, "status": "completed" },
+      { "number": 3, "teamAScore": 3, "teamBScore": 5, "status": "completed" },
+      { "number": 4, "teamAScore": 4, "teamBScore": 4, "status": "completed" },
+      { "number": 5, "teamAScore": 6, "teamBScore": 4, "status": "completed" },
+      { "number": 6, "teamAScore": 4, "teamBScore": 4, "status": "completed" },
+      { "number": 7, "teamAScore": 5, "teamBScore": 3, "status": "completed" },
+      { "number": 8, "teamAScore": 6, "teamBScore": 4, "status": "completed" },
+      { "number": 9, "teamAScore": 4, "teamBScore": 3, "status": "completed" },
+      { "number": 10, "teamAScore": 3, "teamBScore": 4, "status": "completed" },
+      { "number": 11, "teamAScore": 4, "teamBScore": 5, "status": "completed" },
+      { "number": 12, "teamAScore": 6, "teamBScore": 4, "status": "completed" },
+      { "number": 13, "teamAScore": 5, "teamBScore": 3, "status": "completed" },
+      { "number": 14, "teamAScore": 4, "teamBScore": 5, "status": "completed" },
+      { "number": 15, "teamAScore": 3, "teamBScore": 4, "status": "completed" },
+      { "number": 16, "teamAScore": 4, "teamBScore": 4, "status": "completed" },
+      { "number": 17, "teamAScore": 6, "teamBScore": 4, "status": "completed" },
+      { "number": 18, "teamAScore": 5, "teamBScore": 3, "status": "completed" }
+    ]
+  },
+  {
+    "id": 1007,
+    "teamAId": 13,
+    "teamBId": 14,
+    "division": "Trophy",
+    "date": "2024-01-21",
+    "teeTime": "13:30",
+    "course": "Full Course",
+    "type": "Singles",
+    "session": "PM",
+    "status": "completed",
+    "players": {
+      "teamA": ["Chris Otieno"],
+      "teamB": ["Ali Salim"]
+    },
+    "holes": [
+      { "number": 1, "teamAScore": 3, "teamBScore": 4, "status": "completed" },
+      { "number": 2, "teamAScore": 4, "teamBScore": 3, "status": "completed" },
+      { "number": 3, "teamAScore": 5, "teamBScore": 4, "status": "completed" },
+      { "number": 4, "teamAScore": 4, "teamBScore": 6, "status": "completed" },
+      { "number": 5, "teamAScore": 6, "teamBScore": 4, "status": "completed" },
+      { "number": 6, "teamAScore": 4, "teamBScore": 5, "status": "completed" },
+      { "number": 7, "teamAScore": 3, "teamBScore": 5, "status": "completed" },
+      { "number": 8, "teamAScore": 5, "teamBScore": 6, "status": "completed" },
+      { "number": 9, "teamAScore": 4, "teamBScore": 3, "status": "completed" },
+      { "number": 10, "teamAScore": 6, "teamBScore": 4, "status": "completed" },
+      { "number": 11, "teamAScore": 4, "teamBScore": 5, "status": "completed" },
+      { "number": 12, "teamAScore": 5, "teamBScore": 4, "status": "completed" },
+      { "number": 13, "teamAScore": 3, "teamBScore": 5, "status": "completed" },
+      { "number": 14, "teamAScore": 4, "teamBScore": 4, "status": "completed" },
+      { "number": 15, "teamAScore": 6, "teamBScore": 3, "status": "completed" },
+      { "number": 16, "teamAScore": 4, "teamBScore": 5, "status": "completed" },
+      { "number": 17, "teamAScore": 3, "teamBScore": 4, "status": "completed" },
+      { "number": 18, "teamAScore": 6, "teamBScore": 5, "status": "completed" }
+    ]
+  }
+] 

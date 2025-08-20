@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useTournament } from '@/context/TournamentContext';
-import { Match, Hole } from '@/types';
-import { ArrowLeft, Save, AlertCircle, Shield, Lock } from 'lucide-react';
+import { Match } from '@/types';
+import { ArrowLeft, AlertCircle, Shield, Lock } from 'lucide-react';
 import ScoreCard from '@/components/ScoreCard';
 import LiveScorecard from '@/components/LiveScorecard';
 import Link from 'next/link';
@@ -19,8 +19,7 @@ export default function AdminMatchDetail() {
   const { 
     getMatchById, 
     getTeamById, 
-    updateMatch, 
-    updateScore 
+    updateMatch 
   } = useTournament();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -140,51 +139,6 @@ export default function AdminMatchDetail() {
 
   const handleSaveMatch = (updatedMatch: Match) => {
     updateMatch(matchId, updatedMatch);
-    
-    // Update team scores based on match result
-    const calculateMatchResult = (match: Match) => {
-      let teamAWins = 0;
-      let teamBWins = 0;
-      let holesPlayed = 0;
-
-      match.holes.forEach((hole: Hole) => {
-        if (hole.teamAScore !== null && hole.teamBScore !== null) {
-          holesPlayed++;
-          if (hole.teamAScore < hole.teamBScore) {
-            teamAWins++;
-          } else if (hole.teamBScore < hole.teamAScore) {
-            teamBWins++;
-          }
-        }
-      });
-
-      return { teamAWins, teamBWins, holesPlayed };
-    };
-
-    const result = calculateMatchResult(updatedMatch);
-    
-    // Update team scores
-    const teamAScore = updateScore(teamA.id, {
-      teamId: teamA.id,
-      division: teamA.division,
-      points: result.teamAWins > result.teamBWins ? 3 : result.teamAWins === result.teamBWins ? 1 : 0,
-      matchesPlayed: 1,
-      matchesWon: result.teamAWins > result.teamBWins ? 1 : 0,
-      matchesLost: result.teamAWins < result.teamBWins ? 1 : 0,
-      holesWon: result.teamAWins,
-      holesLost: result.teamBWins
-    });
-
-    const teamBScore = updateScore(teamB.id, {
-      teamId: teamB.id,
-      division: teamB.division,
-      points: result.teamBWins > result.teamAWins ? 3 : result.teamBWins === result.teamAWins ? 1 : 0,
-      matchesPlayed: 1,
-      matchesWon: result.teamBWins > result.teamAWins ? 1 : 0,
-      matchesLost: result.teamBWins < result.teamAWins ? 1 : 0,
-      holesWon: result.teamBWins,
-      holesLost: result.teamAWins
-    });
   };
 
   return (

@@ -3,7 +3,7 @@
 import { useTournament } from '@/context/TournamentContext';
 import { Match, Hole } from '@/types';
 import { useState } from 'react';
-import { Zap, Clock, CheckCircle, Circle, ExternalLink, Filter, Calendar, Users, Trophy } from 'lucide-react';
+import { Clock, CheckCircle, Circle, ExternalLink, Filter, Calendar, Users, Trophy } from 'lucide-react';
 import Leaderboard from '@/components/Leaderboard';
 import Link from 'next/link';
 
@@ -20,9 +20,9 @@ export default function LiveScoring() {
     return divisionMatch && statusMatch;
   });
 
-  const activeMatches = []; // No matches are currently in progress
-  const scheduledMatches = matches.filter(match => match.status === 'scheduled');
-  const completedMatches = []; // No matches have been completed yet
+  // const activeMatches = []; // No matches are currently in progress
+  // const scheduledMatches = matches.filter(match => match.status === 'scheduled');
+  // const completedMatches = []; // No matches have been completed yet
 
   const getMatchStatusIcon = (status: string) => {
     switch (status) {

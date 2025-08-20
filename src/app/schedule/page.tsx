@@ -2,7 +2,7 @@
 
 import { useTournament } from '@/context/TournamentContext';
 import { useState } from 'react';
-import { Calendar, Clock, MapPin, Users, Trophy, Medal } from 'lucide-react';
+import { Calendar, Clock, MapPin, Trophy, Medal } from 'lucide-react';
 
 export default function Schedule() {
   const { teams, matches, players } = useTournament();
@@ -70,7 +70,7 @@ export default function Schedule() {
   };
 
   // Helper function to get sample players for a match
-  const getMatchPlayers = (match: any, teamId: number | null, count: number = 2) => {
+  const getMatchPlayers = (match: Match, teamId: number | null, count: number = 2) => {
     if (!teamId) return [];
     const teamPlayers = players.filter(player => player.teamId === teamId);
     

@@ -1,7 +1,7 @@
 'use client';
 
 import { useTournament } from '@/context/TournamentContext';
-import { BarChart3, Trophy, Users, Target, TrendingUp } from 'lucide-react';
+import { Trophy, Users, Target, TrendingUp } from 'lucide-react';
 
 export default function StatsPage() {
   const { teams, scores, matches } = useTournament();

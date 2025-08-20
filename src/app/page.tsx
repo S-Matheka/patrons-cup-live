@@ -1,11 +1,10 @@
 'use client';
 
 import { useTournament } from '@/context/TournamentContext';
-import { useState } from 'react';
-import { Trophy, Medal, Users, Calendar, BarChart3, Zap, Clock, CheckCircle, Circle, ExternalLink } from 'lucide-react';
+// import { useState } from 'react';
 import Leaderboard from '@/components/Leaderboard';
+import { Calendar, Clock, CheckCircle, Circle, Trophy, Medal, Zap } from 'lucide-react';
 
-import Link from 'next/link';
 
 export default function Dashboard() {
   const { teams, scores, matches } = useTournament();
@@ -53,7 +52,7 @@ export default function Dashboard() {
     }
   };
 
-  const calculateMatchResult = (match: any) => {
+  const calculateMatchResult = (match: Match) => {
     if (match.isBye) return 'BYE';
     if (match.status === 'scheduled') return 'Not Started';
     
@@ -61,7 +60,7 @@ export default function Dashboard() {
     let teamBWins = 0;
     let holesPlayed = 0;
 
-    match.holes.forEach((hole: any) => {
+    match.holes.forEach((hole: Hole) => {
       if (hole.teamAScore !== null && hole.teamBScore !== null) {
         holesPlayed++;
         if (hole.teamAScore < hole.teamBScore) {
@@ -248,7 +247,7 @@ export default function Dashboard() {
               <div className="text-center py-8">
                 <Calendar className="w-12 h-12 text-blue-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Tournament Starts Soon!</h3>
-                <p className="text-gray-600 mb-4">4th Edition Patron's Cup 2025</p>
+                <p className="text-gray-600 mb-4">4th Edition Patron&apos;s Cup 2025</p>
                 <div className="bg-blue-50 rounded-lg p-4">
                   <div className="text-sm text-blue-800">
                     <div className="font-medium mb-1">First Round</div>
@@ -286,7 +285,7 @@ export default function Dashboard() {
           <div className="p-6">
             <div className="text-center mb-6">
               <Calendar className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">4th Edition Patron's Cup 2025</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">4th Edition Patron&apos;s Cup 2025</h3>
               <p className="text-gray-600 mb-4">Muthaiga Golf Club</p>
             </div>
             

@@ -3,7 +3,7 @@
 import { useTournament } from '@/context/TournamentContext';
 import { Score, Team } from '@/types';
 import { useState } from 'react';
-import { Trophy, Medal, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Trophy, Medal, TrendingUp, Minus } from 'lucide-react';
 
 export default function Standings() {
   const { teams, scores } = useTournament();

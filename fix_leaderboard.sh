@@ -1,3 +1,9 @@
+#!/bin/bash
+
+echo "Fixing Leaderboard.tsx syntax error..."
+
+# Fix the commented function properly
+cat > temp_leaderboard.tsx << 'LEADERBOARD_EOF'
 'use client';
 
 import { useTournament } from '@/context/TournamentContext';
@@ -102,3 +108,8 @@ export default function Leaderboard({ activeDivision }: LeaderboardProps) {
     </div>
   );
 }
+LEADERBOARD_EOF
+
+mv temp_leaderboard.tsx src/components/Leaderboard.tsx
+
+echo "Leaderboard.tsx fixed!"

@@ -3,7 +3,6 @@
 import { useTournament } from '@/context/TournamentContext';
 import { useState } from 'react';
 import { Users, Mail, Phone, Trophy, Medal } from 'lucide-react';
-import TeamCard from '@/components/TeamCard';
 
 export default function Teams() {
   const { teams, players, scores } = useTournament();

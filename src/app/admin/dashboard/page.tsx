@@ -20,7 +20,7 @@ import Link from 'next/link';
 
 export default function AdminDashboard() {
   const { isAuthenticated, isOfficial, logout } = useAuth();
-  const { teams, matches, scores } = useTournament();
+  const { teams, matches } = useTournament();
   const router = useRouter();
   const [officialRole, setOfficialRole] = useState('');
 
@@ -221,7 +221,7 @@ export default function AdminDashboard() {
           <div className="p-6">
             <div className="text-center py-8">
               <Trophy className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">4th Edition Patron's Cup 2025</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">4th Edition Patron&apos;s Cup 2025</h3>
               <p className="text-gray-600 mb-4">Muthaiga Golf Club • August 22-24, 2025</p>
               <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
                 Pre-Tournament Phase

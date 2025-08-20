@@ -1,13 +1,14 @@
 'use client';
 
 import { useTournament } from '@/context/TournamentContext';
-// import { useState } from 'react';
+import { useState } from 'react';
 import Leaderboard from '@/components/Leaderboard';
 import { Calendar, Clock, CheckCircle, Circle, Trophy, Medal, Zap } from 'lucide-react';
 
 
 export default function Dashboard() {
   const { teams, scores, matches } = useTournament();
+  const [activeDivision, setActiveDivision] = useState<'Trophy' | 'Shield' | 'Plaque' | 'Bowl' | 'Mug'>('Trophy');
 
   const activeMatches = []; // No matches are currently in progress
   const upcomingMatches = matches.filter(match => match.status === 'scheduled');
@@ -190,46 +191,35 @@ export default function Dashboard() {
                 Leaderboard
               </h2>
             </div>
-            <div className="p-6 space-y-6 max-h-96 overflow-y-auto">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                  <Medal className="w-5 h-5 text-yellow-500 mr-2" />
-                  Trophy Division
-                </h3>
-                <Leaderboard teams={teams} scores={scores.filter(s => s.division === 'Trophy')} division="Trophy" />
+            <div className="p-6">
+              {/* Division Tabs */}
+              <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
+                {(['Trophy', 'Shield', 'Plaque', 'Bowl', 'Mug'] as const).map((division) => (
+                  <button
+                    key={division}
+                    onClick={() => setActiveDivision(division)}
+                    className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      activeDivision === division
+                        ? 'bg-white text-green-700 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center space-x-1">
+                      <Medal className={`w-4 h-4 ${
+                        division === 'Trophy' ? 'text-yellow-500' :
+                        division === 'Shield' ? 'text-gray-400' :
+                        division === 'Plaque' ? 'text-amber-600' :
+                        division === 'Bowl' ? 'text-orange-500' :
+                        'text-purple-500'
+                      }`} />
+                      <span>{division}</span>
+                    </div>
+                  </button>
+                ))}
               </div>
               
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                  <Medal className="w-5 h-5 text-gray-400 mr-2" />
-                  Shield Division
-                </h3>
-                <Leaderboard teams={teams} scores={scores.filter(s => s.division === 'Shield')} division="Shield" />
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                  <Medal className="w-5 h-5 text-amber-600 mr-2" />
-                  Plaque Division
-                </h3>
-                <Leaderboard teams={teams} scores={scores.filter(s => s.division === 'Plaque')} division="Plaque" />
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                  <Medal className="w-5 h-5 text-bronze-500 mr-2" />
-                  Bowl Division
-                </h3>
-                <Leaderboard teams={teams} scores={scores.filter(s => s.division === 'Bowl')} division="Bowl" />
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                  <Medal className="w-5 h-5 text-purple-500 mr-2" />
-                  Mug Division
-                </h3>
-                <Leaderboard teams={teams} scores={scores.filter(s => s.division === 'Mug')} division="Mug" />
-              </div>
+              {/* Active Division Leaderboard */}
+              <Leaderboard activeDivision={activeDivision} />
             </div>
           </div>
         </div>
@@ -310,7 +300,44 @@ export default function Dashboard() {
         </div>
 
         {/* Mobile Leaderboard */}
-        <Leaderboard teams={teams} scores={scores} />
+        <div className="bg-white rounded-lg shadow-md">
+          <div className="px-6 py-4 bg-gradient-to-r from-green-600 to-green-700">
+            <h2 className="text-xl font-bold text-white flex items-center">
+              <Trophy className="w-5 h-5 mr-2" />
+              Leaderboard
+            </h2>
+          </div>
+          <div className="p-6">
+            {/* Division Tabs */}
+            <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg overflow-x-auto">
+              {(['Trophy', 'Shield', 'Plaque', 'Bowl', 'Mug'] as const).map((division) => (
+                <button
+                  key={division}
+                  onClick={() => setActiveDivision(division)}
+                  className={`flex-shrink-0 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    activeDivision === division
+                      ? 'bg-white text-green-700 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
+                  }`}
+                >
+                  <div className="flex items-center justify-center space-x-1">
+                    <Medal className={`w-4 h-4 ${
+                      division === 'Trophy' ? 'text-yellow-500' :
+                      division === 'Shield' ? 'text-gray-400' :
+                      division === 'Plaque' ? 'text-amber-600' :
+                      division === 'Bowl' ? 'text-orange-500' :
+                      'text-purple-500'
+                    }`} />
+                    <span>{division}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+            
+            {/* Active Division Leaderboard */}
+            <Leaderboard activeDivision={activeDivision} />
+          </div>
+        </div>
       </div>
     </div>
   );

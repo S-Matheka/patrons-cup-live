@@ -10,10 +10,9 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigation = [
-    { name: 'Leaderboard', href: '/', icon: Trophy },
+    { name: 'Leaderboard', href: '/leaderboard', icon: Trophy },
     { name: 'Schedule', href: '/schedule', icon: Calendar },
     { name: 'Live Scoring', href: '/live', icon: Zap },
-    { name: 'Stats', href: '/stats', icon: BarChart3 },
     { name: 'Standings', href: '/standings', icon: TrendingUp },
   ];
 
@@ -30,7 +29,7 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           {/* Logo and Brand */}
           <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center">
+            <Link href="/" className="flex-shrink-0 flex items-center hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center mr-3">
                 <Trophy className="w-5 h-5 text-green-800" />
               </div>
@@ -38,7 +37,7 @@ const Navbar = () => {
                 <h1 className="text-xl font-bold">Patrons Cup</h1>
                 <p className="text-xs text-green-200">Live Tournament</p>
               </div>
-            </div>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}

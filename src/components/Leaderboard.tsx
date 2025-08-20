@@ -18,6 +18,14 @@ export default function Leaderboard({ activeDivision }: LeaderboardProps) {
     .filter(team => team.division === activeDivision)
     .sort((a, b) => a.seed - b.seed);
 
+  // Debug: Check if we have any teams at all
+  if (teams.length === 0) {
+    console.error('No teams loaded in Leaderboard component');
+    return <div className="p-4 text-red-600">Error: No teams data loaded</div>;
+  }
+
+
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="px-6 py-4 bg-gradient-to-r from-green-600 to-green-700">
@@ -52,7 +60,19 @@ export default function Leaderboard({ activeDivision }: LeaderboardProps) {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {sortedTeams.map((team, index) => (
+            {sortedTeams.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                  <div className="space-y-2">
+                    <div className="text-lg font-medium">No teams found</div>
+                    <div className="text-sm">
+                      Division: {activeDivision} | Total teams loaded: {teams.length}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              sortedTeams.map((team, index) => (
               <tr key={team.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
@@ -83,8 +103,8 @@ export default function Leaderboard({ activeDivision }: LeaderboardProps) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-600">
                   <div className="space-y-1">
-                    <div>Fri AM: {team.sessionPoints?.friAM || 0} pts</div>
-                    <div>Fri PM: {team.sessionPoints?.friPM || 0} pts</div>
+                    <div>Fri AM: {team.sessionPoints?.friAM4BBB || 0} pts</div>
+                    <div>Fri PM: {team.sessionPoints?.friPMFoursomes || 0} pts</div>
                     <div>Sun Singles: {team.sessionPoints?.sunSingles || 0} pts</div>
                   </div>
                 </td>
@@ -95,7 +115,8 @@ export default function Leaderboard({ activeDivision }: LeaderboardProps) {
                   </span>
                 </td>
               </tr>
-            ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>

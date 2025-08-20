@@ -3,7 +3,7 @@
 import { useTournament } from '@/context/TournamentContext';
 import { Match, Hole } from '@/types';
 import { useState } from 'react';
-import { Clock, CheckCircle, Circle, ExternalLink, Filter, Calendar, Users, Trophy } from 'lucide-react';
+import { Clock, CheckCircle, Circle, ExternalLink, Filter, Calendar, Users, Trophy, Medal } from 'lucide-react';
 import Leaderboard from '@/components/Leaderboard';
 import Link from 'next/link';
 
@@ -11,6 +11,7 @@ export default function LiveScoring() {
   const { teams, scores, matches, players } = useTournament();
   const [selectedDivision, setSelectedDivision] = useState<'Trophy' | 'Shield' | 'Plaque' | 'Bowl' | 'Mug' | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'in-progress' | 'scheduled' | 'completed'>('all');
+  const [activeDivision, setActiveDivision] = useState<'Trophy' | 'Shield' | 'Plaque' | 'Bowl' | 'Mug'>('Trophy');
 
 
 
@@ -212,10 +213,40 @@ export default function LiveScoring() {
       {/* Pre-Tournament Leaderboard */}
       <div className="bg-white rounded-lg shadow-md">
         <div className="px-6 py-4 bg-gradient-to-r from-green-600 to-green-700">
-          <h2 className="text-xl font-bold text-white">Tournament Seedings</h2>
+          <h2 className="text-xl font-bold text-white flex items-center">
+            <Trophy className="w-5 h-5 mr-2" />
+            Tournament Seedings
+          </h2>
         </div>
         <div className="p-6">
-          <Leaderboard teams={teams} scores={scores} />
+          {/* Division Tabs */}
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-1 mb-6 bg-gray-100 p-1 rounded-lg overflow-x-auto">
+            {(['Trophy', 'Shield', 'Plaque', 'Bowl', 'Mug'] as const).map((division) => (
+              <button
+                key={division}
+                onClick={() => setActiveDivision(division)}
+                className={`flex-shrink-0 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  activeDivision === division
+                    ? 'bg-white text-green-700 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
+                }`}
+              >
+                <div className="flex items-center justify-center space-x-1">
+                  <Medal className={`w-4 h-4 ${
+                    division === 'Trophy' ? 'text-yellow-500' :
+                    division === 'Shield' ? 'text-gray-400' :
+                    division === 'Plaque' ? 'text-amber-600' :
+                    division === 'Bowl' ? 'text-orange-500' :
+                    'text-purple-500'
+                  }`} />
+                  <span>{division}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+          
+          {/* Active Division Leaderboard */}
+          <Leaderboard activeDivision={activeDivision} />
         </div>
       </div>
 

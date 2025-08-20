@@ -15,6 +15,8 @@ export default function Standings() {
   const bowlScores = scores.filter(score => score.division === 'Bowl');
   const mugScores = scores.filter(score => score.division === 'Mug');
 
+
+
   const getTeamById = (teamId: number) => {
     return teams.find(team => team.id === teamId);
   };

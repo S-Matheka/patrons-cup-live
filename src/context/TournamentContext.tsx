@@ -27,6 +27,8 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
   const [matches, setMatches] = useState<Match[]>(matchesData as Match[]);
   const [scores, setScores] = useState<Score[]>(scoresData as Score[]);
 
+
+
   // Load data from localStorage on mount
   useEffect(() => {
     const savedMatches = localStorage.getItem('tournament-matches');
@@ -49,9 +51,11 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
       }
     }
     
-    if (savedScores) {
-      setScores(JSON.parse(savedScores));
-    }
+    // Always use fresh scores data for pre-tournament state
+    // Clear any old score data that might have points
+    console.log('Loading fresh scores data - ensuring pre-tournament state');
+    setScores(scoresData as Score[]);
+    localStorage.setItem('tournament-scores', JSON.stringify(scoresData));
   }, []);
 
   // Save matches to localStorage whenever they change

@@ -2,121 +2,586 @@
   {
     "id": 1,
     "name": "MGC",
-    "division": "Trophy",
-    "color": "#e1a730",
     "logo": "🏌️",
-    "description": "Mombasa Golf Club"
+    "color": "#e1a730",
+    "division": "Trophy",
+    "description": "Muthaiga Golf Club - Host",
+    "seed": 1,
+    "totalPlayers": 12,
+    "maxPointsAvailable": 172,
+    "sessionPoints": {
+      "friAM4BBB": 20,
+      "friPMFoursomes": 30,
+      "satAM4BBB": 20,
+      "satPMFoursomes": 30,
+      "sunSingles": 72
+    },
+    "playersPerSession": {
+      "friAM4BBB": 8,
+      "friPMFoursomes": 10,
+      "satAM4BBB": 8,
+      "satPMFoursomes": 10,
+      "sunSingles": 12
+    },
+    "restingPerSession": {
+      "friAM4BBB": 4,
+      "friPMFoursomes": 2,
+      "satAM4BBB": 4,
+      "satPMFoursomes": 2,
+      "sunSingles": 0
+    },
+    "pointsPerMatch": {
+      "friAM4BBB": 5,
+      "friPMFoursomes": 3,
+      "satAM4BBB": 5,
+      "satPMFoursomes": 3,
+      "sunSingles": 3
+    }
   },
   {
     "id": 2,
     "name": "Nyali",
-    "division": "Trophy",
-    "color": "#508fdb",
     "logo": "⛳",
-    "description": "Nyali Golf Club"
+    "color": "#508fdb",
+    "division": "Trophy",
+    "description": "Nyali Golf & Country Club",
+    "seed": 2,
+    "totalPlayers": 12,
+    "maxPointsAvailable": 172,
+    "sessionPoints": {
+      "friAM4BBB": 20,
+      "friPMFoursomes": 30,
+      "satAM4BBB": 20,
+      "satPMFoursomes": 30,
+      "sunSingles": 72
+    },
+    "playersPerSession": {
+      "friAM4BBB": 8,
+      "friPMFoursomes": 10,
+      "satAM4BBB": 8,
+      "satPMFoursomes": 10,
+      "sunSingles": 12
+    },
+    "restingPerSession": {
+      "friAM4BBB": 4,
+      "friPMFoursomes": 2,
+      "satAM4BBB": 4,
+      "satPMFoursomes": 2,
+      "sunSingles": 0
+    },
+    "pointsPerMatch": {
+      "friAM4BBB": 5,
+      "friPMFoursomes": 3,
+      "satAM4BBB": 5,
+      "satPMFoursomes": 3,
+      "sunSingles": 3
+    }
   },
   {
     "id": 3,
     "name": "Railway",
-    "division": "Trophy",
-    "color": "#cde0d0",
     "logo": "🚂",
-    "description": "Railway Golf Club"
+    "color": "#cde0d0",
+    "division": "Trophy",
+    "description": "Kenya Railway Golf Club",
+    "seed": 3,
+    "totalPlayers": 12,
+    "maxPointsAvailable": 172,
+    "sessionPoints": {
+      "friAM4BBB": 20,
+      "friPMFoursomes": 30,
+      "satAM4BBB": 20,
+      "satPMFoursomes": 30,
+      "sunSingles": 72
+    },
+    "playersPerSession": {
+      "friAM4BBB": 8,
+      "friPMFoursomes": 10,
+      "satAM4BBB": 8,
+      "satPMFoursomes": 10,
+      "sunSingles": 12
+    },
+    "restingPerSession": {
+      "friAM4BBB": 4,
+      "friPMFoursomes": 2,
+      "satAM4BBB": 4,
+      "satPMFoursomes": 2,
+      "sunSingles": 0
+    },
+    "pointsPerMatch": {
+      "friAM4BBB": 5,
+      "friPMFoursomes": 3,
+      "satAM4BBB": 5,
+      "satPMFoursomes": 3,
+      "sunSingles": 3
+    }
   },
   {
     "id": 4,
     "name": "Vet Lab",
-    "division": "Plate",
-    "color": "#56687e",
     "logo": "🔬",
-    "description": "Vet Lab Sports Club"
+    "color": "#56687e",
+    "division": "Shield",
+    "description": "Vet Lab Sports Club",
+    "seed": 1,
+    "totalPlayers": 12,
+    "maxPointsAvailable": 172,
+    "sessionPoints": {
+      "friAM4BBB": 20,
+      "friPMFoursomes": 30,
+      "satAM4BBB": 20,
+      "satPMFoursomes": 30,
+      "sunSingles": 72
+    },
+    "playersPerSession": {
+      "friAM4BBB": 8,
+      "friPMFoursomes": 10,
+      "satAM4BBB": 8,
+      "satPMFoursomes": 10,
+      "sunSingles": 12
+    },
+    "restingPerSession": {
+      "friAM4BBB": 4,
+      "friPMFoursomes": 2,
+      "satAM4BBB": 4,
+      "satPMFoursomes": 2,
+      "sunSingles": 0
+    },
+    "pointsPerMatch": {
+      "friAM4BBB": 5,
+      "friPMFoursomes": 3,
+      "satAM4BBB": 5,
+      "satPMFoursomes": 3,
+      "sunSingles": 3
+    }
   },
   {
     "id": 5,
     "name": "Sigona",
-    "division": "Plate",
-    "color": "#8f9ba9",
     "logo": "🎯",
-    "description": "Sigona Golf Club"
+    "color": "#8f9ba9",
+    "division": "Shield",
+    "description": "Sigona Golf Club",
+    "seed": 2,
+    "totalPlayers": 12,
+    "maxPointsAvailable": 172,
+    "sessionPoints": {
+      "friAM4BBB": 20,
+      "friPMFoursomes": 30,
+      "satAM4BBB": 20,
+      "satPMFoursomes": 30,
+      "sunSingles": 72
+    },
+    "playersPerSession": {
+      "friAM4BBB": 8,
+      "friPMFoursomes": 10,
+      "satAM4BBB": 8,
+      "satPMFoursomes": 10,
+      "sunSingles": 12
+    },
+    "restingPerSession": {
+      "friAM4BBB": 4,
+      "friPMFoursomes": 2,
+      "satAM4BBB": 4,
+      "satPMFoursomes": 2,
+      "sunSingles": 0
+    },
+    "pointsPerMatch": {
+      "friAM4BBB": 5,
+      "friPMFoursomes": 3,
+      "satAM4BBB": 5,
+      "satPMFoursomes": 3,
+      "sunSingles": 3
+    }
   },
   {
     "id": 6,
     "name": "Kiambu",
-    "division": "Plate",
-    "color": "#c7cdd4",
     "logo": "🌿",
-    "description": "Kiambu Golf Club"
+    "color": "#c7cdd4",
+    "division": "Shield",
+    "description": "Kiambu Golf Club",
+    "seed": 3,
+    "totalPlayers": 12,
+    "maxPointsAvailable": 172,
+    "sessionPoints": {
+      "friAM4BBB": 20,
+      "friPMFoursomes": 30,
+      "satAM4BBB": 20,
+      "satPMFoursomes": 30,
+      "sunSingles": 72
+    },
+    "playersPerSession": {
+      "friAM4BBB": 8,
+      "friPMFoursomes": 10,
+      "satAM4BBB": 8,
+      "satPMFoursomes": 10,
+      "sunSingles": 12
+    },
+    "restingPerSession": {
+      "friAM4BBB": 4,
+      "friPMFoursomes": 2,
+      "satAM4BBB": 4,
+      "satPMFoursomes": 2,
+      "sunSingles": 0
+    },
+    "pointsPerMatch": {
+      "friAM4BBB": 5,
+      "friPMFoursomes": 3,
+      "satAM4BBB": 5,
+      "satPMFoursomes": 3,
+      "sunSingles": 3
+    }
   },
   {
     "id": 7,
     "name": "Limuru",
-    "division": "Bowl",
-    "color": "#e1a730",
     "logo": "🏆",
-    "description": "Limuru Country Club"
+    "color": "#e1a730",
+    "division": "Plaque",
+    "description": "Limuru Country Club",
+    "seed": 1,
+    "totalPlayers": 12,
+    "maxPointsAvailable": 172,
+    "sessionPoints": {
+      "friAM4BBB": 20,
+      "friPMFoursomes": 30,
+      "satAM4BBB": 20,
+      "satPMFoursomes": 30,
+      "sunSingles": 72
+    },
+    "playersPerSession": {
+      "friAM4BBB": 8,
+      "friPMFoursomes": 10,
+      "satAM4BBB": 8,
+      "satPMFoursomes": 10,
+      "sunSingles": 12
+    },
+    "restingPerSession": {
+      "friAM4BBB": 4,
+      "friPMFoursomes": 2,
+      "satAM4BBB": 4,
+      "satPMFoursomes": 2,
+      "sunSingles": 0
+    },
+    "pointsPerMatch": {
+      "friAM4BBB": 5,
+      "friPMFoursomes": 3,
+      "satAM4BBB": 5,
+      "satPMFoursomes": 3,
+      "sunSingles": 3
+    }
   },
   {
     "id": 8,
     "name": "Golf Park",
-    "division": "Bowl",
-    "color": "#508fdb",
     "logo": "🎪",
-    "description": "Golf Park"
+    "color": "#508fdb",
+    "division": "Plaque",
+    "description": "Golf Park Golf Club",
+    "seed": 2,
+    "totalPlayers": 12,
+    "maxPointsAvailable": 172,
+    "sessionPoints": {
+      "friAM4BBB": 20,
+      "friPMFoursomes": 30,
+      "satAM4BBB": 20,
+      "satPMFoursomes": 30,
+      "sunSingles": 72
+    },
+    "playersPerSession": {
+      "friAM4BBB": 8,
+      "friPMFoursomes": 10,
+      "satAM4BBB": 8,
+      "satPMFoursomes": 10,
+      "sunSingles": 12
+    },
+    "restingPerSession": {
+      "friAM4BBB": 4,
+      "friPMFoursomes": 2,
+      "satAM4BBB": 4,
+      "satPMFoursomes": 2,
+      "sunSingles": 0
+    },
+    "pointsPerMatch": {
+      "friAM4BBB": 5,
+      "friPMFoursomes": 3,
+      "satAM4BBB": 5,
+      "satPMFoursomes": 3,
+      "sunSingles": 3
+    }
   },
   {
     "id": 9,
     "name": "Thika",
-    "division": "Bowl",
-    "color": "#cde0d0",
     "logo": "🏭",
-    "description": "Thika Sports Club"
+    "color": "#cde0d0",
+    "division": "Plaque",
+    "description": "Thika Sports Club",
+    "seed": 3,
+    "totalPlayers": 12,
+    "maxPointsAvailable": 172,
+    "sessionPoints": {
+      "friAM4BBB": 20,
+      "friPMFoursomes": 30,
+      "satAM4BBB": 20,
+      "satPMFoursomes": 30,
+      "sunSingles": 72
+    },
+    "playersPerSession": {
+      "friAM4BBB": 8,
+      "friPMFoursomes": 10,
+      "satAM4BBB": 8,
+      "satPMFoursomes": 10,
+      "sunSingles": 12
+    },
+    "restingPerSession": {
+      "friAM4BBB": 4,
+      "friPMFoursomes": 2,
+      "satAM4BBB": 4,
+      "satPMFoursomes": 2,
+      "sunSingles": 0
+    },
+    "pointsPerMatch": {
+      "friAM4BBB": 5,
+      "friPMFoursomes": 3,
+      "satAM4BBB": 5,
+      "satPMFoursomes": 3,
+      "sunSingles": 3
+    }
   },
   {
     "id": 10,
     "name": "Royal",
-    "division": "Mug",
-    "color": "#56687e",
     "logo": "👑",
-    "description": "Royal Nairobi Golf Club"
+    "color": "#56687e",
+    "division": "Bowl",
+    "description": "Royal Nairobi Golf Club",
+    "seed": 1,
+    "totalPlayers": 10,
+    "maxPointsAvailable": 148,
+    "sessionPoints": {
+      "friAM4BBB": 20,
+      "friPMFoursomes": 24,
+      "satAM4BBB": 20,
+      "satPMFoursomes": 24,
+      "sunSingles": 60
+    },
+    "playersPerSession": {
+      "friAM4BBB": 8,
+      "friPMFoursomes": 6,
+      "satAM4BBB": 8,
+      "satPMFoursomes": 6,
+      "sunSingles": 10
+    },
+    "restingPerSession": {
+      "friAM4BBB": 2,
+      "friPMFoursomes": 4,
+      "satAM4BBB": 2,
+      "satPMFoursomes": 4,
+      "sunSingles": 0
+    },
+    "pointsPerMatch": {
+      "friAM4BBB": 5,
+      "friPMFoursomes": 4,
+      "satAM4BBB": 5,
+      "satPMFoursomes": 4,
+      "sunSingles": 3
+    }
   },
   {
     "id": 11,
     "name": "Karen",
-    "division": "Mug",
-    "color": "#8f9ba9",
     "logo": "🌺",
-    "description": "Karen Country Club"
+    "color": "#8f9ba9",
+    "division": "Bowl",
+    "description": "Karen Country Club",
+    "seed": 2,
+    "totalPlayers": 10,
+    "maxPointsAvailable": 148,
+    "sessionPoints": {
+      "friAM4BBB": 20,
+      "friPMFoursomes": 24,
+      "satAM4BBB": 20,
+      "satPMFoursomes": 24,
+      "sunSingles": 60
+    },
+    "playersPerSession": {
+      "friAM4BBB": 8,
+      "friPMFoursomes": 6,
+      "satAM4BBB": 8,
+      "satPMFoursomes": 6,
+      "sunSingles": 10
+    },
+    "restingPerSession": {
+      "friAM4BBB": 2,
+      "friPMFoursomes": 4,
+      "satAM4BBB": 2,
+      "satPMFoursomes": 4,
+      "sunSingles": 0
+    },
+    "pointsPerMatch": {
+      "friAM4BBB": 5,
+      "friPMFoursomes": 4,
+      "satAM4BBB": 5,
+      "satPMFoursomes": 4,
+      "sunSingles": 3
+    }
   },
   {
     "id": 12,
     "name": "Eldoret",
-    "division": "Mug",
-    "color": "#c7cdd4",
     "logo": "🏃",
-    "description": "Eldoret Golf Club"
+    "color": "#c7cdd4",
+    "division": "Bowl",
+    "description": "Eldoret Club",
+    "seed": 3,
+    "totalPlayers": 10,
+    "maxPointsAvailable": 148,
+    "sessionPoints": {
+      "friAM4BBB": 20,
+      "friPMFoursomes": 24,
+      "satAM4BBB": 20,
+      "satPMFoursomes": 24,
+      "sunSingles": 60
+    },
+    "playersPerSession": {
+      "friAM4BBB": 8,
+      "friPMFoursomes": 6,
+      "satAM4BBB": 8,
+      "satPMFoursomes": 6,
+      "sunSingles": 10
+    },
+    "restingPerSession": {
+      "friAM4BBB": 2,
+      "friPMFoursomes": 4,
+      "satAM4BBB": 2,
+      "satPMFoursomes": 4,
+      "sunSingles": 0
+    },
+    "pointsPerMatch": {
+      "friAM4BBB": 5,
+      "friPMFoursomes": 4,
+      "satAM4BBB": 5,
+      "satPMFoursomes": 4,
+      "sunSingles": 3
+    }
   },
   {
     "id": 13,
     "name": "Windsor",
-    "division": "Trophy",
-    "color": "#e1a730",
     "logo": "🏰",
-    "description": "Windsor Golf Hotel & Country Club"
+    "color": "#a78bfa",
+    "division": "Mug",
+    "description": "Windsor Golf & Country Club",
+    "seed": 1,
+    "totalPlayers": 10,
+    "maxPointsAvailable": 148,
+    "sessionPoints": {
+      "friAM4BBB": 20,
+      "friPMFoursomes": 24,
+      "satAM4BBB": 20,
+      "satPMFoursomes": 24,
+      "sunSingles": 60
+    },
+    "playersPerSession": {
+      "friAM4BBB": 8,
+      "friPMFoursomes": 6,
+      "satAM4BBB": 8,
+      "satPMFoursomes": 6,
+      "sunSingles": 10
+    },
+    "restingPerSession": {
+      "friAM4BBB": 2,
+      "friPMFoursomes": 4,
+      "satAM4BBB": 2,
+      "satPMFoursomes": 4,
+      "sunSingles": 0
+    },
+    "pointsPerMatch": {
+      "friAM4BBB": 5,
+      "friPMFoursomes": 4,
+      "satAM4BBB": 5,
+      "satPMFoursomes": 4,
+      "sunSingles": 3
+    }
   },
   {
     "id": 14,
     "name": "Mombasa",
-    "division": "Trophy",
-    "color": "#508fdb",
     "logo": "🌊",
-    "description": "Mombasa Golf Club"
+    "color": "#f59e0b",
+    "division": "Mug",
+    "description": "Mombasa Golf Club",
+    "seed": 2,
+    "totalPlayers": 10,
+    "maxPointsAvailable": 148,
+    "sessionPoints": {
+      "friAM4BBB": 20,
+      "friPMFoursomes": 24,
+      "satAM4BBB": 20,
+      "satPMFoursomes": 24,
+      "sunSingles": 60
+    },
+    "playersPerSession": {
+      "friAM4BBB": 8,
+      "friPMFoursomes": 6,
+      "satAM4BBB": 8,
+      "satPMFoursomes": 6,
+      "sunSingles": 10
+    },
+    "restingPerSession": {
+      "friAM4BBB": 2,
+      "friPMFoursomes": 4,
+      "satAM4BBB": 2,
+      "satPMFoursomes": 4,
+      "sunSingles": 0
+    },
+    "pointsPerMatch": {
+      "friAM4BBB": 5,
+      "friPMFoursomes": 4,
+      "satAM4BBB": 5,
+      "satPMFoursomes": 4,
+      "sunSingles": 3
+    }
   },
   {
     "id": 15,
     "name": "Ruiru",
-    "division": "Trophy",
-    "color": "#cde0d0",
     "logo": "🏘️",
-    "description": "Ruiru Sports Club"
+    "color": "#10b981",
+    "division": "Mug",
+    "description": "Ruiru Sports Club",
+    "seed": 3,
+    "totalPlayers": 10,
+    "maxPointsAvailable": 148,
+    "sessionPoints": {
+      "friAM4BBB": 20,
+      "friPMFoursomes": 24,
+      "satAM4BBB": 20,
+      "satPMFoursomes": 24,
+      "sunSingles": 60
+    },
+    "playersPerSession": {
+      "friAM4BBB": 8,
+      "friPMFoursomes": 6,
+      "satAM4BBB": 8,
+      "satPMFoursomes": 6,
+      "sunSingles": 10
+    },
+    "restingPerSession": {
+      "friAM4BBB": 2,
+      "friPMFoursomes": 4,
+      "satAM4BBB": 2,
+      "satPMFoursomes": 4,
+      "sunSingles": 0
+    },
+    "pointsPerMatch": {
+      "friAM4BBB": 5,
+      "friPMFoursomes": 4,
+      "satAM4BBB": 5,
+      "satPMFoursomes": 4,
+      "sunSingles": 3
+    }
   }
-] 
+]

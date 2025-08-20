@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Trophy, Users, Calendar, BarChart3, Zap, Menu } from 'lucide-react';
+import { Trophy, Calendar, Zap, BarChart3, TrendingUp, Menu } from 'lucide-react';
 import { useState } from 'react';
 
 const Navbar = () => {
@@ -10,11 +10,11 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigation = [
-    { name: 'Dashboard', href: '/', icon: Trophy },
-    { name: 'Live Scoring', href: '/live', icon: Zap },
-    { name: 'Teams', href: '/teams', icon: Users },
+    { name: 'Leaderboard', href: '/', icon: Trophy },
     { name: 'Schedule', href: '/schedule', icon: Calendar },
-    { name: 'Standings', href: '/standings', icon: BarChart3 },
+    { name: 'Live Scoring', href: '/live', icon: Zap },
+    { name: 'Stats', href: '/stats', icon: BarChart3 },
+    { name: 'Standings', href: '/standings', icon: TrendingUp },
   ];
 
   const isActive = (href: string) => {
@@ -60,6 +60,8 @@ const Navbar = () => {
                 </Link>
               );
             })}
+            
+
           </div>
 
           {/* Mobile menu button */}
@@ -96,6 +98,7 @@ const Navbar = () => {
                 </Link>
               );
             })}
+
           </div>
         </div>
       )}

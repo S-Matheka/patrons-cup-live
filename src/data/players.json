@@ -1,410 +1,2667 @@
 [
   {
-    "id": 11,
+    "id": 1,
     "name": "Ben Murimi",
     "teamId": 1,
-    "handicap": 8,
-    "email": "ben.murimi@mgc.com",
-    "phone": "+254-700-123-456"
+    "handicap": 18,
+    "email": "ben.murimi@mgc.co.ke",
+    "phone": "+254700000001",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
-    "id": 12,
+    "id": 2,
     "name": "Bhavnish Chandaria",
     "teamId": 1,
     "handicap": 12,
-    "email": "bhavnish.chandaria@mgc.com",
-    "phone": "+254-700-123-457"
+    "email": "bhavnish.chandaria@mgc.co.ke",
+    "phone": "+254700000002",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
-    "id": 13,
+    "id": 3,
     "name": "Bo Ciera",
     "teamId": 1,
-    "handicap": 6,
-    "email": "bo.ciera@mgc.com",
-    "phone": "+254-700-123-458"
+    "handicap": 15,
+    "email": "bo.ciera@mgc.co.ke",
+    "phone": "+254700000003",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
-    "id": 14,
+    "id": 4,
     "name": "Daniel Kiragu",
     "teamId": 1,
     "handicap": 10,
-    "email": "daniel.kiragu@mgc.com",
-    "phone": "+254-700-123-459"
+    "email": "daniel.kiragu@mgc.co.ke",
+    "phone": "+254700000004",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
-    "id": 15,
+    "id": 5,
     "name": "David Ombisi",
     "teamId": 1,
-    "handicap": 4,
-    "email": "david.ombisi@mgc.com",
-    "phone": "+254-700-123-460"
+    "handicap": 16,
+    "email": "david.ombisi@mgc.co.ke",
+    "phone": "+254700000005",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
-    "id": 16,
-    "name": "Greg Snow (Pro)",
+    "id": 6,
+    "name": "Greg Snow",
     "teamId": 1,
     "handicap": 0,
-    "email": "greg.snow@mgc.com",
-    "phone": "+254-700-123-461"
+    "email": "greg.snow@mgc.co.ke",
+    "phone": "+254700000006",
+    "isPro": true,
+    "isExOfficio": false
   },
   {
-    "id": 17,
+    "id": 7,
     "name": "James Wass",
     "teamId": 1,
-    "handicap": 9,
-    "email": "james.wass@mgc.com",
-    "phone": "+254-700-123-462"
+    "handicap": 8,
+    "email": "james.wass@mgc.co.ke",
+    "phone": "+254700000007",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
-    "id": 18,
+    "id": 8,
     "name": "Jay Sandhu",
     "teamId": 1,
-    "handicap": 7,
-    "email": "jay.sandhu@mgc.com",
-    "phone": "+254-700-123-463"
+    "handicap": 14,
+    "email": "jay.sandhu@mgc.co.ke",
+    "phone": "+254700000008",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
-    "id": 19,
-    "name": "John Koina (Ex)",
+    "id": 9,
+    "name": "John Koina",
     "teamId": 1,
-    "handicap": 5,
-    "email": "john.koina@mgc.com",
-    "phone": "+254-700-123-464"
+    "handicap": 18,
+    "email": "john.koina@mgc.co.ke",
+    "phone": "+254700000009",
+    "isPro": false,
+    "isExOfficio": true
   },
   {
-    "id": 110,
+    "id": 10,
     "name": "Kavit Bhakoo",
     "teamId": 1,
     "handicap": 11,
-    "email": "kavit.bhakoo@mgc.com",
-    "phone": "+254-700-123-465"
+    "email": "kavit.bhakoo@mgc.co.ke",
+    "phone": "+254700000010",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
-    "id": 111,
+    "id": 11,
     "name": "Khushil Nathwani",
     "teamId": 1,
     "handicap": 13,
-    "email": "khushil.nathwani@mgc.com",
-    "phone": "+254-700-123-466"
+    "email": "khushil.nathwani@mgc.co.ke",
+    "phone": "+254700000011",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
-    "id": 112,
-    "name": "Maahir Patel (Jnr)",
+    "id": 12,
+    "name": "Maahir Patel",
     "teamId": 1,
-    "handicap": 15,
-    "email": "maahir.patel@mgc.com",
-    "phone": "+254-700-123-467"
+    "handicap": 20,
+    "email": "maahir.patel@mgc.co.ke",
+    "phone": "+254700000012",
+    "isPro": false,
+    "isExOfficio": false,
+    "isJunior": true
   },
   {
-    "id": 113,
+    "id": 13,
     "name": "Neer Chandaria",
     "teamId": 1,
-    "handicap": 8,
-    "email": "neer.chandaria@mgc.com",
-    "phone": "+254-700-123-468"
+    "handicap": 9,
+    "email": "neer.chandaria@mgc.co.ke",
+    "phone": "+254700000013",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
-    "id": 114,
+    "id": 14,
     "name": "Quram Bhatti",
     "teamId": 1,
-    "handicap": 10,
-    "email": "quram.bhatti@mgc.com",
-    "phone": "+254-700-123-469"
+    "handicap": 17,
+    "email": "quram.bhatti@mgc.co.ke",
+    "phone": "+254700000014",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
-    "id": 115,
-    "name": "Ronan Patel (Jnr)",
+    "id": 15,
+    "name": "Ronan Patel",
     "teamId": 1,
-    "handicap": 14,
-    "email": "ronan.patel@mgc.com",
-    "phone": "+254-700-123-470"
+    "handicap": 22,
+    "email": "ronan.patel@mgc.co.ke",
+    "phone": "+254700000015",
+    "isPro": false,
+    "isExOfficio": false,
+    "isJunior": true
   },
   {
-    "id": 116,
-    "name": "Shashwat Harish",
-    "teamId": 1,
+    "id": 16,
+    "name": "Adel Balala",
+    "teamId": 2,
     "handicap": 12,
-    "email": "shashwat.harish@mgc.com",
-    "phone": "+254-700-123-471"
+    "email": "adel.balala@nyali.co.ke",
+    "phone": "+254700000016",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
-    "id": 117,
-    "name": "Eric Malonza",
-    "teamId": 1,
-    "handicap": 6,
-    "email": "eric.malonza@mgc.com",
-    "phone": "+254710684391"
+    "id": 17,
+    "name": "AJ Molu",
+    "teamId": 2,
+    "handicap": 15,
+    "email": "aj.molu@nyali.co.ke",
+    "phone": "+254700000017",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 18,
+    "name": "Allan Mola",
+    "teamId": 2,
+    "handicap": 10,
+    "email": "allan.mola@nyali.co.ke",
+    "phone": "+254700000018",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 19,
+    "name": "Charles Rob",
+    "teamId": 2,
+    "handicap": 14,
+    "email": "charles.rob@nyali.co.ke",
+    "phone": "+254700000019",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 20,
+    "name": "Daniel Nduva",
+    "teamId": 2,
+    "handicap": 0,
+    "email": "daniel.nduva@nyali.co.ke",
+    "phone": "+254700000020",
+    "isPro": true,
+    "isExOfficio": false
   },
   {
     "id": 21,
-    "name": "Adel Balala",
+    "name": "Dickson Baraza",
     "teamId": 2,
-    "handicap": 9,
-    "email": "adel.balala@nyali.com",
-    "phone": "+254-700-123-472"
+    "handicap": 16,
+    "email": "dickson.baraza@nyali.co.ke",
+    "phone": "+254700000021",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
     "id": 22,
-    "name": "AJ Molu",
+    "name": "George Munyao",
     "teamId": 2,
-    "handicap": 7,
-    "email": "aj.molu@nyali.com",
-    "phone": "+254-700-123-473"
+    "handicap": 11,
+    "email": "george.munyao@nyali.co.ke",
+    "phone": "+254700000022",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
     "id": 23,
-    "name": "Allan Mola",
+    "name": "Gurbux Singh",
     "teamId": 2,
-    "handicap": 11,
-    "email": "allan.mola@nyali.com",
-    "phone": "+254-700-123-474"
+    "handicap": 13,
+    "email": "gurbux.singh@nyali.co.ke",
+    "phone": "+254700000023",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
     "id": 24,
-    "name": "Charles Rob",
+    "name": "John Timbe",
     "teamId": 2,
-    "handicap": 8,
-    "email": "charles.rob@nyali.com",
-    "phone": "+254-700-123-475"
+    "handicap": 18,
+    "email": "john.timbe@nyali.co.ke",
+    "phone": "+254700000024",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
     "id": 25,
-    "name": "Daniel Nduva (Pro)",
+    "name": "Kalamu Hassan Choyo",
     "teamId": 2,
-    "handicap": 0,
-    "email": "daniel.nduva@nyali.com",
-    "phone": "+254-700-123-476"
+    "handicap": 17,
+    "email": "kalamu.hassan@nyali.co.ke",
+    "phone": "+254700000025",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
     "id": 26,
-    "name": "Dickson Baraza",
+    "name": "Mohdhar Abubakar",
     "teamId": 2,
-    "handicap": 10,
-    "email": "dickson.baraza@nyali.com",
-    "phone": "+254-700-123-477"
+    "handicap": 19,
+    "email": "mohdhar.abubakar@nyali.co.ke",
+    "phone": "+254700000026",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
     "id": 27,
-    "name": "George Munyao",
+    "name": "Omar Lewa",
     "teamId": 2,
-    "handicap": 12,
-    "email": "george.munyao@nyali.com",
-    "phone": "+254-700-123-478"
+    "handicap": 9,
+    "email": "omar.lewa@nyali.co.ke",
+    "phone": "+254700000027",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
     "id": 28,
-    "name": "Gurbux Singh",
+    "name": "Said Bajaber",
     "teamId": 2,
-    "handicap": 6,
-    "email": "gurbux.singh@nyali.com",
-    "phone": "+254-700-123-479"
+    "handicap": 8,
+    "email": "said.bajaber@nyali.co.ke",
+    "phone": "+254700000028",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
     "id": 29,
-    "name": "John Timbe",
-    "teamId": 2,
-    "handicap": 9,
-    "email": "john.timbe@nyali.com",
-    "phone": "+254-700-123-480"
-  },
-  {
-    "id": 210,
-    "name": "Kalamu Hassan Choyo",
-    "teamId": 2,
-    "handicap": 13,
-    "email": "kalamu.choyo@nyali.com",
-    "phone": "+254-700-123-481"
-  },
-  {
-    "id": 211,
-    "name": "Mohdhar Abubakar",
-    "teamId": 2,
-    "handicap": 11,
-    "email": "mohdhar.abubakar@nyali.com",
-    "phone": "+254-700-123-482"
-  },
-  {
-    "id": 212,
-    "name": "Omar Lewa",
-    "teamId": 2,
-    "handicap": 8,
-    "email": "omar.lewa@nyali.com",
-    "phone": "+254720322926"
-  },
-  {
-    "id": 213,
-    "name": "Said Bajaber",
-    "teamId": 2,
-    "handicap": 7,
-    "email": "said.bajaber@nyali.com",
-    "phone": "+254-700-123-483"
-  },
-  {
-    "id": 214,
     "name": "Solomon Majanga",
     "teamId": 2,
-    "handicap": 10,
-    "email": "solomon.majanga@nyali.com",
-    "phone": "+254-700-123-484"
+    "handicap": 20,
+    "email": "solomon.majanga@nyali.co.ke",
+    "phone": "+254700000029",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
-    "id": 215,
+    "id": 30,
     "name": "Tahir Mohamed",
     "teamId": 2,
     "handicap": 12,
-    "email": "tahir.mohamed@nyali.com",
-    "phone": "+254-700-123-485"
-  },
-  {
-    "id": 216,
-    "name": "Vimal Ranpura",
-    "teamId": 2,
-    "handicap": 9,
-    "email": "vimal.ranpura@nyali.com",
-    "phone": "+254-700-123-486"
-  },
-  {
-    "id": 217,
-    "name": "William Odeck",
-    "teamId": 2,
-    "handicap": 11,
-    "email": "william.odeck@nyali.com",
-    "phone": "+254-700-123-487"
-  },
-  {
-    "id": 218,
-    "name": "Yobesh Oyaro",
-    "teamId": 2,
-    "handicap": 8,
-    "email": "yobesh.oyaro@nyali.com",
-    "phone": "+254-700-123-488"
+    "email": "tahir.mohamed@nyali.co.ke",
+    "phone": "+254700000030",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
     "id": 31,
-    "name": "Aisha Duba",
-    "teamId": 3,
-    "handicap": 13,
-    "email": "aisha.duba@railway.com",
-    "phone": "+254-700-123-489"
+    "name": "Vimal Ranpura",
+    "teamId": 2,
+    "handicap": 15,
+    "email": "vimal.ranpura@nyali.co.ke",
+    "phone": "+254700000031",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
     "id": 32,
-    "name": "Edward Manywanda",
-    "teamId": 3,
-    "handicap": 9,
-    "email": "edward.manywanda@railway.com",
-    "phone": "+254-700-123-490"
+    "name": "William Odeck",
+    "teamId": 2,
+    "handicap": 16,
+    "email": "william.odeck@nyali.co.ke",
+    "phone": "+254700000032",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
     "id": 33,
-    "name": "Edwin Murungi",
-    "teamId": 3,
-    "handicap": 7,
-    "email": "edwin.murungi@railway.com",
-    "phone": "+254-700-123-491"
+    "name": "Yobesh Oyaro",
+    "teamId": 2,
+    "handicap": 18,
+    "email": "yobesh.oyaro@nyali.co.ke",
+    "phone": "+254700000033",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
     "id": 34,
-    "name": "Eric Genga",
+    "name": "Aisha Duba",
     "teamId": 3,
-    "handicap": 11,
-    "email": "eric.genga@railway.com",
-    "phone": "+254-700-123-492"
+    "handicap": 24,
+    "email": "aisha.duba@railway.co.ke",
+    "phone": "+254700000034",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
     "id": 35,
-    "name": "Fidhelis Kimanzi",
+    "name": "Edward Manywanda",
     "teamId": 3,
-    "handicap": 10,
-    "email": "fidhelis.kimanzi@railway.com",
-    "phone": "+254-700-123-493"
+    "handicap": 14,
+    "email": "edward.manywanda@railway.co.ke",
+    "phone": "+254700000035",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
     "id": 36,
-    "name": "Geoffery Yego",
+    "name": "Edwin Murungi",
     "teamId": 3,
-    "handicap": 8,
-    "email": "geoffery.yego@railway.com",
-    "phone": "+254-700-123-494"
+    "handicap": 12,
+    "email": "edwin.murungi@railway.co.ke",
+    "phone": "+254700000036",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
     "id": 37,
-    "name": "Isaac Makokha",
+    "name": "Eric Genga",
     "teamId": 3,
-    "handicap": 12,
-    "email": "isaac.makokha@railway.com",
-    "phone": "+254-700-123-495"
+    "handicap": 16,
+    "email": "eric.genga@railway.co.ke",
+    "phone": "+254700000037",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
     "id": 38,
-    "name": "Jabari Ongwae",
+    "name": "Fidhelis Kimanzi",
     "teamId": 3,
-    "handicap": 6,
-    "email": "jabari.ongwae@railway.com",
-    "phone": "+254-700-123-496"
+    "handicap": 18,
+    "email": "fidhelis.kimanzi@railway.co.ke",
+    "phone": "+254700000038",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
     "id": 39,
-    "name": "Jeff Momanyi",
-    "teamId": 3,
-    "handicap": 9,
-    "email": "jeff.momanyi@railway.com",
-    "phone": "+254-700-123-497"
-  },
-  {
-    "id": 310,
-    "name": "Jimmy Semenye",
-    "teamId": 3,
-    "handicap": 11,
-    "email": "jimmy.semenye@railway.com",
-    "phone": "+254-700-123-498"
-  },
-  {
-    "id": 311,
-    "name": "John Kamenyi",
-    "teamId": 3,
-    "handicap": 7,
-    "email": "john.kamenyi@railway.com",
-    "phone": "+254725787447"
-  },
-  {
-    "id": 312,
-    "name": "Jonathan Ndung'u",
-    "teamId": 3,
-    "handicap": 8,
-    "email": "jonathan.ndungu@railway.com",
-    "phone": "+254-700-123-499"
-  },
-  {
-    "id": 313,
-    "name": "Kaash Padema",
+    "name": "Geoffery Yego",
     "teamId": 3,
     "handicap": 10,
-    "email": "kaash.padema@railway.com",
-    "phone": "+254-700-123-500"
+    "email": "geoffery.yego@railway.co.ke",
+    "phone": "+254700000039",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
-    "id": 314,
-    "name": "Leigh Mbuthia",
+    "id": 40,
+    "name": "Isaac Makokha",
     "teamId": 3,
-    "handicap": 13,
-    "email": "leigh.mbuthia@railway.com",
-    "phone": "+254-700-123-501"
+    "handicap": 20,
+    "email": "isaac.makokha@railway.co.ke",
+    "phone": "+254700000040",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
-    "id": 315,
-    "name": "Mike Kiasi",
+    "id": 41,
+    "name": "Jabari Ongwae",
     "teamId": 3,
-    "handicap": 9,
-    "email": "mike.kiasi@railway.com",
-    "phone": "+254-700-123-502"
+    "handicap": 15,
+    "email": "jabari.ongwae@railway.co.ke",
+    "phone": "+254700000041",
+    "isPro": false,
+    "isExOfficio": false
   },
   {
-    "id": 316,
-    "name": "Morgan Chirchir",
+    "id": 42,
+    "name": "Jeff Momanyi",
     "teamId": 3,
     "handicap": 11,
-    "email": "morgan.chirchir@railway.com",
-    "phone": "+254-700-123-503"
+    "email": "jeff.momanyi@railway.co.ke",
+    "phone": "+254700000042",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 43,
+    "name": "Jimmy Semenye",
+    "teamId": 3,
+    "handicap": 13,
+    "email": "jimmy.semenye@railway.co.ke",
+    "phone": "+254700000043",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 44,
+    "name": "John Kamenyi",
+    "teamId": 3,
+    "handicap": 17,
+    "email": "john.kamenyi@railway.co.ke",
+    "phone": "+254700000044",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 45,
+    "name": "Jonathan Ndung'u",
+    "teamId": 3,
+    "handicap": 19,
+    "email": "jonathan.ndungu@railway.co.ke",
+    "phone": "+254700000045",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 46,
+    "name": "Kaash Padema",
+    "teamId": 3,
+    "handicap": 8,
+    "email": "kaash.padema@railway.co.ke",
+    "phone": "+254700000046",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 47,
+    "name": "Leigh Mbuthia",
+    "teamId": 3,
+    "handicap": 9,
+    "email": "leigh.mbuthia@railway.co.ke",
+    "phone": "+254700000047",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 48,
+    "name": "Mike Kiasi",
+    "teamId": 3,
+    "handicap": 22,
+    "email": "mike.kiasi@railway.co.ke",
+    "phone": "+254700000048",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 49,
+    "name": "Morgan Chirchir",
+    "teamId": 3,
+    "handicap": 14,
+    "email": "morgan.chirchir@railway.co.ke",
+    "phone": "+254700000049",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 50,
+    "name": "Peter Muigai",
+    "teamId": 3,
+    "handicap": 16,
+    "email": "peter.muigai@railway.co.ke",
+    "phone": "+254700000050",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 51,
+    "name": "Samwel Ndonga",
+    "teamId": 3,
+    "handicap": 18,
+    "email": "samwel.ndonga@railway.co.ke",
+    "phone": "+254700000051",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 52,
+    "name": "Saruni Melly",
+    "teamId": 3,
+    "handicap": 21,
+    "email": "saruni.melly@railway.co.ke",
+    "phone": "+254700000052",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 53,
+    "name": "Wellington Kirathe",
+    "teamId": 3,
+    "handicap": 12,
+    "email": "wellington.kirathe@railway.co.ke",
+    "phone": "+254700000053",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 54,
+    "name": "Carl Wambasi",
+    "teamId": 4,
+    "handicap": 16,
+    "email": "carl.wambasi@vetlab.co.ke",
+    "phone": "+254700000054",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 55,
+    "name": "Dr. P. Okemwa",
+    "teamId": 4,
+    "handicap": 18,
+    "email": "p.okemwa@vetlab.co.ke",
+    "phone": "+254700000055",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 56,
+    "name": "Ebill Omollo",
+    "teamId": 4,
+    "handicap": 14,
+    "email": "ebill.omollo@vetlab.co.ke",
+    "phone": "+254700000056",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 57,
+    "name": "Eric Karuga",
+    "teamId": 4,
+    "handicap": 12,
+    "email": "eric.karuga@vetlab.co.ke",
+    "phone": "+254700000057",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 58,
+    "name": "George TheMburu",
+    "teamId": 4,
+    "handicap": 10,
+    "email": "george.themburu@vetlab.co.ke",
+    "phone": "+254700000058",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 59,
+    "name": "Godwin Karuga",
+    "teamId": 4,
+    "handicap": 15,
+    "email": "godwin.karuga@vetlab.co.ke",
+    "phone": "+254700000059",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 60,
+    "name": "Gulraaj Sehmi",
+    "teamId": 4,
+    "handicap": 13,
+    "email": "gulraaj.sehmi@vetlab.co.ke",
+    "phone": "+254700000060",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 61,
+    "name": "Henry Obino",
+    "teamId": 4,
+    "handicap": 17,
+    "email": "henry.obino@vetlab.co.ke",
+    "phone": "+254700000061",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 62,
+    "name": "Isaiah Otuke",
+    "teamId": 4,
+    "handicap": 0,
+    "email": "isaiah.otuke@vetlab.co.ke",
+    "phone": "+254700000062",
+    "isPro": true,
+    "isExOfficio": false
+  },
+  {
+    "id": 63,
+    "name": "Jack Mwangi",
+    "teamId": 4,
+    "handicap": 19,
+    "email": "jack.mwangi@vetlab.co.ke",
+    "phone": "+254700000063",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 64,
+    "name": "Justin Ngeera",
+    "teamId": 4,
+    "handicap": 22,
+    "email": "justin.ngeera@vetlab.co.ke",
+    "phone": "+254700000064",
+    "isPro": false,
+    "isExOfficio": false,
+    "isJunior": true
+  },
+  {
+    "id": 65,
+    "name": "Krish Beiju Shah",
+    "teamId": 4,
+    "handicap": 11,
+    "email": "krish.shah@vetlab.co.ke",
+    "phone": "+254700000065",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 66,
+    "name": "Lee Njoroge",
+    "teamId": 4,
+    "handicap": 20,
+    "email": "lee.njoroge@vetlab.co.ke",
+    "phone": "+254700000066",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 67,
+    "name": "Mikael Kihara",
+    "teamId": 4,
+    "handicap": 9,
+    "email": "mikael.kihara@vetlab.co.ke",
+    "phone": "+254700000067",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 68,
+    "name": "Peter Kiige",
+    "teamId": 4,
+    "handicap": 16,
+    "email": "peter.kiige@vetlab.co.ke",
+    "phone": "+254700000068",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 69,
+    "name": "Richard Wafula",
+    "teamId": 4,
+    "handicap": 18,
+    "email": "richard.wafula@vetlab.co.ke",
+    "phone": "+254700000069",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 70,
+    "name": "Shem Orwenyo",
+    "teamId": 4,
+    "handicap": 0,
+    "email": "shem.orwenyo@vetlab.co.ke",
+    "phone": "+254700000070",
+    "isPro": true,
+    "isExOfficio": false
+  },
+  {
+    "id": 71,
+    "name": "Steve Orinda",
+    "teamId": 4,
+    "handicap": 14,
+    "email": "steve.orinda@vetlab.co.ke",
+    "phone": "+254700000071",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 72,
+    "name": "Wahome Mutahi",
+    "teamId": 4,
+    "handicap": 24,
+    "email": "wahome.mutahi@vetlab.co.ke",
+    "phone": "+254700000072",
+    "isPro": false,
+    "isExOfficio": false,
+    "isJunior": true
+  },
+  {
+    "id": 73,
+    "name": "Wasim Ali",
+    "teamId": 4,
+    "handicap": 21,
+    "email": "wasim.ali@vetlab.co.ke",
+    "phone": "+254700000073",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 74,
+    "name": "Adam Tayebjee",
+    "teamId": 5,
+    "handicap": 12,
+    "email": "adam.tayebjee@sigona.co.ke",
+    "phone": "+254700000074",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 75,
+    "name": "Akshay Chandaria",
+    "teamId": 5,
+    "handicap": 8,
+    "email": "akshay.chandaria@sigona.co.ke",
+    "phone": "+254700000075",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 76,
+    "name": "Alishaan Merali",
+    "teamId": 5,
+    "handicap": 15,
+    "email": "alishaan.merali@sigona.co.ke",
+    "phone": "+254700000076",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 77,
+    "name": "Amit Modi",
+    "teamId": 5,
+    "handicap": 10,
+    "email": "amit.modi@sigona.co.ke",
+    "phone": "+254700000077",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 78,
+    "name": "Anand Chandarana",
+    "teamId": 5,
+    "handicap": 14,
+    "email": "anand.chandarana@sigona.co.ke",
+    "phone": "+254700000078",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 79,
+    "name": "C J Wangai",
+    "teamId": 5,
+    "handicap": 0,
+    "email": "cj.wangai@sigona.co.ke",
+    "phone": "+254700000079",
+    "isPro": true,
+    "isExOfficio": false
+  },
+  {
+    "id": 80,
+    "name": "Deep Shah",
+    "teamId": 5,
+    "handicap": 16,
+    "email": "deep.shah@sigona.co.ke",
+    "phone": "+254700000080",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 81,
+    "name": "Dinesh Vara",
+    "teamId": 5,
+    "handicap": 18,
+    "email": "dinesh.vara@sigona.co.ke",
+    "phone": "+254700000081",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 82,
+    "name": "Haki Sehmi",
+    "teamId": 5,
+    "handicap": 13,
+    "email": "haki.sehmi@sigona.co.ke",
+    "phone": "+254700000082",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 83,
+    "name": "Hannif Tayebjee",
+    "teamId": 5,
+    "handicap": 11,
+    "email": "hannif.tayebjee@sigona.co.ke",
+    "phone": "+254700000083",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 84,
+    "name": "Hetansh S",
+    "teamId": 5,
+    "handicap": 20,
+    "email": "hetansh.s@sigona.co.ke",
+    "phone": "+254700000084",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 85,
+    "name": "Ishan Samani",
+    "teamId": 5,
+    "handicap": 17,
+    "email": "ishan.samani@sigona.co.ke",
+    "phone": "+254700000085",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 86,
+    "name": "John Ngondo",
+    "teamId": 5,
+    "handicap": 19,
+    "email": "john.ngondo@sigona.co.ke",
+    "phone": "+254700000086",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 87,
+    "name": "Junaid Manji",
+    "teamId": 5,
+    "handicap": 9,
+    "email": "junaid.manji@sigona.co.ke",
+    "phone": "+254700000087",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 88,
+    "name": "Kush Mediratta",
+    "teamId": 5,
+    "handicap": 12,
+    "email": "kush.mediratta@sigona.co.ke",
+    "phone": "+254700000088",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 89,
+    "name": "Mohhit Mediratta",
+    "teamId": 5,
+    "handicap": 0,
+    "email": "mohhit.mediratta@sigona.co.ke",
+    "phone": "+254700000089",
+    "isPro": true,
+    "isExOfficio": false
+  },
+  {
+    "id": 90,
+    "name": "Sam King'ori",
+    "teamId": 5,
+    "handicap": 15,
+    "email": "sam.kingori@sigona.co.ke",
+    "phone": "+254700000090",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 91,
+    "name": "Sandeep M",
+    "teamId": 5,
+    "handicap": 21,
+    "email": "sandeep.m@sigona.co.ke",
+    "phone": "+254700000091",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 92,
+    "name": "Tsevi Tsoni",
+    "teamId": 5,
+    "handicap": 16,
+    "email": "tsevi.tsoni@sigona.co.ke",
+    "phone": "+254700000092",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 93,
+    "name": "Yuvraj Rajput",
+    "teamId": 5,
+    "handicap": 22,
+    "email": "yuvraj.rajput@sigona.co.ke",
+    "phone": "+254700000093",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 94,
+    "name": "A Kamau",
+    "teamId": 6,
+    "handicap": 18,
+    "email": "a.kamau@kiambu.co.ke",
+    "phone": "+254700000094",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 95,
+    "name": "Apha Ndungu",
+    "teamId": 6,
+    "handicap": 24,
+    "email": "apha.ndungu@kiambu.co.ke",
+    "phone": "+254700000095",
+    "isPro": false,
+    "isExOfficio": false,
+    "isJunior": true
+  },
+  {
+    "id": 96,
+    "name": "C Mugo",
+    "teamId": 6,
+    "handicap": 16,
+    "email": "c.mugo@kiambu.co.ke",
+    "phone": "+254700000096",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 97,
+    "name": "Chris Kieu",
+    "teamId": 6,
+    "handicap": 12,
+    "email": "chris.kieu@kiambu.co.ke",
+    "phone": "+254700000097",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 98,
+    "name": "Evans Ngene",
+    "teamId": 6,
+    "handicap": 14,
+    "email": "evans.ngene@kiambu.co.ke",
+    "phone": "+254700000098",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 99,
+    "name": "Elvis Muigua",
+    "teamId": 6,
+    "handicap": 10,
+    "email": "elvis.muigua@kiambu.co.ke",
+    "phone": "+254700000099",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 100,
+    "name": "J Kamais",
+    "teamId": 6,
+    "handicap": 20,
+    "email": "j.kamais@kiambu.co.ke",
+    "phone": "+254700000100",
+    "isPro": false,
+    "isExOfficio": true
+  },
+  {
+    "id": 101,
+    "name": "Jemile Gacheru",
+    "teamId": 6,
+    "handicap": 22,
+    "email": "jemile.gacheru@kiambu.co.ke",
+    "phone": "+254700000101",
+    "isPro": false,
+    "isExOfficio": false,
+    "isJunior": true
+  },
+  {
+    "id": 102,
+    "name": "Joyce Wanjiru",
+    "teamId": 6,
+    "handicap": 28,
+    "email": "joyce.wanjiru@kiambu.co.ke",
+    "phone": "+254700000102",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 103,
+    "name": "K Nzioka",
+    "teamId": 6,
+    "handicap": 15,
+    "email": "k.nzioka@kiambu.co.ke",
+    "phone": "+254700000103",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 104,
+    "name": "Michael Ngene",
+    "teamId": 6,
+    "handicap": 13,
+    "email": "michael.ngene@kiambu.co.ke",
+    "phone": "+254700000104",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 105,
+    "name": "Michael Karanga",
+    "teamId": 6,
+    "handicap": 17,
+    "email": "michael.karanga@kiambu.co.ke",
+    "phone": "+254700000105",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 106,
+    "name": "Nahashon Mburu",
+    "teamId": 6,
+    "handicap": 19,
+    "email": "nahashon.mburu@kiambu.co.ke",
+    "phone": "+254700000106",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 107,
+    "name": "Njenga Mbugua",
+    "teamId": 6,
+    "handicap": 11,
+    "email": "njenga.mbugua@kiambu.co.ke",
+    "phone": "+254700000107",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 108,
+    "name": "P Waiharo",
+    "teamId": 6,
+    "handicap": 21,
+    "email": "p.waiharo@kiambu.co.ke",
+    "phone": "+254700000108",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 109,
+    "name": "Patrick Nduati",
+    "teamId": 6,
+    "handicap": 9,
+    "email": "patrick.nduati@kiambu.co.ke",
+    "phone": "+254700000109",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 110,
+    "name": "Pro Ngige",
+    "teamId": 6,
+    "handicap": 0,
+    "email": "pro.ngige@kiambu.co.ke",
+    "phone": "+254700000110",
+    "isPro": true,
+    "isExOfficio": false
+  },
+  {
+    "id": 111,
+    "name": "Stephen Kiaro",
+    "teamId": 6,
+    "handicap": 8,
+    "email": "stephen.kiaro@kiambu.co.ke",
+    "phone": "+254700000111",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 112,
+    "name": "S Maina",
+    "teamId": 6,
+    "handicap": 23,
+    "email": "s.maina@kiambu.co.ke",
+    "phone": "+254700000112",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 113,
+    "name": "William Muguima",
+    "teamId": 6,
+    "handicap": 18,
+    "email": "william.muguima@kiambu.co.ke",
+    "phone": "+254700000113",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 114,
+    "name": "Aziz Mussaji",
+    "teamId": 7,
+    "handicap": 12,
+    "email": "aziz.mussaji@limuru.co.ke",
+    "phone": "+254700000114",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 115,
+    "name": "Bianca Ngecu",
+    "teamId": 7,
+    "handicap": 24,
+    "email": "bianca.ngecu@limuru.co.ke",
+    "phone": "+254700000115",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 116,
+    "name": "David Irimu",
+    "teamId": 7,
+    "handicap": 14,
+    "email": "david.irimu@limuru.co.ke",
+    "phone": "+254700000116",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 117,
+    "name": "Dennis Maara",
+    "teamId": 7,
+    "handicap": 16,
+    "email": "dennis.maara@limuru.co.ke",
+    "phone": "+254700000117",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 118,
+    "name": "Fash Alibhai",
+    "teamId": 7,
+    "handicap": 10,
+    "email": "fash.alibhai@limuru.co.ke",
+    "phone": "+254700000118",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 119,
+    "name": "Francis Kimani",
+    "teamId": 7,
+    "handicap": 18,
+    "email": "francis.kimani@limuru.co.ke",
+    "phone": "+254700000119",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 120,
+    "name": "James Kihiu",
+    "teamId": 7,
+    "handicap": 13,
+    "email": "james.kihiu@limuru.co.ke",
+    "phone": "+254700000120",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 121,
+    "name": "James Mbui",
+    "teamId": 7,
+    "handicap": 15,
+    "email": "james.mbui@limuru.co.ke",
+    "phone": "+254700000121",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 122,
+    "name": "Jeff Macharia",
+    "teamId": 7,
+    "handicap": 11,
+    "email": "jeff.macharia@limuru.co.ke",
+    "phone": "+254700000122",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 123,
+    "name": "Jelani Kihanya",
+    "teamId": 7,
+    "handicap": 17,
+    "email": "jelani.kihanya@limuru.co.ke",
+    "phone": "+254700000123",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 124,
+    "name": "John Kariuki",
+    "teamId": 7,
+    "handicap": 19,
+    "email": "john.kariuki@limuru.co.ke",
+    "phone": "+254700000124",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 125,
+    "name": "John Wambari",
+    "teamId": 7,
+    "handicap": 20,
+    "email": "john.wambari@limuru.co.ke",
+    "phone": "+254700000125",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 126,
+    "name": "Joseph Ikanyi",
+    "teamId": 7,
+    "handicap": 22,
+    "email": "joseph.ikanyi@limuru.co.ke",
+    "phone": "+254700000126",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 127,
+    "name": "Kevin Muchiri",
+    "teamId": 7,
+    "handicap": 9,
+    "email": "kevin.muchiri@limuru.co.ke",
+    "phone": "+254700000127",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 128,
+    "name": "Mutahi Kibugu",
+    "teamId": 7,
+    "handicap": 0,
+    "email": "mutahi.kibugu@limuru.co.ke",
+    "phone": "+254700000128",
+    "isPro": true,
+    "isExOfficio": false
+  },
+  {
+    "id": 129,
+    "name": "Nadeem Alibhai",
+    "teamId": 7,
+    "handicap": 8,
+    "email": "nadeem.alibhai@limuru.co.ke",
+    "phone": "+254700000129",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 130,
+    "name": "Nancy Wairimu",
+    "teamId": 7,
+    "handicap": 26,
+    "email": "nancy.wairimu@limuru.co.ke",
+    "phone": "+254700000130",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 131,
+    "name": "Paul Muchangi",
+    "teamId": 7,
+    "handicap": 21,
+    "email": "paul.muchangi@limuru.co.ke",
+    "phone": "+254700000131",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 132,
+    "name": "Peter Kinuthia",
+    "teamId": 7,
+    "handicap": 23,
+    "email": "peter.kinuthia@limuru.co.ke",
+    "phone": "+254700000132",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 133,
+    "name": "Solomon Mumbi",
+    "teamId": 7,
+    "handicap": 25,
+    "email": "solomon.mumbi@limuru.co.ke",
+    "phone": "+254700000133",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 134,
+    "name": "Amos Odongo",
+    "teamId": 8,
+    "handicap": 16,
+    "email": "amos.odongo@golfpark.co.ke",
+    "phone": "+254700000134",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 135,
+    "name": "Collins Munuve",
+    "teamId": 8,
+    "handicap": 14,
+    "email": "collins.munuve@golfpark.co.ke",
+    "phone": "+254700000135",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 136,
+    "name": "Darren Chesumei",
+    "teamId": 8,
+    "handicap": 12,
+    "email": "darren.chesumei@golfpark.co.ke",
+    "phone": "+254700000136",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 137,
+    "name": "David Wakhu",
+    "teamId": 8,
+    "handicap": 0,
+    "email": "david.wakhu@golfpark.co.ke",
+    "phone": "+254700000137",
+    "isPro": true,
+    "isExOfficio": false
+  },
+  {
+    "id": 138,
+    "name": "David Wanjihia",
+    "teamId": 8,
+    "handicap": 18,
+    "email": "david.wanjihia@golfpark.co.ke",
+    "phone": "+254700000138",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 139,
+    "name": "Dennis Ronoh",
+    "teamId": 8,
+    "handicap": 10,
+    "email": "dennis.ronoh@golfpark.co.ke",
+    "phone": "+254700000139",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 140,
+    "name": "Elly Limo",
+    "teamId": 8,
+    "handicap": 20,
+    "email": "elly.limo@golfpark.co.ke",
+    "phone": "+254700000140",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 141,
+    "name": "Eric Ooko",
+    "teamId": 8,
+    "handicap": 0,
+    "email": "eric.ooko@golfpark.co.ke",
+    "phone": "+254700000141",
+    "isPro": true,
+    "isExOfficio": false
+  },
+  {
+    "id": 142,
+    "name": "Etaan Silvester",
+    "teamId": 8,
+    "handicap": 22,
+    "email": "etaan.silvester@golfpark.co.ke",
+    "phone": "+254700000142",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 143,
+    "name": "Felix Dusabe",
+    "teamId": 8,
+    "handicap": 15,
+    "email": "felix.dusabe@golfpark.co.ke",
+    "phone": "+254700000143",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 144,
+    "name": "James Mwangi",
+    "teamId": 8,
+    "handicap": 17,
+    "email": "james.mwangi@golfpark.co.ke",
+    "phone": "+254700000144",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 145,
+    "name": "Jeff Waweru",
+    "teamId": 8,
+    "handicap": 13,
+    "email": "jeff.waweru@golfpark.co.ke",
+    "phone": "+254700000145",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 146,
+    "name": "Josphat Rono",
+    "teamId": 8,
+    "handicap": 19,
+    "email": "josphat.rono@golfpark.co.ke",
+    "phone": "+254700000146",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 147,
+    "name": "Kelly Otieno",
+    "teamId": 8,
+    "handicap": 24,
+    "email": "kelly.otieno@golfpark.co.ke",
+    "phone": "+254700000147",
+    "isPro": false,
+    "isExOfficio": false,
+    "isJunior": true
+  },
+  {
+    "id": 148,
+    "name": "Margaret Njoki",
+    "teamId": 8,
+    "handicap": 28,
+    "email": "margaret.njoki@golfpark.co.ke",
+    "phone": "+254700000148",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 149,
+    "name": "Nicholas Michino",
+    "teamId": 8,
+    "handicap": 11,
+    "email": "nicholas.michino@golfpark.co.ke",
+    "phone": "+254700000149",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 150,
+    "name": "Peter Macharia",
+    "teamId": 8,
+    "handicap": 21,
+    "email": "peter.macharia@golfpark.co.ke",
+    "phone": "+254700000150",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 151,
+    "name": "Robert Odera",
+    "teamId": 8,
+    "handicap": 23,
+    "email": "robert.odera@golfpark.co.ke",
+    "phone": "+254700000151",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 152,
+    "name": "Sammy Mulama",
+    "teamId": 8,
+    "handicap": 9,
+    "email": "sammy.mulama@golfpark.co.ke",
+    "phone": "+254700000152",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 153,
+    "name": "Samuel Kimutai",
+    "teamId": 8,
+    "handicap": 25,
+    "email": "samuel.kimutai@golfpark.co.ke",
+    "phone": "+254700000153",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 154,
+    "name": "Anthony Mwaura",
+    "teamId": 9,
+    "handicap": 14,
+    "email": "anthony.mwaura@thika.co.ke",
+    "phone": "+254700000154",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 155,
+    "name": "Benard Waciuri",
+    "teamId": 9,
+    "handicap": 12,
+    "email": "benard.waciuri@thika.co.ke",
+    "phone": "+254700000155",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 156,
+    "name": "David Matano",
+    "teamId": 9,
+    "handicap": 16,
+    "email": "david.matano@thika.co.ke",
+    "phone": "+254700000156",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 157,
+    "name": "David Otuke",
+    "teamId": 9,
+    "handicap": 18,
+    "email": "david.otuke@thika.co.ke",
+    "phone": "+254700000157",
+    "isPro": false,
+    "isExOfficio": true
+  },
+  {
+    "id": 158,
+    "name": "Dennis Gakuo",
+    "teamId": 9,
+    "handicap": 10,
+    "email": "dennis.gakuo@thika.co.ke",
+    "phone": "+254700000158",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 159,
+    "name": "Duncan Ndungu",
+    "teamId": 9,
+    "handicap": 20,
+    "email": "duncan.ndungu@thika.co.ke",
+    "phone": "+254700000159",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 160,
+    "name": "Edward Nyamu",
+    "teamId": 9,
+    "handicap": 22,
+    "email": "edward.nyamu@thika.co.ke",
+    "phone": "+254700000160",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 161,
+    "name": "Edwin Kiarie",
+    "teamId": 9,
+    "handicap": 15,
+    "email": "edwin.kiarie@thika.co.ke",
+    "phone": "+254700000161",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 162,
+    "name": "Garcia Kimemia",
+    "teamId": 9,
+    "handicap": 24,
+    "email": "garcia.kimemia@thika.co.ke",
+    "phone": "+254700000162",
+    "isPro": false,
+    "isExOfficio": false,
+    "isJunior": true
+  },
+  {
+    "id": 163,
+    "name": "Gicheru Kimani",
+    "teamId": 9,
+    "handicap": 26,
+    "email": "gicheru.kimani@thika.co.ke",
+    "phone": "+254700000163",
+    "isPro": false,
+    "isExOfficio": false,
+    "isJunior": true
+  },
+  {
+    "id": 164,
+    "name": "Gicheru Mwathi",
+    "teamId": 9,
+    "handicap": 28,
+    "email": "gicheru.mwathi@thika.co.ke",
+    "phone": "+254700000164",
+    "isPro": false,
+    "isExOfficio": false,
+    "isJunior": true
+  },
+  {
+    "id": 165,
+    "name": "Kimani Guchu",
+    "teamId": 9,
+    "handicap": 13,
+    "email": "kimani.guchu@thika.co.ke",
+    "phone": "+254700000165",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 166,
+    "name": "Lewis Mwaniki",
+    "teamId": 9,
+    "handicap": 25,
+    "email": "lewis.mwaniki@thika.co.ke",
+    "phone": "+254700000166",
+    "isPro": false,
+    "isExOfficio": false,
+    "isJunior": true
+  },
+  {
+    "id": 167,
+    "name": "N. Ngugi",
+    "teamId": 9,
+    "handicap": 0,
+    "email": "n.ngugi@thika.co.ke",
+    "phone": "+254700000167",
+    "isPro": true,
+    "isExOfficio": false
+  },
+  {
+    "id": 168,
+    "name": "Paul Nduati",
+    "teamId": 9,
+    "handicap": 17,
+    "email": "paul.nduati@thika.co.ke",
+    "phone": "+254700000168",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 169,
+    "name": "Simon Ndungu",
+    "teamId": 9,
+    "handicap": 19,
+    "email": "simon.ndungu@thika.co.ke",
+    "phone": "+254700000169",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 170,
+    "name": "Thuku Ndegwa",
+    "teamId": 9,
+    "handicap": 23,
+    "email": "thuku.ndegwa@thika.co.ke",
+    "phone": "+254700000170",
+    "isPro": false,
+    "isExOfficio": false,
+    "isJunior": true
+  },
+  {
+    "id": 171,
+    "name": "Watson Burugu",
+    "teamId": 9,
+    "handicap": 11,
+    "email": "watson.burugu@thika.co.ke",
+    "phone": "+254700000171",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 172,
+    "name": "Andrew Gathere",
+    "teamId": 10,
+    "handicap": 14,
+    "email": "andrew.gathere@royal.co.ke",
+    "phone": "+254700000172",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 173,
+    "name": "Ashley Awuor",
+    "teamId": 10,
+    "handicap": 22,
+    "email": "ashley.awuor@royal.co.ke",
+    "phone": "+254700000173",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 174,
+    "name": "Brian Gachuba",
+    "teamId": 10,
+    "handicap": 16,
+    "email": "brian.gachuba@royal.co.ke",
+    "phone": "+254700000174",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 175,
+    "name": "Charles Kariuki",
+    "teamId": 10,
+    "handicap": 12,
+    "email": "charles.kariuki@royal.co.ke",
+    "phone": "+254700000175",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 176,
+    "name": "Chloe Cherono",
+    "teamId": 10,
+    "handicap": 24,
+    "email": "chloe.cherono@royal.co.ke",
+    "phone": "+254700000176",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 177,
+    "name": "Collins Too",
+    "teamId": 10,
+    "handicap": 18,
+    "email": "collins.too@royal.co.ke",
+    "phone": "+254700000177",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 178,
+    "name": "Dr. Paul Ngugi",
+    "teamId": 10,
+    "handicap": 10,
+    "email": "paul.ngugi@royal.co.ke",
+    "phone": "+254700000178",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 179,
+    "name": "Edwin Kinisu",
+    "teamId": 10,
+    "handicap": 20,
+    "email": "edwin.kinisu@royal.co.ke",
+    "phone": "+254700000179",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 180,
+    "name": "George Eshuchi",
+    "teamId": 10,
+    "handicap": 15,
+    "email": "george.eshuchi@royal.co.ke",
+    "phone": "+254700000180",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 181,
+    "name": "Jeff Kubwa",
+    "teamId": 10,
+    "handicap": 0,
+    "email": "jeff.kubwa@royal.co.ke",
+    "phone": "+254700000181",
+    "isPro": true,
+    "isExOfficio": false
+  },
+  {
+    "id": 182,
+    "name": "John Lejirma",
+    "teamId": 10,
+    "handicap": 13,
+    "email": "john.lejirma@royal.co.ke",
+    "phone": "+254700000182",
+    "isPro": false,
+    "isExOfficio": true
+  },
+  {
+    "id": 183,
+    "name": "Josiah Kogo",
+    "teamId": 10,
+    "handicap": 17,
+    "email": "josiah.kogo@royal.co.ke",
+    "phone": "+254700000183",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 184,
+    "name": "Kevin Juma",
+    "teamId": 10,
+    "handicap": 19,
+    "email": "kevin.juma@royal.co.ke",
+    "phone": "+254700000184",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 185,
+    "name": "Kigen Koitaba",
+    "teamId": 10,
+    "handicap": 21,
+    "email": "kigen.koitaba@royal.co.ke",
+    "phone": "+254700000185",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 186,
+    "name": "Njogu Kungu",
+    "teamId": 10,
+    "handicap": 11,
+    "email": "njogu.kungu@royal.co.ke",
+    "phone": "+254700000186",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 187,
+    "name": "Robert Nyanchoga",
+    "teamId": 10,
+    "handicap": 23,
+    "email": "robert.nyanchoga@royal.co.ke",
+    "phone": "+254700000187",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 188,
+    "name": "Ryan Mutinda",
+    "teamId": 10,
+    "handicap": 9,
+    "email": "ryan.mutinda@royal.co.ke",
+    "phone": "+254700000188",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 189,
+    "name": "Shawn Malesi",
+    "teamId": 10,
+    "handicap": 25,
+    "email": "shawn.malesi@royal.co.ke",
+    "phone": "+254700000189",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 190,
+    "name": "Wesley Kibet",
+    "teamId": 10,
+    "handicap": 8,
+    "email": "wesley.kibet@royal.co.ke",
+    "phone": "+254700000190",
+    "isPro": false,
+    "isExOfficio": true
+  },
+  {
+    "id": 191,
+    "name": "Willy Mastamet",
+    "teamId": 10,
+    "handicap": 26,
+    "email": "willy.mastamet@royal.co.ke",
+    "phone": "+254700000191",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 192,
+    "name": "Ali Mohmaed",
+    "teamId": 11,
+    "handicap": 16,
+    "email": "ali.mohmaed@karen.co.ke",
+    "phone": "+254700000192",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 193,
+    "name": "Anthony Gichuki",
+    "teamId": 11,
+    "handicap": 12,
+    "email": "anthony.gichuki@karen.co.ke",
+    "phone": "+254700000193",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 194,
+    "name": "Emmanuel Agengo",
+    "teamId": 11,
+    "handicap": 18,
+    "email": "emmanuel.agengo@karen.co.ke",
+    "phone": "+254700000194",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 195,
+    "name": "Gilbert O. Maina",
+    "teamId": 11,
+    "handicap": 14,
+    "email": "gilbert.maina@karen.co.ke",
+    "phone": "+254700000195",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 196,
+    "name": "James Ngotho",
+    "teamId": 11,
+    "handicap": 10,
+    "email": "james.ngotho@karen.co.ke",
+    "phone": "+254700000196",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 197,
+    "name": "Jatinder Thethy",
+    "teamId": 11,
+    "handicap": 20,
+    "email": "jatinder.thethy@karen.co.ke",
+    "phone": "+254700000197",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 198,
+    "name": "Johnny Limb Jr.",
+    "teamId": 11,
+    "handicap": 0,
+    "email": "johnny.limb@karen.co.ke",
+    "phone": "+254700000198",
+    "isPro": true,
+    "isExOfficio": false
+  },
+  {
+    "id": 199,
+    "name": "Kellie Gachaga",
+    "teamId": 11,
+    "handicap": 24,
+    "email": "kellie.gachaga@karen.co.ke",
+    "phone": "+254700000199",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 200,
+    "name": "Kiunjuri Mathu",
+    "teamId": 11,
+    "handicap": 22,
+    "email": "kiunjuri.mathu@karen.co.ke",
+    "phone": "+254700000200",
+    "isPro": false,
+    "isExOfficio": false,
+    "isJunior": true
+  },
+  {
+    "id": 201,
+    "name": "Lesaan Shani",
+    "teamId": 11,
+    "handicap": 15,
+    "email": "lesaan.shani@karen.co.ke",
+    "phone": "+254700000201",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 202,
+    "name": "Liban Roba",
+    "teamId": 11,
+    "handicap": 17,
+    "email": "liban.roba@karen.co.ke",
+    "phone": "+254700000202",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 203,
+    "name": "Lyndon Darker",
+    "teamId": 11,
+    "handicap": 25,
+    "email": "lyndon.darker@karen.co.ke",
+    "phone": "+254700000203",
+    "isPro": false,
+    "isExOfficio": false,
+    "isJunior": true
+  },
+  {
+    "id": 204,
+    "name": "Nathan Lyomu",
+    "teamId": 11,
+    "handicap": 26,
+    "email": "nathan.lyomu@karen.co.ke",
+    "phone": "+254700000204",
+    "isPro": false,
+    "isExOfficio": false,
+    "isJunior": true
+  },
+  {
+    "id": 205,
+    "name": "Nick Markham",
+    "teamId": 11,
+    "handicap": 13,
+    "email": "nick.markham@karen.co.ke",
+    "phone": "+254700000205",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 206,
+    "name": "Paul Kaguamba",
+    "teamId": 11,
+    "handicap": 19,
+    "email": "paul.kaguamba@karen.co.ke",
+    "phone": "+254700000206",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 207,
+    "name": "Robert Keter",
+    "teamId": 11,
+    "handicap": 21,
+    "email": "robert.keter@karen.co.ke",
+    "phone": "+254700000207",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 208,
+    "name": "Rufus Gichuki",
+    "teamId": 11,
+    "handicap": 11,
+    "email": "rufus.gichuki@karen.co.ke",
+    "phone": "+254700000208",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 209,
+    "name": "Wade Kilburn",
+    "teamId": 11,
+    "handicap": 23,
+    "email": "wade.kilburn@karen.co.ke",
+    "phone": "+254700000209",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 210,
+    "name": "Wambugu Githumbi",
+    "teamId": 11,
+    "handicap": 9,
+    "email": "wambugu.githumbi@karen.co.ke",
+    "phone": "+254700000210",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 211,
+    "name": "Zach Koech",
+    "teamId": 11,
+    "handicap": 27,
+    "email": "zach.koech@karen.co.ke",
+    "phone": "+254700000211",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 212,
+    "name": "Aaron Kitur",
+    "teamId": 12,
+    "handicap": 14,
+    "email": "aaron.kitur@eldoret.co.ke",
+    "phone": "+254700000212",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 213,
+    "name": "Alex Tolgos",
+    "teamId": 12,
+    "handicap": 16,
+    "email": "alex.tolgos@eldoret.co.ke",
+    "phone": "+254700000213",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 214,
+    "name": "Andrew Chelogoi",
+    "teamId": 12,
+    "handicap": 0,
+    "email": "andrew.chelogoi@eldoret.co.ke",
+    "phone": "+254700000214",
+    "isPro": true,
+    "isExOfficio": false
+  },
+  {
+    "id": 215,
+    "name": "Dr. Mathew Koech",
+    "teamId": 12,
+    "handicap": 12,
+    "email": "mathew.koech@eldoret.co.ke",
+    "phone": "+254700000215",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 216,
+    "name": "Dr. Peter Maritim",
+    "teamId": 12,
+    "handicap": 18,
+    "email": "peter.maritim@eldoret.co.ke",
+    "phone": "+254700000216",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 217,
+    "name": "Dr. Wilson Sugut",
+    "teamId": 12,
+    "handicap": 20,
+    "email": "wilson.sugut@eldoret.co.ke",
+    "phone": "+254700000217",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 218,
+    "name": "Elly Barno",
+    "teamId": 12,
+    "handicap": 10,
+    "email": "elly.barno@eldoret.co.ke",
+    "phone": "+254700000218",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 219,
+    "name": "Felix Kandie",
+    "teamId": 12,
+    "handicap": 22,
+    "email": "felix.kandie@eldoret.co.ke",
+    "phone": "+254700000219",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 220,
+    "name": "George Njoroge",
+    "teamId": 12,
+    "handicap": 15,
+    "email": "george.njoroge@eldoret.co.ke",
+    "phone": "+254700000220",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 221,
+    "name": "Howard Sinyeri",
+    "teamId": 12,
+    "handicap": 17,
+    "email": "howard.sinyeri@eldoret.co.ke",
+    "phone": "+254700000221",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 222,
+    "name": "Jackson Kiprono",
+    "teamId": 12,
+    "handicap": 19,
+    "email": "jackson.kiprono@eldoret.co.ke",
+    "phone": "+254700000222",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 223,
+    "name": "Jackson Tuwei",
+    "teamId": 12,
+    "handicap": 21,
+    "email": "jackson.tuwei@eldoret.co.ke",
+    "phone": "+254700000223",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 224,
+    "name": "James Komen",
+    "teamId": 12,
+    "handicap": 13,
+    "email": "james.komen@eldoret.co.ke",
+    "phone": "+254700000224",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 225,
+    "name": "Joseph Watunu",
+    "teamId": 12,
+    "handicap": 23,
+    "email": "joseph.watunu@eldoret.co.ke",
+    "phone": "+254700000225",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 226,
+    "name": "Kenneth Serem",
+    "teamId": 12,
+    "handicap": 11,
+    "email": "kenneth.serem@eldoret.co.ke",
+    "phone": "+254700000226",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 227,
+    "name": "Luka Cheserek",
+    "teamId": 12,
+    "handicap": 25,
+    "email": "luka.cheserek@eldoret.co.ke",
+    "phone": "+254700000227",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 228,
+    "name": "Milton Ambunya",
+    "teamId": 12,
+    "handicap": 9,
+    "email": "milton.ambunya@eldoret.co.ke",
+    "phone": "+254700000228",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 229,
+    "name": "Nathan Tororei",
+    "teamId": 12,
+    "handicap": 24,
+    "email": "nathan.tororei@eldoret.co.ke",
+    "phone": "+254700000229",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 230,
+    "name": "Shadrack Ngetich",
+    "teamId": 12,
+    "handicap": 26,
+    "email": "shadrack.ngetich@eldoret.co.ke",
+    "phone": "+254700000230",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 231,
+    "name": "Silas Maiyo",
+    "teamId": 12,
+    "handicap": 28,
+    "email": "silas.maiyo@eldoret.co.ke",
+    "phone": "+254700000231",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 232,
+    "name": "Alex Mwangi",
+    "teamId": 13,
+    "handicap": 16,
+    "email": "alex.mwangi@windsor.co.ke",
+    "phone": "+254700000232",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 233,
+    "name": "Alishaan Merali",
+    "teamId": 13,
+    "handicap": 14,
+    "email": "alishaan.merali@windsor.co.ke",
+    "phone": "+254700000233",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 234,
+    "name": "Amar Shah",
+    "teamId": 13,
+    "handicap": 12,
+    "email": "amar.shah@windsor.co.ke",
+    "phone": "+254700000234",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 235,
+    "name": "Chege Kiragu",
+    "teamId": 13,
+    "handicap": 18,
+    "email": "chege.kiragu@windsor.co.ke",
+    "phone": "+254700000235",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 236,
+    "name": "Joshua Maina",
+    "teamId": 13,
+    "handicap": 20,
+    "email": "joshua.maina@windsor.co.ke",
+    "phone": "+254700000236",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 237,
+    "name": "Kanana Muthomi",
+    "teamId": 13,
+    "handicap": 22,
+    "email": "kanana.muthomi@windsor.co.ke",
+    "phone": "+254700000237",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 238,
+    "name": "Kevin Ayien",
+    "teamId": 13,
+    "handicap": 10,
+    "email": "kevin.ayien@windsor.co.ke",
+    "phone": "+254700000238",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 239,
+    "name": "Njoroge Kibugu",
+    "teamId": 13,
+    "handicap": 0,
+    "email": "njoroge.kibugu@windsor.co.ke",
+    "phone": "+254700000239",
+    "isPro": true,
+    "isExOfficio": false
+  },
+  {
+    "id": 240,
+    "name": "Reagan Kibugi",
+    "teamId": 13,
+    "handicap": 24,
+    "email": "reagan.kibugi@windsor.co.ke",
+    "phone": "+254700000240",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 241,
+    "name": "Solomon Kanja",
+    "teamId": 13,
+    "handicap": 15,
+    "email": "solomon.kanja@windsor.co.ke",
+    "phone": "+254700000241",
+    "isPro": false,
+    "isExOfficio": true
+  },
+  {
+    "id": 242,
+    "name": "Anthony Huth",
+    "teamId": 14,
+    "handicap": 13,
+    "email": "anthony.huth@mombasa.co.ke",
+    "phone": "+254700000242",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 243,
+    "name": "Edwin Kiptoo",
+    "teamId": 14,
+    "handicap": 17,
+    "email": "edwin.kiptoo@mombasa.co.ke",
+    "phone": "+254700000243",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 244,
+    "name": "Fidel Wasike",
+    "teamId": 14,
+    "handicap": 19,
+    "email": "fidel.wasike@mombasa.co.ke",
+    "phone": "+254700000244",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 245,
+    "name": "Henry Kamau",
+    "teamId": 14,
+    "handicap": 21,
+    "email": "henry.kamau@mombasa.co.ke",
+    "phone": "+254700000245",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 246,
+    "name": "Jason Mwai",
+    "teamId": 14,
+    "handicap": 11,
+    "email": "jason.mwai@mombasa.co.ke",
+    "phone": "+254700000246",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 247,
+    "name": "Maj. Joel Mochanga",
+    "teamId": 14,
+    "handicap": 23,
+    "email": "joel.mochanga@mombasa.co.ke",
+    "phone": "+254700000247",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 248,
+    "name": "Martin Ombura",
+    "teamId": 14,
+    "handicap": 25,
+    "email": "martin.ombura@mombasa.co.ke",
+    "phone": "+254700000248",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 249,
+    "name": "Nathan Ngweno",
+    "teamId": 14,
+    "handicap": 9,
+    "email": "nathan.ngweno@mombasa.co.ke",
+    "phone": "+254700000249",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 250,
+    "name": "Tirus Githaiga",
+    "teamId": 14,
+    "handicap": 27,
+    "email": "tirus.githaiga@mombasa.co.ke",
+    "phone": "+254700000250",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 251,
+    "name": "Victor Simbi",
+    "teamId": 14,
+    "handicap": 26,
+    "email": "victor.simbi@mombasa.co.ke",
+    "phone": "+254700000251",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 252,
+    "name": "Andrea Christopher",
+    "teamId": 15,
+    "handicap": 18,
+    "email": "andrea.christopher@ruiru.co.ke",
+    "phone": "+254700000252",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 253,
+    "name": "Bernard Omondi",
+    "teamId": 15,
+    "handicap": 20,
+    "email": "bernard.omondi@ruiru.co.ke",
+    "phone": "+254700000253",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 254,
+    "name": "Eliakim Maina",
+    "teamId": 15,
+    "handicap": 16,
+    "email": "eliakim.maina@ruiru.co.ke",
+    "phone": "+254700000254",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 255,
+    "name": "Frank Munyua",
+    "teamId": 15,
+    "handicap": 14,
+    "email": "frank.munyua@ruiru.co.ke",
+    "phone": "+254700000255",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 256,
+    "name": "Jessy Ndegwa",
+    "teamId": 15,
+    "handicap": 22,
+    "email": "jessy.ndegwa@ruiru.co.ke",
+    "phone": "+254700000256",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 257,
+    "name": "John Mburu",
+    "teamId": 15,
+    "handicap": 12,
+    "email": "john.mburu@ruiru.co.ke",
+    "phone": "+254700000257",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 258,
+    "name": "John Njenga",
+    "teamId": 15,
+    "handicap": 24,
+    "email": "john.njenga@ruiru.co.ke",
+    "phone": "+254700000258",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 259,
+    "name": "Kelvin Kuria",
+    "teamId": 15,
+    "handicap": 10,
+    "email": "kelvin.kuria@ruiru.co.ke",
+    "phone": "+254700000259",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 260,
+    "name": "Kelvin Metto",
+    "teamId": 15,
+    "handicap": 26,
+    "email": "kelvin.metto@ruiru.co.ke",
+    "phone": "+254700000260",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 261,
+    "name": "Lemingani Raphael",
+    "teamId": 15,
+    "handicap": 28,
+    "email": "lemingani.raphael@ruiru.co.ke",
+    "phone": "+254700000261",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 262,
+    "name": "Louis Nderi",
+    "teamId": 15,
+    "handicap": 8,
+    "email": "louis.nderi@ruiru.co.ke",
+    "phone": "+254700000262",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 263,
+    "name": "Peter Mwaura",
+    "teamId": 15,
+    "handicap": 15,
+    "email": "peter.mwaura@ruiru.co.ke",
+    "phone": "+254700000263",
+    "isPro": false,
+    "isExOfficio": false
+  },
+  {
+    "id": 264,
+    "name": "Sulivan Muthugia",
+    "teamId": 15,
+    "handicap": 0,
+    "email": "sulivan.muthugia@ruiru.co.ke",
+    "phone": "+254700000264",
+    "isPro": true,
+    "isExOfficio": false
+  },
+  {
+    "id": 265,
+    "name": "Teddy Muriuki",
+    "teamId": 15,
+    "handicap": 17,
+    "email": "teddy.muriuki@ruiru.co.ke",
+    "phone": "+254700000265",
+    "isPro": false,
+    "isExOfficio": false
   }
-] 
+]

@@ -32,8 +32,21 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
     const savedMatches = localStorage.getItem('tournament-matches');
     const savedScores = localStorage.getItem('tournament-scores');
     
+    // Check if we have the new match structure (158 matches vs old structure)
     if (savedMatches) {
-      setMatches(JSON.parse(savedMatches));
+      const parsedMatches = JSON.parse(savedMatches);
+      // Check if we have old data with incorrect status or structure
+      const hasInProgressMatches = parsedMatches.some((match: any) => match.status === 'in-progress');
+      const hasCorrectStructure = parsedMatches.length === 158 && parsedMatches[0]?.gameNumber;
+      
+      // If we don't have 158 matches, missing gameNumber, or have in-progress matches, use fresh data
+      if (!hasCorrectStructure || hasInProgressMatches) {
+        console.log('Loading fresh match data - old localStorage data detected');
+        setMatches(matchesData as Match[]);
+        localStorage.setItem('tournament-matches', JSON.stringify(matchesData));
+      } else {
+        setMatches(parsedMatches);
+      }
     }
     
     if (savedScores) {

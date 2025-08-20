@@ -5,8 +5,8 @@ import { useState } from 'react';
 import { Calendar, Clock, MapPin, Users, Trophy, Medal } from 'lucide-react';
 
 export default function Schedule() {
-  const { teams, matches } = useTournament();
-  const [selectedDate, setSelectedDate] = useState<string>('2024-01-19');
+  const { teams, matches, players } = useTournament();
+  const [selectedDate, setSelectedDate] = useState<string>('2025-08-22');
 
   // Get unique dates from matches
   const matchDates = [...new Set(matches.map(match => match.date))].sort();
@@ -60,12 +60,8 @@ export default function Schedule() {
   };
 
   const getTimeSlot = (teeTime: string) => {
-    const time = new Date(`2000-01-01T${teeTime}`);
-    return time.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
+    // teeTime is already in format like "7:30 AM"
+    return teeTime;
   };
 
   const getDayFromDate = (dateString: string) => {
@@ -73,31 +69,54 @@ export default function Schedule() {
     return date.toLocaleDateString('en-US', { weekday: 'long' });
   };
 
+  // Helper function to get sample players for a match
+  const getMatchPlayers = (match: any, teamId: number | null, count: number = 2) => {
+    if (!teamId) return [];
+    const teamPlayers = players.filter(player => player.teamId === teamId);
+    
+    if (teamPlayers.length === 0) return [];
+    
+    // For pre-tournament display, show a consistent sample of players based on match ID
+    // This ensures the same players are always shown for the same match
+    const startIndex = (match.id * teamId) % teamPlayers.length;
+    const selectedPlayers = [];
+    
+    for (let i = 0; i < count && i < teamPlayers.length; i++) {
+      const playerIndex = (startIndex + i) % teamPlayers.length;
+      selectedPlayers.push(teamPlayers[playerIndex]);
+    }
+    
+    return selectedPlayers;
+  };
+
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Tournament Schedule</h1>
-        <p className="text-lg text-gray-600">Match schedule and tee times</p>
+      <div className="text-center px-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Tournament Schedule</h1>
+        <p className="text-sm sm:text-lg text-gray-600">Match schedule and tee times</p>
       </div>
 
       {/* Date Navigation */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="flex items-center space-x-4">
-          <Calendar className="w-5 h-5 text-gray-500" />
-          <span className="text-sm font-medium text-gray-700">Select Date:</span>
-          <div className="flex space-x-2 overflow-x-auto">
+      <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+          <div className="flex items-center space-x-2">
+            <Calendar className="w-5 h-5 text-gray-500" />
+            <span className="text-sm font-medium text-gray-700">Select Date:</span>
+          </div>
+          <div className="flex space-x-2 overflow-x-auto pb-2 sm:pb-0">
             {matchDates.map(date => (
               <button
                 key={date}
                 onClick={() => setSelectedDate(date)}
-                className={`px-4 py-2 rounded-md font-medium whitespace-nowrap ${
+                className={`px-3 sm:px-4 py-2 rounded-md font-medium whitespace-nowrap text-xs sm:text-sm ${
                   selectedDate === date
                     ? 'bg-green-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                {getDayFromDate(date)} - {formatDate(date)}
+                <span className="sm:hidden">{getDayFromDate(date)}</span>
+                <span className="hidden sm:inline">{getDayFromDate(date)} - {formatDate(date)}</span>
               </button>
             ))}
           </div>
@@ -124,27 +143,33 @@ export default function Schedule() {
                 .map(match => {
                   const teamA = getTeamById(match.teamAId);
                   const teamB = getTeamById(match.teamBId);
+                  const teamC = match.teamCId ? getTeamById(match.teamCId) : null;
                   const DivisionIcon = getDivisionIcon(match.division);
+
+                  // Get sample players for each team
+                  const teamAPlayers = getMatchPlayers(match, match.teamAId, match.type === 'Singles' ? 1 : 2);
+                  const teamBPlayers = getMatchPlayers(match, match.teamBId, match.type === 'Singles' ? 1 : 2);
+                  const teamCPlayers = getMatchPlayers(match, match.teamCId, match.type === 'Singles' ? 1 : 2);
 
                   if (!teamA || !teamB) return null;
 
                   return (
-                    <div key={match.id} className="border rounded-lg p-6 hover:shadow-md transition-shadow">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center space-x-4">
-                          <div className="flex items-center space-x-2">
+                    <div key={match.id} className="border rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-4">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <div className="flex items-center space-x-1 sm:space-x-2">
                             <Clock className="w-4 h-4 text-gray-500" />
-                            <span className="font-medium text-gray-900">
+                            <span className="font-medium text-gray-900 text-sm sm:text-base">
                               {getTimeSlot(match.teeTime)}
                             </span>
                           </div>
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-1 sm:space-x-2">
                             <MapPin className="w-4 h-4 text-gray-500" />
-                            <span className="text-gray-600">{match.course}</span>
+                            <span className="text-gray-600 text-sm">{match.tee} Tee</span>
                           </div>
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-1 sm:space-x-2">
                             <DivisionIcon className="w-4 h-4 text-gray-500" />
-                            <span className="text-sm text-gray-600">{match.division}</span>
+                            <span className="text-xs sm:text-sm text-gray-600">{match.division}</span>
                           </div>
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getMatchTypeColor(match.type)}`}>
                             {match.type}
@@ -155,57 +180,90 @@ export default function Schedule() {
                             {match.session}
                           </span>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {match.isPro && (
+                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                              PRO
+                            </span>
+                          )}
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getMatchStatusColor(match.status)}`}>
                             {match.status}
                           </span>
-                          <span className="text-sm text-gray-600">Match #{match.id}</span>
+                          <span className="text-xs sm:text-sm text-gray-600">Game #{match.gameNumber}</span>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className={`grid grid-cols-1 gap-4 sm:gap-6 ${match.isThreeWay ? 'lg:grid-cols-3' : 'lg:grid-cols-3'}`}>
                         {/* Team A */}
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-3 sm:space-x-4">
                           <div 
-                            className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold"
+                            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white text-base sm:text-lg font-bold flex-shrink-0"
                             style={{ backgroundColor: teamA.color }}
                           >
                             {teamA.logo}
                           </div>
-                          <div>
-                            <div className="font-medium text-gray-900">{teamA.name}</div>
-                            <div className="text-sm text-gray-600">{teamA.description}</div>
-                            <div className="text-xs text-gray-500 mt-1">
-                              Players: {match.players?.teamA?.join(', ') || 'TBD'}
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium text-gray-900 text-sm sm:text-base">{teamA.name}</div>
+                            <div className="text-xs sm:text-sm text-gray-600 truncate">{teamA.description}</div>
+                            <div className="text-xs text-gray-500 mt-1 break-words">
+                              Players: {teamAPlayers.length > 0 
+                                ? teamAPlayers.map(p => `${p.name}${p.isPro ? ' (Pro)' : ''}${p.isJunior ? ' (Jnr)' : ''}`).join(', ')
+                                : 'TBD'
+                              }
                             </div>
                           </div>
                         </div>
 
-                        {/* VS */}
-                        <div className="flex items-center justify-center">
+                        {/* VS or Center */}
+                        <div className="flex items-center justify-center lg:order-none order-last">
                           <div className="text-center">
-                            <div className="text-2xl font-bold text-gray-400">vs</div>
-                            <div className="text-sm text-gray-500 mt-1">{match.course}</div>
+                            <div className="text-xl sm:text-2xl font-bold text-gray-400">{match.isThreeWay ? '3-WAY' : 'vs'}</div>
+                            <div className="text-xs sm:text-sm text-gray-500 mt-1">{match.course}</div>
                             <div className="text-xs text-gray-500 mt-1">{match.type}</div>
                           </div>
                         </div>
 
                         {/* Team B */}
-                        <div className="flex items-center space-x-4 justify-end">
-                          <div className="text-right">
-                            <div className="font-medium text-gray-900">{teamB.name}</div>
-                            <div className="text-sm text-gray-600">{teamB.description}</div>
-                            <div className="text-xs text-gray-500 mt-1">
-                              Players: {match.players?.teamB?.join(', ') || 'TBD'}
+                        <div className="flex items-center space-x-3 sm:space-x-4 lg:justify-end">
+                          <div className="min-w-0 flex-1 lg:text-right">
+                            <div className="font-medium text-gray-900 text-sm sm:text-base">{teamB.name}</div>
+                            <div className="text-xs sm:text-sm text-gray-600 truncate">{teamB.description}</div>
+                            <div className="text-xs text-gray-500 mt-1 break-words">
+                              Players: {teamBPlayers.length > 0 
+                                ? teamBPlayers.map(p => `${p.name}${p.isPro ? ' (Pro)' : ''}${p.isJunior ? ' (Jnr)' : ''}`).join(', ')
+                                : 'TBD'
+                              }
                             </div>
                           </div>
                           <div 
-                            className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold"
+                            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white text-base sm:text-lg font-bold flex-shrink-0 lg:order-last"
                             style={{ backgroundColor: teamB.color }}
                           >
                             {teamB.logo}
                           </div>
                         </div>
+
+                        {/* Team C for 3-way matches */}
+                        {match.isThreeWay && teamC && (
+                          <div className="md:col-span-3 flex items-center justify-center space-x-4 pt-4 border-t">
+                            <div 
+                              className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold"
+                              style={{ backgroundColor: teamC.color }}
+                            >
+                              {teamC.logo}
+                            </div>
+                            <div>
+                              <div className="font-medium text-gray-900">{teamC.name}</div>
+                              <div className="text-sm text-gray-600">{teamC.description}</div>
+                              <div className="text-xs text-gray-500 mt-1">
+                                Players: {teamCPlayers.length > 0 
+                                  ? teamCPlayers.map(p => `${p.name}${p.isPro ? ' (Pro)' : ''}${p.isJunior ? ' (Jnr)' : ''}`).join(', ')
+                                  : 'TBD'
+                                }
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* Match Progress */}
@@ -240,7 +298,7 @@ export default function Schedule() {
       </div>
 
       {/* Tournament Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center space-x-3 mb-4">
             <Trophy className="w-6 h-6 text-yellow-600" />
@@ -271,25 +329,52 @@ export default function Schedule() {
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center space-x-3 mb-4">
             <Medal className="w-6 h-6 text-purple-600" />
-            <h3 className="text-lg font-semibold text-gray-900">Plate Division</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Shield Division</h3>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-600">Matches:</span>
               <span className="font-medium">
-                {matches.filter(m => m.division === 'Plate').length}
+                {matches.filter(m => m.division === 'Shield').length}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Completed:</span>
               <span className="font-medium">
-                {matches.filter(m => m.division === 'Plate' && m.status === 'completed').length}
+                {matches.filter(m => m.division === 'Shield' && m.status === 'completed').length}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">In Progress:</span>
               <span className="font-medium">
-                {matches.filter(m => m.division === 'Plate' && m.status === 'in-progress').length}
+                {matches.filter(m => m.division === 'Shield' && m.status === 'in-progress').length}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-center space-x-3 mb-4">
+            <Medal className="w-6 h-6 text-green-600" />
+            <h3 className="text-lg font-semibold text-gray-900">Plaque Division</h3>
+          </div>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Matches:</span>
+              <span className="font-medium">
+                {matches.filter(m => m.division === 'Plaque').length}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Completed:</span>
+              <span className="font-medium">
+                {matches.filter(m => m.division === 'Plaque' && m.status === 'completed').length}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">In Progress:</span>
+              <span className="font-medium">
+                {matches.filter(m => m.division === 'Plaque' && m.status === 'in-progress').length}
               </span>
             </div>
           </div>

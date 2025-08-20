@@ -1,12 +1,12 @@
 'use client';
 
 import { Team, Score } from '@/types';
-import { Trophy, Medal, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Trophy, Medal, TrendingUp, TrendingDown, Minus, Clock } from 'lucide-react';
 
 interface LeaderboardProps {
   teams: Team[];
   scores: Score[];
-  division?: 'Trophy' | 'Plate' | 'Bowl' | 'Mug';
+  division?: 'Trophy' | 'Shield' | 'Plaque' | 'Bowl' | 'Mug';
   showAll?: boolean;
 }
 
@@ -21,40 +21,48 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
     : scores;
 
   const sortedScores = [...filteredScores].sort((a, b) => {
-    // Sort by points first
-    if (b.points !== a.points) {
-      return b.points - a.points;
+    const teamA = teams.find(t => t.id === a.teamId);
+    const teamB = teams.find(t => t.id === b.teamId);
+    
+    // Pre-tournament: Sort by seeding (lower seed = higher position)
+    if (teamA && teamB) {
+      return teamA.seed - teamB.seed;
     }
-    // Then by matches won
-    if (b.matchesWon !== a.matchesWon) {
-      return b.matchesWon - a.matchesWon;
-    }
-    // Then by holes won
-    return b.holesWon - a.holesWon;
+    
+    // Fallback to points if teams not found
+    return b.points - a.points;
   });
 
   const getPositionIcon = (position: number) => {
     switch (position) {
       case 1:
-        return <Trophy className="w-5 h-5 text-yellow-500" />;
+        return <span className="text-2xl">🥇</span>;
       case 2:
-        return <Medal className="w-5 h-5 text-gray-400" />;
+        return <span className="text-2xl">🥈</span>;
       case 3:
-        return <Medal className="w-5 h-5 text-amber-600" />;
+        return <span className="text-2xl">🥉</span>;
       default:
-        return <span className="text-gray-500 font-medium">{position}</span>;
+        return <span className="text-gray-500 font-medium text-lg">{position}</span>;
     }
   };
 
-  const getTrendIcon = (score: Score, previousScore?: Score) => {
-    if (!previousScore) return <Minus className="w-4 h-4 text-gray-400" />;
+  const getTrendIcon = (score: Score) => {
+    if (!score.positionChange) return <Minus className="w-4 h-4 text-gray-400" />;
     
-    if (score.points > previousScore.points) {
-      return <TrendingUp className="w-4 h-4 text-green-500" />;
-    } else if (score.points < previousScore.points) {
-      return <TrendingDown className="w-4 h-4 text-red-500" />;
+    switch (score.positionChange) {
+      case 'up':
+        return <TrendingUp className="w-4 h-4 text-green-500" />;
+      case 'down':
+        return <TrendingDown className="w-4 h-4 text-red-500" />;
+      default:
+        return <Minus className="w-4 h-4 text-gray-400" />;
     }
-    return <Minus className="w-4 h-4 text-gray-400" />;
+  };
+
+  const formatStrokeDifferential = (differential?: number) => {
+    if (differential === undefined) return 'E';
+    if (differential === 0) return 'E';
+    return differential > 0 ? `+${differential}` : `${differential}`;
   };
 
   return (
@@ -76,19 +84,16 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                 Team
               </th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Points
+                Players
               </th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Matches
+                Max Points
               </th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Wins
+                Points Distribution
               </th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Holes Won
-              </th>
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Trend
+                Status
               </th>
             </tr>
           </thead>
@@ -119,19 +124,26 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
-                    <span className="text-lg font-bold text-green-600">{score.points || 0}</span>
+                    <div className="text-lg font-bold text-blue-600">{team.totalPlayers}</div>
+                    <div className="text-xs text-gray-500">Total Squad</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
-                    <span className="text-sm text-gray-900">{score.matchesPlayed || 0}</span>
+                    <div className="text-lg font-bold text-green-600">{team.maxPointsAvailable}</div>
+                    <div className="text-xs text-gray-500">Maximum Available</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
-                    <span className="text-sm text-blue-600 font-medium">{score.matchesWon || 0}</span>
+                    <div className="text-xs space-y-1">
+                      <div>4BBB: <span className="font-medium text-blue-600">{team.sessionPoints.friAM4BBB + team.sessionPoints.satAM4BBB}</span></div>
+                      <div>Foursomes: <span className="font-medium text-purple-600">{team.sessionPoints.friPMFoursomes + team.sessionPoints.satPMFoursomes}</span></div>
+                      <div>Singles: <span className="font-medium text-orange-600">{team.sessionPoints.sunSingles}</span></div>
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
-                    <span className="text-sm text-gray-900">{score.holesWon || 0}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
-                    {getTrendIcon(score)}
+                    <div className="flex items-center justify-center">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">
+                        Ready
+                      </span>
+                    </div>
                   </td>
                 </tr>
               );

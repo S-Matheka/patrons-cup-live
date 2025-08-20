@@ -7,7 +7,7 @@ import TeamCard from '@/components/TeamCard';
 
 export default function Teams() {
   const { teams, players, scores } = useTournament();
-  const [selectedDivision, setSelectedDivision] = useState<'Trophy' | 'Plate' | 'Bowl' | 'Mug' | 'all'>('all');
+  const [selectedDivision, setSelectedDivision] = useState<'Trophy' | 'Shield' | 'Plaque' | 'Bowl' | 'Mug' | 'all'>('all');
   const [selectedTeam, setSelectedTeam] = useState<number | null>(null);
 
   const filteredTeams = selectedDivision === 'all' 
@@ -26,7 +26,9 @@ export default function Teams() {
     switch (division) {
       case 'Trophy':
         return Trophy;
-      case 'Plate':
+      case 'Shield':
+        return Medal;
+      case 'Plaque':
         return Medal;
       case 'Bowl':
         return Medal;
@@ -40,14 +42,14 @@ export default function Teams() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Teams & Players</h1>
-        <p className="text-lg text-gray-600">Browse tournament teams and player information</p>
+      <div className="text-center px-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Teams & Players</h1>
+        <p className="text-sm sm:text-lg text-gray-600">Browse tournament teams and player information</p>
       </div>
 
       {/* Division Filter */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="flex items-center space-x-4 overflow-x-auto">
+      <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+        <div className="flex items-center space-x-2 sm:space-x-4 overflow-x-auto pb-2 sm:pb-0">
           <span className="text-sm font-medium text-gray-700 whitespace-nowrap">Filter by Division:</span>
           <button
             onClick={() => setSelectedDivision('all')}
@@ -70,14 +72,24 @@ export default function Teams() {
             Trophy Division
           </button>
           <button
-            onClick={() => setSelectedDivision('Plate')}
+            onClick={() => setSelectedDivision('Shield')}
             className={`px-4 py-2 rounded-md font-medium whitespace-nowrap ${
-              selectedDivision === 'Plate'
+              selectedDivision === 'Shield'
                 ? 'bg-purple-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            Plate Division
+            Shield Division
+          </button>
+          <button
+            onClick={() => setSelectedDivision('Plaque')}
+            className={`px-4 py-2 rounded-md font-medium whitespace-nowrap ${
+              selectedDivision === 'Plaque'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Plaque Division
           </button>
           <button
             onClick={() => setSelectedDivision('Bowl')}

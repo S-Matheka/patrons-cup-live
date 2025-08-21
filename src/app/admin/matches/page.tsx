@@ -133,6 +133,11 @@ export default function AdminMatchesPage() {
   const handleSaveMatch = (match: Match) => {
     // The real-time subscription will handle updating the UI
     console.log('Match saved:', match);
+    
+    // Force a refresh of the matches to ensure UI updates
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
 
   if (!user) {

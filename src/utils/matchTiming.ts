@@ -2,6 +2,8 @@
  * Utility functions for match timing and status validation
  */
 
+import { getCurrentEAT, parseTeeTimeEAT as parseMatchDateTime } from './timezone';
+
 export interface MatchTimingInfo {
   canScore: boolean;
   reason: string;
@@ -107,5 +109,4 @@ export function formatTimeUntilStart(timeDiffMs: number): string {
     : `${days} day${days !== 1 ? 's' : ''}`;
 }
 
-// Import EAT utilities
-export { getCurrentEAT, parseTeeTimeEAT as parseMatchDateTime } from './timezone';
+

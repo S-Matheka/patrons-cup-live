@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getAdminClient } from '@/lib/supabase-admin';
+
 import { Match, Team, Player } from '@/types';
 import { useTournament } from '@/context/TournamentContext';
 import { X, Save, Calendar, Clock, Users, MapPin, UserPlus, UserMinus, AlertCircle } from 'lucide-react';
@@ -239,30 +239,37 @@ export default function MatchEditModal({ match, isOpen, onClose, onSave }: Match
         // Note: ID is intentionally excluded - it should be auto-generated for new records
       };
 
-      const adminClient = getAdminClient();
-      if (!adminClient) {
-        throw new Error('Admin client not available');
-      }
-
+      // Use server-side API for admin operations
       let result;
       if (match?.id) {
         // Update existing match
-        result = await adminClient
-          .from('matches')
-          .update(matchData)
-          .eq('id', match.id)
-          .select()
-          .single();
+        const response = await fetch('/api/admin/matches', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: match.id, ...matchData })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to update match');
+        }
+        
+        result = await response.json();
       } else {
         // Create new match
-        result = await adminClient
-          .from('matches')
-          .insert(matchData)
-          .select()
-          .single();
+        const response = await fetch('/api/admin/matches', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(matchData)
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to create match');
+        }
+        
+        result = await response.json();
       }
-
-      if (result.error) throw result.error;
 
       // Convert back to frontend format
       const savedMatch: Match = {
@@ -287,6 +294,13 @@ export default function MatchEditModal({ match, isOpen, onClose, onSave }: Match
       };
 
       onSave(savedMatch);
+      
+      // Force a UI refresh to ensure the changes are visible
+      console.log('✅ Match saved successfully, refreshing UI...');
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+      
       onClose();
     } catch (error) {
       console.error('Error saving match:', error);

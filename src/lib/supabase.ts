@@ -1,15 +1,26 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  realtime: {
-    params: {
-      eventsPerSecond: 10,
-    },
-  },
-})
+// Create Supabase client only if environment variables are available
+export const supabase = supabaseUrl && supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      realtime: {
+        params: {
+          eventsPerSecond: 10,
+        },
+      },
+    })
+  : null
+
+// Helper function to check if Supabase is configured
+export const isSupabaseConfigured = () => {
+  return !!(supabaseUrl && 
+           supabaseAnonKey && 
+           supabaseUrl !== 'your_supabase_url_here' &&
+           supabaseAnonKey !== 'your_supabase_anon_key_here')
+}
 
 // Database type definitions for better TypeScript support
 export interface Database {

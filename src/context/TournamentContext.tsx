@@ -6,7 +6,7 @@ import teamsData from '@/data/teams.json';
 import playersData from '@/data/players.json';
 import matchesData from '@/data/matches.json';
 import scoresData from '@/data/scores.json';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 const TournamentContext = createContext<TournamentContextType | undefined>(undefined);
 
@@ -31,12 +31,7 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
 
   // Check if Supabase is configured
   useEffect(() => {
-    const supabaseConfigured = 
-      process.env.NEXT_PUBLIC_SUPABASE_URL && 
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
-      process.env.NEXT_PUBLIC_SUPABASE_URL !== 'your_supabase_url_here';
-    
-    if (supabaseConfigured) {
+    if (isSupabaseConfigured() && supabase) {
       setUseSupabase(true);
       loadFromSupabase();
       setupRealtimeSubscriptions();
@@ -85,6 +80,11 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
 
   // Supabase functions
   const loadFromSupabase = async () => {
+    if (!supabase || !isSupabaseConfigured()) {
+      console.log('Supabase not configured, skipping data load');
+      return;
+    }
+    
     try {
       console.log('Loading data from Supabase...');
       
@@ -203,7 +203,7 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
   };
 
   const setupRealtimeSubscriptions = () => {
-    if (!supabase) return;
+    if (!supabase || !isSupabaseConfigured()) return;
     
     // Subscribe to matches changes
     const matchesChannel = supabase
@@ -259,7 +259,7 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
   };
 
   const updateMatch = async (matchId: number, updatedMatch: Match) => {
-    if (useSupabase) {
+    if (useSupabase && supabase && isSupabaseConfigured()) {
       try {
         // Update in Supabase
         const { error } = await supabase
@@ -321,7 +321,7 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
   };
 
   const updateScore = async (teamId: number, updatedScore: Score) => {
-    if (useSupabase) {
+    if (useSupabase && supabase && isSupabaseConfigured()) {
       try {
         const { error } = await supabase
           .from('scores')

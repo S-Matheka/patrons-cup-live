@@ -49,6 +49,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isScorer, setIsScorer] = useState(false);
 
   useEffect(() => {
+    // Only run on client side to avoid hydration mismatch
+    if (typeof window === 'undefined') return;
+    
     // Check if user is already authenticated on app load
     const authStatus = localStorage.getItem('tournament-auth');
     const authTimestamp = localStorage.getItem('tournament-auth-time');

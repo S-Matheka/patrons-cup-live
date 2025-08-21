@@ -102,7 +102,6 @@ export default function MatchDetail() {
             {/* VS Divider */}
             <div className="text-center py-2">
               <div className="text-2xl font-bold text-white">VS</div>
-              <div className="text-green-200 text-sm">{match.course}</div>
             </div>
             
             {/* Team B */}
@@ -146,7 +145,6 @@ export default function MatchDetail() {
               
               <div className="text-center px-6">
                 <div className="text-3xl font-bold text-white">VS</div>
-                <div className="text-green-200 text-sm">{match.course}</div>
               </div>
               
               <div className="flex items-center space-x-4">

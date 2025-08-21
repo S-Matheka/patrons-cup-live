@@ -192,7 +192,6 @@ export default function AdminMatchDetail() {
               
               <div className="text-center">
                 <div className="text-2xl font-bold">vs</div>
-                <div className="text-sm opacity-90">{match.course}</div>
               </div>
               
               <div className="flex items-center space-x-4">

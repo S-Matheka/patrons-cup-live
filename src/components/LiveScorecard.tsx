@@ -125,7 +125,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
           <div className="text-white">
             <h2 className="text-lg sm:text-xl font-bold">Live Scorecard</h2>
-            <p className="text-blue-100 text-sm">{match.course} • {match.date}</p>
+            <p className="text-blue-100 text-sm">{match.date}</p>
           </div>
           <div className="text-center sm:text-right text-white">
             <div className="text-base sm:text-lg font-bold">{getMatchStatus()}</div>
@@ -301,7 +301,9 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
               </tr>
             </thead>
             <tbody>
-              {match.holes.map((hole, index) => {
+              {match.holes
+                .sort((a, b) => a.number - b.number) // Ensure holes are sorted by number
+                .map((hole, index) => {
                 const teamAIndicator = getScoreIndicator(hole.teamAStrokes, hole.par);
                 const teamBIndicator = getScoreIndicator(hole.teamBStrokes, hole.par);
                 

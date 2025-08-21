@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { Match, Team } from '@/types';
 import MatchEditModal from '@/components/admin/MatchEditModal';
 import RoleGuard from '@/components/admin/RoleGuard';
+import MatchStatusMonitor from '@/components/admin/MatchStatusMonitor';
 import { 
   Calendar, 
   Clock, 
@@ -161,6 +162,11 @@ export default function AdminMatchesPage() {
             <Plus className="w-4 h-4 mr-2" />
             Add Match
           </button>
+        </div>
+
+        {/* Match Status Monitor */}
+        <div className="mb-8">
+          <MatchStatusMonitor />
         </div>
 
         {/* Stats Cards */}

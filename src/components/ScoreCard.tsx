@@ -110,7 +110,6 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Match #{match.id}</h2>
           <div className="text-right">
-            <div className="text-sm opacity-90">{match.course}</div>
             <div className="text-sm opacity-90">{match.teeTime}</div>
           </div>
         </div>
@@ -154,7 +153,9 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
         <div className="overflow-x-auto">
           <div className="grid grid-cols-11 gap-2 mb-4 min-w-max">
             <div className="text-center font-medium text-gray-600">Hole</div>
-            {match.holes.map(hole => (
+            {match.holes
+              .sort((a, b) => a.number - b.number)
+              .map(hole => (
               <div key={hole.number} className="text-center font-medium text-gray-600 min-w-8">
                 {hole.number}
               </div>
@@ -163,7 +164,9 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
 
           <div className="grid grid-cols-11 gap-2 mb-4 min-w-max">
             <div className="text-center font-medium text-gray-600">Team A</div>
-            {match.holes.map(hole => (
+            {match.holes
+              .sort((a, b) => a.number - b.number)
+              .map(hole => (
               <div key={hole.number} className="text-center min-w-8">
                 {hole.teamAScore !== null ? hole.teamAScore : '-'}
               </div>
@@ -172,7 +175,9 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
 
           <div className="grid grid-cols-11 gap-2 mb-4 min-w-max">
             <div className="text-center font-medium text-gray-600">Team B</div>
-            {match.holes.map(hole => (
+            {match.holes
+              .sort((a, b) => a.number - b.number)
+              .map(hole => (
               <div key={hole.number} className="text-center min-w-8">
                 {hole.teamBScore !== null ? hole.teamBScore : '-'}
               </div>
@@ -204,7 +209,9 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Edit Scores</h3>
           <div className="grid grid-cols-3 gap-4">
-            {match.holes.map(hole => (
+            {match.holes
+              .sort((a, b) => a.number - b.number)
+              .map(hole => (
               <div key={hole.number} className="border rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="font-medium">Hole {hole.number}</h4>

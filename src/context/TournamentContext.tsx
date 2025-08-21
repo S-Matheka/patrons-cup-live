@@ -7,6 +7,7 @@ import playersData from '@/data/players.json';
 import matchesData from '@/data/matches.json';
 import scoresData from '@/data/scores.json';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { matchStatusManager } from '@/utils/matchStatusManager';
 
 const TournamentContext = createContext<TournamentContextType | undefined>(undefined);
 
@@ -35,12 +36,22 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
       setUseSupabase(true);
       loadFromSupabase();
       setupRealtimeSubscriptions();
+      
+      // Start automatic match status monitoring
+      matchStatusManager.startMonitoring();
+      
+      // Cleanup function to stop monitoring when component unmounts
+      return () => {
+        matchStatusManager.stopMonitoring();
+      };
     }
   }, []);
 
   // Load data from localStorage on mount
   useEffect(() => {
     if (useSupabase) return; // Skip localStorage if using Supabase
+    if (typeof window === 'undefined') return; // Only run on client side
+    
     const savedMatches = localStorage.getItem('tournament-matches');
     const savedScores = localStorage.getItem('tournament-scores');
     
@@ -51,11 +62,13 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
       const hasInProgressMatches = parsedMatches.some((match: Match) => match.status === 'in-progress');
       const hasCorrectStructure = parsedMatches.length === 158 && parsedMatches[0]?.gameNumber;
       
-      // If we dondon'tapos;t have 158 matches, missing gameNumber, or have in-progress matches, use fresh data
+      // If we don't have 158 matches, missing gameNumber, or have in-progress matches, use fresh data
       if (!hasCorrectStructure || hasInProgressMatches) {
         console.log('Loading fresh match data - old localStorage data detected');
         setMatches(matchesData as Match[]);
-        localStorage.setItem('tournament-matches', JSON.stringify(matchesData));
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('tournament-matches', JSON.stringify(matchesData));
+        }
       } else {
         setMatches(parsedMatches);
       }
@@ -65,17 +78,23 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
     // Clear any old score data that might have points
     console.log('Loading fresh scores data - ensuring pre-tournament state');
     setScores(scoresData as Score[]);
-    localStorage.setItem('tournament-scores', JSON.stringify(scoresData));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('tournament-scores', JSON.stringify(scoresData));
+    }
   }, []);
 
   // Save matches to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('tournament-matches', JSON.stringify(matches));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('tournament-matches', JSON.stringify(matches));
+    }
   }, [matches]);
 
   // Save scores to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('tournament-scores', JSON.stringify(scores));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('tournament-scores', JSON.stringify(scores));
+    }
   }, [scores]);
 
   // Supabase functions
@@ -92,19 +111,23 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
       const [teamsRes, playersRes, matchesRes, scoresRes] = await Promise.all([
         supabase.from('teams').select('*').order('seed'),
         supabase.from('players').select('*').order('name'),
-        supabase.from('matches').select(`
-          *,
-          holes (
-            hole_number,
-            par,
-            team_a_score,
-            team_b_score,
-            team_a_strokes,
-            team_b_strokes,
-            status,
-            last_updated
-          )
-        `).order('game_number'),
+        supabase
+          .from('matches')
+          .select(`
+            *,
+            holes!inner (
+              hole_number,
+              par,
+              team_a_score,
+              team_b_score,
+              team_a_strokes,
+              team_b_strokes,
+              status,
+              last_updated
+            )
+          `)
+          .order('game_number')
+          .order('hole_number', { referencedTable: 'holes' }),
         supabase.from('scores').select('*').order('points', { ascending: false })
       ]);
 

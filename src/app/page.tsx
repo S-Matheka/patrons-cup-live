@@ -174,14 +174,14 @@ export default function Dashboard() {
               <table className="min-w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 font-medium text-gray-600">Position</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-600">Team</th>
-                    <th className="text-center py-3 px-4 font-medium text-gray-600">Points</th>
-                    <th className="text-center py-3 px-4 font-medium text-gray-600">Played</th>
-                    <th className="text-center py-3 px-4 font-medium text-gray-600">Won</th>
-                    <th className="text-center py-3 px-4 font-medium text-gray-600">Lost</th>
-                    <th className="text-center py-3 px-4 font-medium text-gray-600">AS</th>
-                    <th className="text-center py-3 px-4 font-medium text-gray-600">Recent</th>
+                    <th className="text-left py-3 px-2 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Position</th>
+                    <th className="text-left py-3 px-2 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Team</th>
+                    <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Points</th>
+                    <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm hidden xs:table-cell">Played</th>
+                    <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Won</th>
+                    <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Lost</th>
+                    <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">AS</th>
+                    <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm hidden sm:table-cell">Recent</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -191,50 +191,54 @@ export default function Dashboard() {
                     
                     return (
                       <tr key={score.teamId} className="border-b border-gray-100 hover:bg-gray-50">
-                        <td className="py-4 px-4">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-lg font-bold text-gray-900">#{position}</span>
-                            {getPositionIcon(score.positionChange || 'same')}
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="flex items-center space-x-3">
-                            {getDivisionIcon(score.division)}
-                            <div>
-                              <div className="font-medium text-gray-900">{team?.name}</div>
-                              <div className="text-sm text-gray-500">Seed #{team?.seed}</div>
+                        <td className="py-3 sm:py-4 px-2 sm:px-4">
+                          <div className="flex items-center space-x-1 sm:space-x-2">
+                            <span className="text-sm sm:text-lg font-bold text-gray-900">#{position}</span>
+                            <div className="hidden xs:block">
+                              {getPositionIcon(score.positionChange || 'same')}
                             </div>
                           </div>
                         </td>
-                        <td className="py-4 px-4 text-center">
-                          <span className="text-xl font-bold text-green-600">
+                        <td className="py-3 sm:py-4 px-2 sm:px-4">
+                          <div className="flex items-center space-x-2 sm:space-x-3">
+                            <div className="hidden xs:block">
+                              {getDivisionIcon(score.division)}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="font-medium text-gray-900 text-xs sm:text-sm truncate">{team?.name}</div>
+                              <div className="text-xs text-gray-500 hidden sm:block">Seed #{team?.seed}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-3 sm:py-4 px-1 sm:px-4 text-center">
+                          <span className="text-sm sm:text-xl font-bold text-green-600">
                             {score.points.toFixed(1)}
                           </span>
                         </td>
-                        <td className="py-4 px-4 text-center text-gray-900">
+                        <td className="py-3 sm:py-4 px-1 sm:px-4 text-center text-gray-900 text-xs sm:text-sm hidden xs:table-cell">
                           {score.matchesPlayed}
                         </td>
-                        <td className="py-4 px-4 text-center">
-                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                        <td className="py-3 sm:py-4 px-1 sm:px-4 text-center">
+                          <span className="inline-flex px-1 sm:px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
                             {score.matchesWon}
                           </span>
                         </td>
-                        <td className="py-4 px-4 text-center">
-                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                        <td className="py-3 sm:py-4 px-1 sm:px-4 text-center">
+                          <span className="inline-flex px-1 sm:px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
                             {score.matchesLost}
                           </span>
                         </td>
-                        <td className="py-4 px-4 text-center">
-                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                        <td className="py-3 sm:py-4 px-1 sm:px-4 text-center">
+                          <span className="inline-flex px-1 sm:px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
                             {score.matchesHalved}
                           </span>
                         </td>
-                        <td className="py-4 px-4 text-center">
+                        <td className="py-3 sm:py-4 px-1 sm:px-4 text-center hidden sm:table-cell">
                           <div className="flex items-center justify-center space-x-1">
                             {getTeamForm(score.teamId).map((result, idx) => (
                               <span
                                 key={idx}
-                                className={`inline-flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full ${
+                                className={`inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 text-xs font-bold rounded-full ${
                                   result === 'W' ? 'bg-green-100 text-green-800' :
                                   result === 'L' ? 'bg-red-100 text-red-800' :
                                   'bg-gray-100 text-gray-800'

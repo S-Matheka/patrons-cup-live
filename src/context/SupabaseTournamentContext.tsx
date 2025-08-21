@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { TournamentContextType, Team, Player, Match, Score, Hole } from '@/types';
 import { supabase } from '@/lib/supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { matchStatusManager } from '@/utils/matchStatusManager';
 
 const TournamentContext = createContext<TournamentContextType | undefined>(undefined);
 
@@ -32,12 +33,18 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
   useEffect(() => {
     loadInitialData();
     setupRealtimeSubscriptions();
+    
+    // Start automatic match status monitoring
+    matchStatusManager.startMonitoring();
 
     // Cleanup subscriptions on unmount
     return () => {
       channels.forEach(channel => {
         supabase.removeChannel(channel);
       });
+      
+      // Stop match status monitoring
+      matchStatusManager.stopMonitoring();
     };
   }, []);
 
@@ -48,19 +55,23 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
       const [teamsRes, playersRes, matchesRes, scoresRes] = await Promise.all([
         supabase.from('teams').select('*').order('seed'),
         supabase.from('players').select('*').order('name'),
-        supabase.from('matches').select(`
-          *,
-          holes (
-            hole_number,
-            par,
-            team_a_score,
-            team_b_score,
-            team_a_strokes,
-            team_b_strokes,
-            status,
-            last_updated
-          )
-        `).order('game_number'),
+        supabase
+          .from('matches')
+          .select(`
+            *,
+            holes!inner (
+              hole_number,
+              par,
+              team_a_score,
+              team_b_score,
+              team_a_strokes,
+              team_b_strokes,
+              status,
+              last_updated
+            )
+          `)
+          .order('game_number')
+          .order('hole_number', { referencedTable: 'holes' }),
         supabase.from('scores').select('*').order('points', { ascending: false })
       ]);
 

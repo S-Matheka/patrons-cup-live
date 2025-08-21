@@ -149,40 +149,38 @@ export default function Standings() {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
-                        <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
-                        <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
-                        <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matches</th>
-                        <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wins</th>
-                        <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Losses</th>
-                        <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AS</th>
-                        <th className="hidden lg:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trend</th>
+                        <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                        <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
+                        <th className="px-1 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
+                        <th className="px-1 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wins</th>
+                        <th className="px-1 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Losses</th>
+                        <th className="px-1 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AS</th>
+                        <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trend</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {sortedScores(trophyScores).map((score, index) => (
                         <tr key={score.teamId} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
+                          <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div 
-                                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3"
+                                className="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-bold mr-2 sm:mr-3 flex-shrink-0"
                                 style={{ backgroundColor: score.team.color }}
                               >
                                 {score.team.logo}
                               </div>
-                              <div>
-                                <div className="text-sm font-medium text-gray-900">{score.team.name}</div>
-                                <div className="text-sm text-gray-500">{score.team.description}</div>
+                              <div className="min-w-0">
+                                <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">{score.team.name}</div>
+                                <div className="text-xs text-gray-500 hidden sm:block truncate">{score.team.description}</div>
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
+                          <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 font-bold">{score.points}</td>
+                          <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">{score.matchesWon}</td>
+                          <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">{score.matchesLost}</td>
+                          <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">{score.matchesHalved}</td>
+                          <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
                         </tr>
                       ))}
                     </tbody>

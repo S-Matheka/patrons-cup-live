@@ -19,8 +19,15 @@ export default function TournamentCountdown({
     seconds: number;
   } | null>(null);
   const [isStarted, setIsStarted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return; // Only run on client side after mount
+    
     const calculateTimeLeft = () => {
       const now = new Date().getTime();
       const tournamentStart = new Date(startDate).getTime();
@@ -47,11 +54,23 @@ export default function TournamentCountdown({
     const timer = setInterval(calculateTimeLeft, 1000);
 
     return () => clearInterval(timer);
-  }, [startDate]);
+  }, [startDate, isMounted]);
 
   // Don't render if tournament has started
   if (isStarted || !timeLeft) {
     return null;
+  }
+
+  // Show loading state during SSR to prevent hydration mismatch
+  if (!isMounted) {
+    return (
+      <div className={`bg-gradient-to-r from-green-600 to-green-700 rounded-lg shadow-lg ${className}`}>
+        <div className="px-6 py-4 text-center">
+          <h3 className="text-xl font-bold text-white mb-2">Tournament Countdown</h3>
+          <div className="text-white opacity-75">Loading...</div>
+        </div>
+      </div>
+    );
   }
 
   return (

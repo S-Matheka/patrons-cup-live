@@ -28,7 +28,7 @@ const LiveTournamentFeed = () => {
       // Tournament announcements
       items.push({
         id: '1',
-        timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 mins ago
+        timestamp: '2025-08-22T06:30:00Z', // Static timestamp
         type: 'score_update',
         teamName: 'Tournament',
         teamColor: '#10b981',
@@ -40,7 +40,7 @@ const LiveTournamentFeed = () => {
 
       items.push({
         id: '2',
-        timestamp: new Date(Date.now() - 60 * 60 * 1000).toISOString(), // 1 hour ago
+        timestamp: '2025-08-22T06:00:00Z', // Static timestamp
         type: 'position_change',
         teamName: 'Muthaiga',
         teamColor: '#e1a730',
@@ -51,7 +51,7 @@ const LiveTournamentFeed = () => {
 
       items.push({
         id: '3',
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+        timestamp: '2025-08-22T05:00:00Z', // Static timestamp
         type: 'match_complete',
         teamName: 'Teams',
         teamColor: '#3b82f6',
@@ -62,7 +62,7 @@ const LiveTournamentFeed = () => {
 
       items.push({
         id: '4',
-        timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
+        timestamp: '2025-08-22T04:00:00Z', // Static timestamp
         type: 'hole_complete',
         teamName: 'Officials',
         teamColor: '#6b7280',
@@ -73,7 +73,7 @@ const LiveTournamentFeed = () => {
 
       items.push({
         id: '5',
-        timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
+        timestamp: '2025-08-22T03:00:00Z', // Static timestamp
         type: 'position_change',
         teamName: 'Weather',
         teamColor: '#059669',
@@ -111,16 +111,18 @@ const LiveTournamentFeed = () => {
   };
 
   const formatTimeAgo = (timestamp: string) => {
-    const now = new Date();
+    // Use static relative times to avoid hydration mismatch
     const time = new Date(timestamp);
-    const diffInMinutes = Math.floor((now.getTime() - time.getTime()) / (1000 * 60));
+    const tournamentDate = new Date('2025-08-22T07:00:00Z');
     
-    if (diffInMinutes < 1) return 'Just now';
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    // For pre-tournament, show static relative times
+    if (timestamp === '2025-08-22T06:30:00Z') return '30m ago';
+    if (timestamp === '2025-08-22T06:00:00Z') return '1h ago';
+    if (timestamp === '2025-08-22T05:00:00Z') return '2h ago';
+    if (timestamp === '2025-08-22T04:00:00Z') return '3h ago';
+    if (timestamp === '2025-08-22T03:00:00Z') return '4h ago';
     
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    
+    // Fallback to date string for other timestamps
     return time.toLocaleDateString();
   };
 

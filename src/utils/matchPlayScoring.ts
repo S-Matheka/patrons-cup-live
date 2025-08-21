@@ -61,17 +61,17 @@ export function calculateMatchPlayResult(
 
   if (isMatchComplete) {
     if (teamAHolesWon === teamBHolesWon) {
-      // Match is tied after all holes
+      // Match is tied after all holes - only possible if played to hole 18
       result = 'AS';
       winner = 'halved';
     } else if (holesPlayed === totalHoles) {
-      // Match went to the final hole
+      // Match went to the final hole (hole 18)
       result = `${holesDifference}up`;
       winner = leadingTeam!;
     } else {
       // Match ended early (dormie situation)
-      const holesEarlyEnd = totalHoles - holesPlayed;
-      result = `${holesDifference}/${holesEarlyEnd}`;
+      // Format: holes_up/holes_remaining (e.g., 3/2, 4/3, etc.)
+      result = `${holesDifference}/${holesRemaining}`;
       winner = leadingTeam!;
     }
   } else {

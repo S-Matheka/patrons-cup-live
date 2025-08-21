@@ -239,7 +239,6 @@ export default function Schedule() {
                         <div className="flex items-center justify-center lg:order-none order-last">
                           <div className="text-center">
                             <div className="text-xl sm:text-2xl font-bold text-gray-400">{match.isThreeWay ? '3-WAY' : 'vs'}</div>
-                            <div className="text-xs sm:text-sm text-gray-500 mt-1">{match.course}</div>
                             <div className="text-xs text-gray-500 mt-1">{match.type}</div>
                           </div>
                         </div>

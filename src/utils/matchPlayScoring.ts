@@ -34,7 +34,8 @@ export function calculateMatchPlayResult(
 
   // Count holes won by each team
   for (const hole of holes) {
-    if (hole.teamAStrokes > 0 && hole.teamBStrokes > 0) {
+    // Only count holes where both teams have valid scores (not null/undefined/0)
+    if (hole.teamAStrokes && hole.teamBStrokes && hole.teamAStrokes > 0 && hole.teamBStrokes > 0) {
       holesPlayed++;
       
       if (hole.teamAStrokes < hole.teamBStrokes) {

@@ -38,10 +38,10 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
   const calculateMatchStatus = () => {
     // Convert holes to the format expected by the match play calculator
     const holesData = match.holes.map(hole => ({
-      holeNumber: hole.holeNumber,
+      holeNumber: hole.number,
       par: hole.par || 4, // Default to par 4 if not specified
-      teamAStrokes: hole.teamAStrokes || 0,
-      teamBStrokes: hole.teamBStrokes || 0
+      teamAStrokes: hole.teamAScore || 0, // Use teamAScore instead of teamAStrokes
+      teamBStrokes: hole.teamBScore || 0  // Use teamBScore instead of teamBStrokes
     }));
 
     const result = calculateMatchPlayResult(holesData, 18);
@@ -102,6 +102,12 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
 
   const handleSaveHole = async () => {
     if (editingHole && (tempScores.teamA !== null || tempScores.teamB !== null)) {
+      console.log('💾 Saving hole scores:', {
+        holeNumber: editingHole,
+        teamAScore: tempScores.teamA,
+        teamBScore: tempScores.teamB,
+        matchId: match.id
+      });
       const updatedHoles = match.holes.map(hole => 
         hole.number === editingHole 
           ? {
@@ -117,8 +123,8 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
       const holesData = updatedHoles.map(hole => ({
         holeNumber: hole.number,
         par: hole.par || 4,
-        teamAStrokes: hole.teamAScore || 0,
-        teamBStrokes: hole.teamBScore || 0
+        teamAStrokes: hole.teamAScore || 0, // Use teamAScore
+        teamBStrokes: hole.teamBScore || 0  // Use teamBScore
       }));
 
       const matchPlayResult = calculateMatchPlayResult(holesData, 18);
@@ -130,9 +136,11 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
         status: isMatchComplete ? 'completed' : 'in-progress'
       };
 
-      // Save the match first
-      onSave(updatedMatch);
-      await updateMatch(updatedMatch);
+      // Save the match to database first
+      console.log('🔄 Updating match in database...');
+      await updateMatch(updatedMatch.id, updatedMatch);
+      console.log('✅ Match updated in database successfully');
+      onSave(updatedMatch); // This updates local state
 
       // If match is complete, update leaderboard automatically
       if (isMatchComplete) {

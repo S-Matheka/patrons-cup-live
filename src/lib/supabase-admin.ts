@@ -1,44 +1,49 @@
 import { createClient } from '@supabase/supabase-js'
+import { supabase } from './supabase'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-// Create admin Supabase client with service role key for admin operations
-// Only create if both URL and service key are available
-let supabaseAdmin: any = null;
-
-if (supabaseUrl && supabaseServiceKey) {
+// Helper function to create admin client only when needed
+function createAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.error('❌ Missing admin environment variables:', {
+      NEXT_PUBLIC_SUPABASE_URL: supabaseUrl ? 'SET' : 'MISSING',
+      SUPABASE_SERVICE_ROLE_KEY: supabaseServiceKey ? 'SET' : 'MISSING'
+    });
+    return null;
+  }
+  
   try {
-    supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+    return createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false
       }
     });
-    console.log('✅ Admin client created successfully');
   } catch (error) {
     console.error('❌ Failed to create admin client:', error);
-    supabaseAdmin = null;
+    return null;
   }
-} else {
-  console.warn('⚠️ Admin client not created - missing environment variables');
 }
 
 // Helper function to check if admin client is configured
 export const isSupabaseAdminConfigured = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   return !!(supabaseUrl && 
            supabaseServiceKey && 
            supabaseUrl !== 'your_supabase_url_here' &&
            supabaseServiceKey !== 'your_supabase_service_role_key_here')
 }
 
-// Import regular supabase client for fallback
-import { supabase } from './supabase'
-
-// Fallback to regular supabase client if admin is not configured
+// Get admin client or fallback to regular client
 export const getAdminClient = () => {
-  if (supabaseAdmin) {
-    return supabaseAdmin;
+  const adminClient = createAdminClient();
+  
+  if (adminClient) {
+    console.log('✅ Admin client created successfully');
+    return adminClient;
   }
   
   if (supabase) {

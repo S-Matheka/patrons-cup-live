@@ -251,7 +251,8 @@ export default function MatchEditModal({ match, isOpen, onClose, onSave }: Match
         
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to update match');
+          console.error('❌ API Error Response:', errorData);
+          throw new Error(errorData.error || `HTTP ${response.status}: Failed to update match`);
         }
         
         result = await response.json();
@@ -265,7 +266,8 @@ export default function MatchEditModal({ match, isOpen, onClose, onSave }: Match
         
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to create match');
+          console.error('❌ API Error Response:', errorData);
+          throw new Error(errorData.error || `HTTP ${response.status}: Failed to create match`);
         }
         
         result = await response.json();

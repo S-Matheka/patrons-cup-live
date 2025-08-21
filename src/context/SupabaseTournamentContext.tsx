@@ -1,0 +1,440 @@
+'use client';
+
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { TournamentContextType, Team, Player, Match, Score, Hole } from '@/types';
+import { supabase } from '@/lib/supabase';
+import type { RealtimeChannel } from '@supabase/supabase-js';
+
+const TournamentContext = createContext<TournamentContextType | undefined>(undefined);
+
+export const useTournament = () => {
+  const context = useContext(TournamentContext);
+  if (context === undefined) {
+    throw new Error('useTournament must be used within a TournamentProvider');
+  }
+  return context;
+};
+
+interface TournamentProviderProps {
+  children: React.ReactNode;
+}
+
+export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children }) => {
+  // Start with JSON data to match localStorage provider behavior
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [scores, setScores] = useState<Score[]>([]);
+  const [loading, setLoading] = useState(false); // Start without loading to prevent hydration issues
+  const [channels, setChannels] = useState<RealtimeChannel[]>([]);
+
+  // Load initial data from Supabase
+  useEffect(() => {
+    loadInitialData();
+    setupRealtimeSubscriptions();
+
+    // Cleanup subscriptions on unmount
+    return () => {
+      channels.forEach(channel => {
+        supabase.removeChannel(channel);
+      });
+    };
+  }, []);
+
+  const loadInitialData = async () => {
+    try {
+
+      // Load all data in parallel
+      const [teamsRes, playersRes, matchesRes, scoresRes] = await Promise.all([
+        supabase.from('teams').select('*').order('seed'),
+        supabase.from('players').select('*').order('name'),
+        supabase.from('matches').select(`
+          *,
+          holes (
+            hole_number,
+            par,
+            team_a_score,
+            team_b_score,
+            team_a_strokes,
+            team_b_strokes,
+            status,
+            last_updated
+          )
+        `).order('game_number'),
+        supabase.from('scores').select('*').order('points', { ascending: false })
+      ]);
+
+      if (teamsRes.error) throw teamsRes.error;
+      if (playersRes.error) throw playersRes.error;
+      if (matchesRes.error) throw matchesRes.error;
+      if (scoresRes.error) throw scoresRes.error;
+
+      // Transform Supabase data to match our types
+      const transformedTeams: Team[] = teamsRes.data.map(team => ({
+        id: team.id,
+        name: team.name,
+        division: team.division,
+        color: team.color,
+        logo: team.logo || '',
+        description: team.description || '',
+        seed: team.seed,
+        totalPlayers: team.total_players,
+        maxPointsAvailable: team.max_points_available,
+        sessionPoints: team.session_points,
+        playersPerSession: team.players_per_session,
+        restingPerSession: team.resting_per_session,
+        pointsPerMatch: team.points_per_match
+      }));
+
+      const transformedPlayers: Player[] = playersRes.data.map(player => ({
+        id: player.id,
+        name: player.name,
+        teamId: player.team_id,
+        handicap: player.handicap,
+        email: player.email || '',
+        phone: player.phone || '',
+        isPro: player.is_pro,
+        isExOfficio: player.is_ex_officio,
+        isJunior: player.is_junior
+      }));
+
+      const transformedMatches: Match[] = matchesRes.data.map(match => ({
+        id: match.id,
+        teamAId: match.team_a_id,
+        teamBId: match.team_b_id,
+        teamCId: match.team_c_id,
+        division: match.division,
+        date: match.match_date,
+        teeTime: match.tee_time,
+        tee: match.tee,
+        course: match.course,
+        type: match.match_type,
+        session: match.session,
+        status: match.status,
+        players: match.players,
+        gameNumber: match.game_number,
+        isThreeWay: match.is_three_way,
+        isPro: match.is_pro,
+        isBye: match.is_bye,
+        holes: (match.holes || []).map((hole: any) => ({
+          number: hole.hole_number,
+          par: hole.par,
+          teamAScore: hole.team_a_score,
+          teamBScore: hole.team_b_score,
+          teamAStrokes: hole.team_a_strokes,
+          teamBStrokes: hole.team_b_strokes,
+          status: hole.status,
+          lastUpdated: hole.last_updated
+        }))
+      }));
+
+      const transformedScores: Score[] = scoresRes.data.map(score => ({
+        teamId: score.team_id,
+        division: score.division,
+        points: score.points,
+        matchesPlayed: score.matches_played,
+        matchesWon: score.matches_won,
+        matchesLost: score.matches_lost,
+        matchesHalved: score.matches_halved,
+        holesWon: score.holes_won,
+        holesLost: score.holes_lost,
+        totalStrokes: score.total_strokes,
+        strokesDifferential: score.strokes_differential,
+        currentRound: score.current_round,
+        position: score.position,
+        positionChange: score.position_change,
+        lastUpdated: score.last_updated
+      }));
+
+      setTeams(transformedTeams);
+      setPlayers(transformedPlayers);
+      setMatches(transformedMatches);
+      setScores(transformedScores);
+
+    } catch (error) {
+      console.error('Error loading initial data:', error);
+    }
+  };
+
+  const setupRealtimeSubscriptions = () => {
+    const newChannels: RealtimeChannel[] = [];
+
+    // Subscribe to matches changes
+    const matchesChannel = supabase
+      .channel('matches-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'matches' },
+        (payload) => {
+          console.log('Match updated:', payload);
+          handleMatchUpdate(payload);
+        }
+      )
+      .subscribe();
+
+    // Subscribe to holes changes
+    const holesChannel = supabase
+      .channel('holes-changes')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'holes' },
+        (payload) => {
+          console.log('Hole updated:', payload);
+          handleHoleUpdate(payload);
+        }
+      )
+      .subscribe();
+
+    // Subscribe to scores changes
+    const scoresChannel = supabase
+      .channel('scores-changes')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'scores' },
+        (payload) => {
+          console.log('Score updated:', payload);
+          handleScoreUpdate(payload);
+        }
+      )
+      .subscribe();
+
+    newChannels.push(matchesChannel, holesChannel, scoresChannel);
+    setChannels(newChannels);
+  };
+
+  const handleMatchUpdate = (payload: any) => {
+    const { eventType, new: newRecord, old: oldRecord } = payload;
+
+    setMatches(currentMatches => {
+      switch (eventType) {
+        case 'INSERT':
+          return [...currentMatches, transformSupabaseMatch(newRecord)];
+        case 'UPDATE':
+          return currentMatches.map(match =>
+            match.id === newRecord.id ? transformSupabaseMatch(newRecord) : match
+          );
+        case 'DELETE':
+          return currentMatches.filter(match => match.id !== oldRecord.id);
+        default:
+          return currentMatches;
+      }
+    });
+  };
+
+  const handleHoleUpdate = (payload: any) => {
+    const { eventType, new: newRecord, old: oldRecord } = payload;
+
+    setMatches(currentMatches => {
+      return currentMatches.map(match => {
+        if (match.id === (newRecord?.match_id || oldRecord?.match_id)) {
+          const updatedHoles = [...match.holes];
+          const holeIndex = updatedHoles.findIndex(h => h.number === (newRecord?.hole_number || oldRecord?.hole_number));
+
+          switch (eventType) {
+            case 'INSERT':
+            case 'UPDATE':
+              if (holeIndex >= 0) {
+                updatedHoles[holeIndex] = transformSupabaseHole(newRecord);
+              } else {
+                updatedHoles.push(transformSupabaseHole(newRecord));
+              }
+              break;
+            case 'DELETE':
+              if (holeIndex >= 0) {
+                updatedHoles.splice(holeIndex, 1);
+              }
+              break;
+          }
+
+          return { ...match, holes: updatedHoles };
+        }
+        return match;
+      });
+    });
+  };
+
+  const handleScoreUpdate = (payload: any) => {
+    const { eventType, new: newRecord, old: oldRecord } = payload;
+
+    setScores(currentScores => {
+      switch (eventType) {
+        case 'INSERT':
+          return [...currentScores, transformSupabaseScore(newRecord)];
+        case 'UPDATE':
+          return currentScores.map(score =>
+            score.teamId === newRecord.team_id ? transformSupabaseScore(newRecord) : score
+          );
+        case 'DELETE':
+          return currentScores.filter(score => score.teamId !== oldRecord.team_id);
+        default:
+          return currentScores;
+      }
+    });
+  };
+
+  // Transform functions
+  const transformSupabaseMatch = (supabaseMatch: any): Match => ({
+    id: supabaseMatch.id,
+    teamAId: supabaseMatch.team_a_id,
+    teamBId: supabaseMatch.team_b_id,
+    teamCId: supabaseMatch.team_c_id,
+    division: supabaseMatch.division,
+    date: supabaseMatch.match_date,
+    teeTime: supabaseMatch.tee_time,
+    tee: supabaseMatch.tee,
+    course: supabaseMatch.course,
+    type: supabaseMatch.match_type,
+    session: supabaseMatch.session,
+    status: supabaseMatch.status,
+    players: supabaseMatch.players,
+    gameNumber: supabaseMatch.game_number,
+    isThreeWay: supabaseMatch.is_three_way,
+    isPro: supabaseMatch.is_pro,
+    isBye: supabaseMatch.is_bye,
+    holes: [] // Holes are loaded separately
+  });
+
+  const transformSupabaseHole = (supabaseHole: any): Hole => ({
+    number: supabaseHole.hole_number,
+    par: supabaseHole.par,
+    teamAScore: supabaseHole.team_a_score,
+    teamBScore: supabaseHole.team_b_score,
+    teamAStrokes: supabaseHole.team_a_strokes,
+    teamBStrokes: supabaseHole.team_b_strokes,
+    status: supabaseHole.status,
+    lastUpdated: supabaseHole.last_updated
+  });
+
+  const transformSupabaseScore = (supabaseScore: any): Score => ({
+    teamId: supabaseScore.team_id,
+    division: supabaseScore.division,
+    points: supabaseScore.points,
+    matchesPlayed: supabaseScore.matches_played,
+    matchesWon: supabaseScore.matches_won,
+    matchesLost: supabaseScore.matches_lost,
+    matchesHalved: supabaseScore.matches_halved,
+    holesWon: supabaseScore.holes_won,
+    holesLost: supabaseScore.holes_lost,
+    totalStrokes: supabaseScore.total_strokes,
+    strokesDifferential: supabaseScore.strokes_differential,
+    currentRound: supabaseScore.current_round,
+    position: supabaseScore.position,
+    positionChange: supabaseScore.position_change,
+    lastUpdated: supabaseScore.last_updated
+  });
+
+  // Update functions
+  const updateMatch = async (matchId: number, updatedMatch: Match) => {
+    try {
+      const { error } = await supabase
+        .from('matches')
+        .update({
+          team_a_id: updatedMatch.teamAId,
+          team_b_id: updatedMatch.teamBId,
+          team_c_id: updatedMatch.teamCId,
+          division: updatedMatch.division,
+          match_date: updatedMatch.date,
+          tee_time: updatedMatch.teeTime,
+          tee: updatedMatch.tee,
+          course: updatedMatch.course,
+          match_type: updatedMatch.type,
+          session: updatedMatch.session,
+          status: updatedMatch.status,
+          players: updatedMatch.players,
+          game_number: updatedMatch.gameNumber,
+          is_three_way: updatedMatch.isThreeWay,
+          is_pro: updatedMatch.isPro,
+          is_bye: updatedMatch.isBye,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', matchId);
+
+      if (error) throw error;
+
+      // Update holes if they exist
+      if (updatedMatch.holes && updatedMatch.holes.length > 0) {
+        const holesData = updatedMatch.holes.map(hole => ({
+          match_id: matchId,
+          hole_number: hole.number,
+          par: hole.par,
+          team_a_score: hole.teamAScore,
+          team_b_score: hole.teamBScore,
+          team_a_strokes: hole.teamAStrokes,
+          team_b_strokes: hole.teamBStrokes,
+          status: hole.status,
+          last_updated: new Date().toISOString()
+        }));
+
+        const { error: holesError } = await supabase
+          .from('holes')
+          .upsert(holesData, { onConflict: 'match_id,hole_number' });
+
+        if (holesError) throw holesError;
+      }
+
+    } catch (error) {
+      console.error('Error updating match:', error);
+    }
+  };
+
+  const updateScore = async (teamId: number, updatedScore: Score) => {
+    try {
+      const { error } = await supabase
+        .from('scores')
+        .update({
+          division: updatedScore.division,
+          points: updatedScore.points,
+          matches_played: updatedScore.matchesPlayed,
+          matches_won: updatedScore.matchesWon,
+          matches_lost: updatedScore.matchesLost,
+          matches_halved: updatedScore.matchesHalved,
+          holes_won: updatedScore.holesWon,
+          holes_lost: updatedScore.holesLost,
+          total_strokes: updatedScore.totalStrokes,
+          strokes_differential: updatedScore.strokesDifferential,
+          current_round: updatedScore.currentRound,
+          position: updatedScore.position,
+          position_change: updatedScore.positionChange,
+          last_updated: new Date().toISOString()
+        })
+        .eq('team_id', teamId);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error updating score:', error);
+    }
+  };
+
+  // Helper functions
+  const getTeamById = (id: number): Team | undefined => {
+    return teams.find(team => team.id === id);
+  };
+
+  const getPlayersByTeamId = (teamId: number): Player[] => {
+    return players.filter(player => player.teamId === teamId);
+  };
+
+  const getMatchById = (id: number): Match | undefined => {
+    return matches.find(match => match.id === id);
+  };
+
+  const getScoreByTeamId = (teamId: number): Score | undefined => {
+    return scores.find(score => score.teamId === teamId);
+  };
+
+  const value: TournamentContextType = {
+    teams,
+    players,
+    matches,
+    scores,
+    updateMatch,
+    updateScore,
+    getTeamById,
+    getPlayersByTeamId,
+    getMatchById,
+    getScoreByTeamId
+  };
+
+  return (
+    <TournamentContext.Provider value={value}>
+      {children}
+    </TournamentContext.Provider>
+  );
+};

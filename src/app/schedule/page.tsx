@@ -139,7 +139,25 @@ export default function Schedule() {
           ) : (
             <div className="space-y-6">
               {getMatchesByDate(selectedDate)
-                .sort((a, b) => a.teeTime.localeCompare(b.teeTime))
+                .sort((a, b) => {
+                  // Convert time strings to comparable format
+                  const convertTimeToMinutes = (timeStr: string) => {
+                    const [time, period] = timeStr.split(' ');
+                    const [hours, minutes] = time.split(':').map(Number);
+                    let totalMinutes = hours * 60 + minutes;
+                    
+                    // Convert to 24-hour format
+                    if (period === 'PM' && hours !== 12) {
+                      totalMinutes += 12 * 60;
+                    } else if (period === 'AM' && hours === 12) {
+                      totalMinutes -= 12 * 60;
+                    }
+                    
+                    return totalMinutes;
+                  };
+                  
+                  return convertTimeToMinutes(a.teeTime) - convertTimeToMinutes(b.teeTime);
+                })
                 .map(match => {
                   const teamA = getTeamById(match.teamAId);
                   const teamB = getTeamById(match.teamBId);
@@ -154,8 +172,9 @@ export default function Schedule() {
                   if (!teamA || !teamB) return null;
 
                   return (
-                    <div key={match.id} className="border rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-4">
+                    <div key={match.id} className="border rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow overflow-hidden">
+                      <div className="mb-4 space-y-3">
+                        {/* First row - Time and basic info */}
                         <div className="flex flex-wrap items-center gap-2">
                           <div className="flex items-center space-x-1 sm:space-x-2">
                             <Clock className="w-4 h-4 text-gray-500" />
@@ -167,6 +186,11 @@ export default function Schedule() {
                             <MapPin className="w-4 h-4 text-gray-500" />
                             <span className="text-gray-600 text-sm">{match.tee} Tee</span>
                           </div>
+                          <span className="text-xs sm:text-sm text-gray-600">Game #{match.gameNumber}</span>
+                        </div>
+                        
+                        {/* Second row - Division, type, and status */}
+                        <div className="flex flex-wrap items-center gap-2">
                           <div className="flex items-center space-x-1 sm:space-x-2">
                             <DivisionIcon className="w-4 h-4 text-gray-500" />
                             <span className="text-xs sm:text-sm text-gray-600">{match.division}</span>
@@ -179,8 +203,6 @@ export default function Schedule() {
                           }`}>
                             {match.session}
                           </span>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-2">
                           {match.isPro && (
                             <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
                               PRO
@@ -189,11 +211,10 @@ export default function Schedule() {
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getMatchStatusColor(match.status)}`}>
                             {match.status}
                           </span>
-                          <span className="text-xs sm:text-sm text-gray-600">Game #{match.gameNumber}</span>
                         </div>
                       </div>
 
-                      <div className={`grid grid-cols-1 gap-4 sm:gap-6 ${match.isThreeWay ? 'lg:grid-cols-3' : 'lg:grid-cols-3'}`}>
+                      <div className={`grid grid-cols-1 gap-4 sm:gap-6 ${match.isThreeWay ? 'md:grid-cols-1 lg:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-3'}`}>
                         {/* Team A */}
                         <div className="flex items-center space-x-3 sm:space-x-4">
                           <div 
@@ -268,13 +289,13 @@ export default function Schedule() {
 
                       {/* Match Progress */}
                       <div className="mt-4 pt-4 border-t border-gray-200">
-                        <div className="flex items-center justify-between text-sm">
+                        <div className="flex flex-col space-y-2 text-sm">
                           <span className="text-gray-600">Match Progress:</span>
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                             {match.holes.map(hole => (
                               <div
                                 key={hole.number}
-                                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0 ${
                                   hole.status === 'completed'
                                     ? 'bg-green-500 text-white'
                                     : hole.status === 'in-progress'

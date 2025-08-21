@@ -1,341 +1,269 @@
 'use client';
 
 import { useTournament } from '@/context/TournamentContext';
-import { useState } from 'react';
-import Leaderboard from '@/components/Leaderboard';
-import { Calendar, Clock, CheckCircle, Circle, Trophy, Medal, Zap } from 'lucide-react';
-
+import { useState, useMemo } from 'react';
+import { Trophy, Medal, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import TournamentCountdown from '@/components/TournamentCountdown';
 
 export default function Dashboard() {
-  const { teams, scores, matches } = useTournament();
+  const { teams, scores, matches, getTeamById } = useTournament();
   const [activeDivision, setActiveDivision] = useState<'Trophy' | 'Shield' | 'Plaque' | 'Bowl' | 'Mug'>('Trophy');
 
-  const activeMatches = []; // No matches are currently in progress
-  const upcomingMatches = matches.filter(match => match.status === 'scheduled');
-  const completedMatches = []; // No matches have been completed yet
+  // Get recent match results for a team (last 5 matches)
+  const getTeamForm = (teamId: number) => {
+    const teamMatches = matches
+      .filter(match => 
+        (match.teamAId === teamId || match.teamBId === teamId) && 
+        match.status === 'completed' && 
+        !match.isBye
+      )
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // Most recent first
+      .slice(0, 5); // Last 5 matches
 
-  const getMatchStatusIcon = (status: string) => {
-    switch (status) {
-      case 'in-progress':
-        return <Clock className="w-4 h-4 text-yellow-500" />;
-      case 'completed':
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'scheduled':
-        return <Circle className="w-4 h-4 text-gray-400" />;
-      default:
-        return <Circle className="w-4 h-4 text-gray-400" />;
-    }
-  };
-
-  const getMatchStatusColor = (status: string) => {
-    switch (status) {
-      case 'in-progress':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'scheduled':
-        return 'bg-gray-100 text-gray-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getMatchStatusEmoji = (status: string) => {
-    switch (status) {
-      case 'in-progress':
-        return '🟢 Live';
-      case 'completed':
-        return '✅ Completed';
-      case 'scheduled':
-        return '🔜 Upcoming';
-      default:
-        return '⏳ TBD';
-    }
-  };
-
-  const calculateMatchResult = (match: Match) => {
-    if (match.isBye) return 'BYE';
-    if (match.status === 'scheduled') return 'Not Started';
-    
-    let teamAWins = 0;
-    let teamBWins = 0;
-    let holesPlayed = 0;
-
-    match.holes.forEach((hole: Hole) => {
-      if (hole.teamAScore !== null && hole.teamBScore !== null) {
-        holesPlayed++;
-        if (hole.teamAScore < hole.teamBScore) {
-          teamAWins++;
-        } else if (hole.teamBScore < hole.teamAScore) {
-          teamBWins++;
+    return teamMatches.map(match => {
+      const isTeamA = match.teamAId === teamId;
+      
+      // Calculate match result based on holes won
+      let teamHolesWon = 0;
+      let opponentHolesWon = 0;
+      
+      match.holes?.forEach(hole => {
+        if (hole.teamAStrokes && hole.teamBStrokes) {
+          if (hole.teamAStrokes < hole.teamBStrokes) {
+            if (isTeamA) teamHolesWon++; else opponentHolesWon++;
+          } else if (hole.teamBStrokes < hole.teamAStrokes) {
+            if (isTeamA) opponentHolesWon++; else teamHolesWon++;
+          }
         }
-      }
-    });
+      });
 
-    if (holesPlayed === 0) return 'Not Started';
-    
-    if (match.status === 'completed') {
-      if (teamAWins > teamBWins) return `Match Won ${teamAWins - teamBWins} UP`;
-      if (teamBWins > teamAWins) return `Match Won ${teamBWins - teamAWins} UP`;
-      return 'HALVED';
-    }
-    
-    // For in-progress matches
-    if (teamAWins > teamBWins) return `${teamAWins - teamBWins} UP`;
-    if (teamBWins > teamAWins) return `${teamBWins - teamAWins} UP`;
-    return 'All Square';
+      // Determine result
+      if (teamHolesWon > opponentHolesWon) return 'W';
+      if (opponentHolesWon > teamHolesWon) return 'L';
+      return 'H'; // Halved
+    });
   };
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'short', 
-      month: 'short', 
-      day: 'numeric' 
-    });
+  // Get live standings for the selected division
+  const divisionStandings = useMemo(() => {
+    return scores
+      .filter(score => score.division === activeDivision)
+      .sort((a, b) => {
+        // Sort by points (descending), then by matches played (ascending), then by holes won (descending)
+        if (b.points !== a.points) return b.points - a.points;
+        if (a.matchesPlayed !== b.matchesPlayed) return a.matchesPlayed - b.matchesPlayed;
+        return b.holesWon - a.holesWon;
+      });
+  }, [scores, activeDivision]);
+
+  // Get tournament statistics
+  const tournamentStats = useMemo(() => {
+    const totalMatches = matches.length;
+    const completedMatches = matches.filter(m => m.status === 'completed').length;
+    const inProgressMatches = matches.filter(m => m.status === 'in-progress').length;
+    const scheduledMatches = matches.filter(m => m.status === 'scheduled').length;
+
+    return {
+      totalMatches,
+      completedMatches,
+      inProgressMatches,
+      scheduledMatches,
+      completionPercentage: totalMatches > 0 ? Math.round((completedMatches / totalMatches) * 100) : 0
+    };
+  }, [matches]);
+
+  const getPositionIcon = (change: string) => {
+    switch (change) {
+      case 'up':
+        return <TrendingUp className="w-4 h-4 text-green-500" />;
+      case 'down':
+        return <TrendingDown className="w-4 h-4 text-red-500" />;
+      default:
+        return <Minus className="w-4 h-4 text-gray-400" />;
+    }
+  };
+
+  const getDivisionIcon = (division: string) => {
+    const iconClass = "w-5 h-5";
+    switch (division) {
+      case 'Trophy':
+        return <Trophy className={`${iconClass} text-yellow-500`} />;
+      default:
+        return <Medal className={`${iconClass} ${
+          division === 'Shield' ? 'text-gray-400' :
+          division === 'Plaque' ? 'text-amber-600' :
+          division === 'Bowl' ? 'text-orange-500' :
+          'text-purple-500'
+        }`} />;
+    }
   };
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="text-center px-4">
-        <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2">Patron's Cup Tournament</h1>
-        <p className="text-sm md:text-lg text-gray-600">Live scoring and tournament dashboard</p>
+      {/* Tournament Countdown */}
+      <div className="max-w-6xl mx-auto px-4">
+        <TournamentCountdown />
       </div>
 
-      {/* Desktop 3-Column Layout */}
-      <div className="hidden lg:grid lg:grid-cols-3 lg:gap-6">
-        
-        {/* Left Column - Schedule/Fixtures */}
-        <div className="space-y-4">
-          <div className="bg-white rounded-lg shadow-md">
-            <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700">
-              <h2 className="text-xl font-bold text-white flex items-center">
-                <Calendar className="w-5 h-5 mr-2" />
-                Schedule / Fixtures
-              </h2>
-            </div>
-            <div className="p-6 space-y-4 max-h-96 overflow-y-auto">
-              {[...activeMatches, ...upcomingMatches, ...completedMatches.slice(-3)].map(match => {
-                const teamA = teams.find(t => t.id === match.teamAId);
-                const teamB = teams.find(t => t.id === match.teamBId);
-                
-                return (
-                  <div key={match.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="text-sm font-medium text-gray-900">
-                        {formatDate(match.date)} {match.session} ({match.teeTime})
-                      </div>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getMatchStatusColor(match.status)}`}>
-                        {getMatchStatusEmoji(match.status)}
-                      </span>
-                    </div>
-                    
-                    <div className="text-sm text-gray-600 mb-2">
-                      {match.type} | {match.division} Division
-                    </div>
-                    
-                    {match.isBye ? (
-                      <div className="text-center py-2">
-                        <div className="font-medium text-gray-900">{teamA?.name} (BYE)</div>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          {teamA && (
-                            <>
-                              <div 
-                                className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs"
-                                style={{ backgroundColor: teamA.color }}
-                              >
-                                {teamA.logo}
-                              </div>
-                              <span className="text-sm font-medium">{teamA.name}</span>
-                            </>
-                          )}
-                        </div>
-                        <span className="text-xs text-gray-500">vs</span>
-                        <div className="flex items-center space-x-2">
-                          {teamB && (
-                            <>
-                              <span className="text-sm font-medium">{teamB.name}</span>
-                              <div 
-                                className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs"
-                                style={{ backgroundColor: teamB.color }}
-                              >
-                                {teamB.logo}
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div className="mt-2 text-xs text-gray-500">
-                      {match.course} | {calculateMatchResult(match)}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+      {/* Tournament Progress */}
+      <div className="max-w-6xl mx-auto">
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium text-gray-900">Tournament Progress</h3>
+            <span className="text-2xl font-bold text-green-600">{tournamentStats.completionPercentage}%</span>
           </div>
-
-        </div>
-
-        {/* Center Column - Leaderboard */}
-        <div className="space-y-4">
-          <div className="bg-white rounded-lg shadow-md">
-            <div className="px-6 py-4 bg-gradient-to-r from-green-600 to-green-700">
-              <h2 className="text-xl font-bold text-white flex items-center">
-                <Trophy className="w-5 h-5 mr-2" />
-                Leaderboard
-              </h2>
-            </div>
-            <div className="p-6">
-              {/* Division Tabs */}
-              <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
-                {(['Trophy', 'Shield', 'Plaque', 'Bowl', 'Mug'] as const).map((division) => (
-                  <button
-                    key={division}
-                    onClick={() => setActiveDivision(division)}
-                    className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                      activeDivision === division
-                        ? 'bg-white text-green-700 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-center space-x-1">
-                      <Medal className={`w-4 h-4 ${
-                        division === 'Trophy' ? 'text-yellow-500' :
-                        division === 'Shield' ? 'text-gray-400' :
-                        division === 'Plaque' ? 'text-amber-600' :
-                        division === 'Bowl' ? 'text-orange-500' :
-                        'text-purple-500'
-                      }`} />
-                      <span>{division}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-              
-              {/* Active Division Leaderboard */}
-              <Leaderboard activeDivision={activeDivision} />
-            </div>
+          <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+            <div 
+              className="bg-green-600 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${tournamentStats.completionPercentage}%` }}
+            ></div>
           </div>
-        </div>
-
-        {/* Right Column - Live Scoring & Tournament Feed */}
-        <div className="space-y-4">
-          <div className="bg-white rounded-lg shadow-md">
-            <div className="px-6 py-4 bg-gradient-to-r from-red-600 to-red-700">
-              <h2 className="text-xl font-bold text-white flex items-center">
-                <Zap className="w-5 h-5 mr-2" />
-                Live Scoring
-              </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div>
+              <div className="text-xl font-bold text-gray-600">{tournamentStats.completedMatches}</div>
+              <div className="text-xs text-gray-500">Completed</div>
             </div>
-            <div className="p-6 space-y-4 max-h-96 overflow-y-auto">
-              <div className="text-center py-8">
-                <Calendar className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Tournament Starts Soon!</h3>
-                <p className="text-gray-600 mb-4">4th Edition Patron&apos;s Cup 2025</p>
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <div className="text-sm text-blue-800">
-                    <div className="font-medium mb-1">First Round</div>
-                    <div>Friday, August 22nd at 7:30 AM</div>
-                    <div className="text-xs mt-1">4BBB Shotgun Start</div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Tournament Stats */}
-              <div className="border-t pt-4 mt-4">
-                <div className="grid grid-cols-2 gap-4 text-center">
-                  <div>
-                    <div className="text-lg font-bold text-blue-600">15</div>
-                    <div className="text-xs text-gray-500">Teams Ready</div>
-                  </div>
-                  <div>
-                    <div className="text-lg font-bold text-purple-600">5</div>
-                    <div className="text-xs text-gray-500">Divisions</div>
-                  </div>
-                </div>
-              </div>
+            <div>
+              <div className="text-xl font-bold text-green-600">{tournamentStats.inProgressMatches}</div>
+              <div className="text-xs text-gray-500">Live</div>
+            </div>
+            <div>
+              <div className="text-xl font-bold text-blue-600">{tournamentStats.scheduledMatches}</div>
+              <div className="text-xs text-gray-500">Scheduled</div>
+            </div>
+            <div>
+              <div className="text-xl font-bold text-purple-600">{tournamentStats.totalMatches}</div>
+              <div className="text-xs text-gray-500">Total</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Mobile/Tablet Stacked Layout */}
-      <div className="lg:hidden space-y-6">
-        {/* Mobile Tournament Info */}
-        <div className="bg-white rounded-lg shadow-md">
-          <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700">
-            <h2 className="text-xl font-bold text-white">Tournament Information</h2>
-          </div>
-          <div className="p-6">
-            <div className="text-center mb-6">
-              <Calendar className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">4th Edition Patron&apos;s Cup 2025</h3>
-              <p className="text-gray-600 mb-4">Muthaiga Golf Club</p>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="bg-blue-50 rounded-lg p-4">
-                <div className="font-medium text-blue-900 mb-1">Tournament Dates</div>
-                <div className="text-sm text-blue-800">August 22-24, 2025</div>
-              </div>
-              
-              <div className="bg-green-50 rounded-lg p-4">
-                <div className="font-medium text-green-900 mb-1">First Round</div>
-                <div className="text-sm text-green-800">Friday, August 22nd at 7:30 AM</div>
-                <div className="text-xs text-green-700">4BBB Shotgun Start</div>
-              </div>
-              
-              <div className="bg-purple-50 rounded-lg p-4">
-                <div className="font-medium text-purple-900 mb-1">Participating Teams</div>
-                <div className="text-sm text-purple-800">15 clubs across 5 divisions</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Leaderboard */}
+      {/* Leaderboard Section */}
+      <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-lg shadow-md">
           <div className="px-6 py-4 bg-gradient-to-r from-green-600 to-green-700">
             <h2 className="text-xl font-bold text-white flex items-center">
               <Trophy className="w-5 h-5 mr-2" />
-              Leaderboard
+              Live Tournament Standings
             </h2>
           </div>
           <div className="p-6">
             {/* Division Tabs */}
-            <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg overflow-x-auto">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-1 mb-6 bg-gray-100 p-1 rounded-lg overflow-x-auto">
               {(['Trophy', 'Shield', 'Plaque', 'Bowl', 'Mug'] as const).map((division) => (
                 <button
                   key={division}
                   onClick={() => setActiveDivision(division)}
-                  className={`flex-shrink-0 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  className={`flex-shrink-0 px-4 py-3 text-sm font-medium rounded-md transition-colors ${
                     activeDivision === division
                       ? 'bg-white text-green-700 shadow-sm'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
                   }`}
                 >
-                  <div className="flex items-center justify-center space-x-1">
-                    <Medal className={`w-4 h-4 ${
-                      division === 'Trophy' ? 'text-yellow-500' :
-                      division === 'Shield' ? 'text-gray-400' :
-                      division === 'Plaque' ? 'text-amber-600' :
-                      division === 'Bowl' ? 'text-orange-500' :
-                      'text-purple-500'
-                    }`} />
+                  <div className="flex items-center justify-center space-x-2">
+                    {getDivisionIcon(division)}
                     <span>{division}</span>
                   </div>
                 </button>
               ))}
             </div>
             
-            {/* Active Division Leaderboard */}
-            <Leaderboard activeDivision={activeDivision} />
+            {/* Live Standings Table */}
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left py-3 px-4 font-medium text-gray-600">Position</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-600">Team</th>
+                    <th className="text-center py-3 px-4 font-medium text-gray-600">Points</th>
+                    <th className="text-center py-3 px-4 font-medium text-gray-600">Played</th>
+                    <th className="text-center py-3 px-4 font-medium text-gray-600">Won</th>
+                    <th className="text-center py-3 px-4 font-medium text-gray-600">Lost</th>
+                    <th className="text-center py-3 px-4 font-medium text-gray-600">AS</th>
+                    <th className="text-center py-3 px-4 font-medium text-gray-600">Recent</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {divisionStandings.map((score, index) => {
+                    const team = getTeamById(score.teamId);
+                    const position = index + 1;
+                    
+                    return (
+                      <tr key={score.teamId} className="border-b border-gray-100 hover:bg-gray-50">
+                        <td className="py-4 px-4">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-lg font-bold text-gray-900">#{position}</span>
+                            {getPositionIcon(score.positionChange || 'same')}
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex items-center space-x-3">
+                            {getDivisionIcon(score.division)}
+                            <div>
+                              <div className="font-medium text-gray-900">{team?.name}</div>
+                              <div className="text-sm text-gray-500">Seed #{team?.seed}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          <span className="text-xl font-bold text-green-600">
+                            {score.points.toFixed(1)}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 text-center text-gray-900">
+                          {score.matchesPlayed}
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                            {score.matchesWon}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                            {score.matchesLost}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                            {score.matchesHalved}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          <div className="flex items-center justify-center space-x-1">
+                            {getTeamForm(score.teamId).map((result, idx) => (
+                              <span
+                                key={idx}
+                                className={`inline-flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full ${
+                                  result === 'W' ? 'bg-green-100 text-green-800' :
+                                  result === 'L' ? 'bg-red-100 text-red-800' :
+                                  'bg-gray-100 text-gray-800'
+                                }`}
+                              >
+                                {result}
+                              </span>
+                            ))}
+                            {getTeamForm(score.teamId).length === 0 && (
+                              <span className="text-xs text-gray-400">-</span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {divisionStandings.length === 0 && (
+              <div className="text-center py-12">
+                <Trophy className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-2 text-sm font-medium text-gray-900">No scores available</h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  Standings will appear here once matches are completed.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

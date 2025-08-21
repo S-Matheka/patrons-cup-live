@@ -52,63 +52,121 @@ export default function MatchDetail() {
   }
 
   return (
-    <div className="space-y-6 px-4 sm:px-0">
+    <div className="space-y-4 sm:space-y-6 px-4 sm:px-0">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-        <div className="flex items-center space-x-4">
-          <Link
-            href="/live"
-            className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm sm:text-base">Back to Live Scoring</span>
-          </Link>
-        </div>
+      <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
+        <Link
+          href="/live"
+          className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors self-start"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span className="text-sm sm:text-base font-medium">Back to Live Scoring</span>
+        </Link>
+        
         <div className="text-left sm:text-right">
-          <div className="text-sm text-gray-600">Match #{match.id}</div>
+          <div className="text-lg sm:text-xl font-bold text-gray-900">Match #{match.gameNumber || match.id}</div>
           <div className="text-sm text-gray-600">{match.date} at {match.teeTime}</div>
         </div>
       </div>
 
-      {/* Match Info Banner */}
-      <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-lg p-4 sm:p-6 text-white">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-          <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
-            <div className="flex items-center space-x-3 sm:space-x-4">
-              <div 
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white text-lg sm:text-xl font-bold flex-shrink-0"
-                style={{ backgroundColor: teamA.color }}
-              >
-                {teamA.logo}
-              </div>
-              <div className="min-w-0">
-                <div className="font-bold text-base sm:text-lg truncate">{teamA.name}</div>
-                <div className="text-xs sm:text-sm opacity-90 truncate">{teamA.description}</div>
+      {/* Mobile-First Match Header */}
+      <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-lg overflow-hidden">
+        {/* Match Info Bar */}
+        <div className="px-4 py-3 bg-black bg-opacity-20">
+          <div className="flex items-center justify-between text-white text-sm">
+            <span>{match.type} - {match.division} Division</span>
+            <span>{match.session} Session • Tee {match.tee}</span>
+          </div>
+        </div>
+        
+        {/* Teams Display */}
+        <div className="p-4 sm:p-6">
+          {/* Mobile: Stacked Layout */}
+          <div className="block sm:hidden space-y-4">
+            {/* Team A */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div 
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0"
+                  style={{ backgroundColor: teamA.color }}
+                >
+                  {teamA.logo}
+                </div>
+                <div className="min-w-0">
+                  <div className="font-bold text-white text-lg truncate">{teamA.name}</div>
+                  <div className="text-green-100 text-sm truncate">{teamA.description}</div>
+                </div>
               </div>
             </div>
             
-            <div className="text-center sm:text-left lg:text-center">
-              <div className="text-xl sm:text-2xl font-bold">vs</div>
-              <div className="text-sm opacity-90">{match.course}</div>
+            {/* VS Divider */}
+            <div className="text-center py-2">
+              <div className="text-2xl font-bold text-white">VS</div>
+              <div className="text-green-200 text-sm">{match.course}</div>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <div className="font-bold text-lg">{teamB.name}</div>
-                <div className="text-sm opacity-90">{teamB.description}</div>
+            {/* Team B */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div 
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0"
+                  style={{ backgroundColor: teamB.color }}
+                >
+                  {teamB.logo}
+                </div>
+                <div className="min-w-0">
+                  <div className="font-bold text-white text-lg truncate">{teamB.name}</div>
+                  <div className="text-green-100 text-sm truncate">{teamB.description}</div>
+                </div>
               </div>
-              <div 
-                className="w-12 h-12 rounded-full flex items-center justify-center text-white text-xl font-bold"
-                style={{ backgroundColor: teamB.color }}
-              >
-                {teamB.logo}
-              </div>
+            </div>
+            
+            {/* Status */}
+            <div className="text-center pt-2 border-t border-green-500">
+              <div className="text-green-200 text-sm">Status</div>
+              <div className="text-white text-lg font-bold capitalize">{match.status}</div>
             </div>
           </div>
           
-          <div className="text-center">
-            <div className="text-sm opacity-90">Status</div>
-            <div className="text-lg font-bold capitalize">{match.status}</div>
+          {/* Desktop: Horizontal Layout */}
+          <div className="hidden sm:flex sm:items-center sm:justify-between">
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-4">
+                <div 
+                  className="w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold flex-shrink-0"
+                  style={{ backgroundColor: teamA.color }}
+                >
+                  {teamA.logo}
+                </div>
+                <div className="min-w-0">
+                  <div className="font-bold text-white text-xl truncate">{teamA.name}</div>
+                  <div className="text-green-100 text-sm truncate">{teamA.description}</div>
+                </div>
+              </div>
+              
+              <div className="text-center px-6">
+                <div className="text-3xl font-bold text-white">VS</div>
+                <div className="text-green-200 text-sm">{match.course}</div>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <div className="text-right min-w-0">
+                  <div className="font-bold text-white text-xl truncate">{teamB.name}</div>
+                  <div className="text-green-100 text-sm truncate">{teamB.description}</div>
+                </div>
+                <div 
+                  className="w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold flex-shrink-0"
+                  style={{ backgroundColor: teamB.color }}
+                >
+                  {teamB.logo}
+                </div>
+              </div>
+            </div>
+            
+            <div className="text-center ml-6">
+              <div className="text-green-200 text-sm">Status</div>
+              <div className="text-white text-xl font-bold capitalize">{match.status}</div>
+            </div>
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@ import { Match, Hole } from '@/types';
 import { useState } from 'react';
 import { Clock, CheckCircle, Circle, ExternalLink, Filter, Calendar, Users, Trophy, Medal } from 'lucide-react';
 import Leaderboard from '@/components/Leaderboard';
+import TournamentCountdown from '@/components/TournamentCountdown';
 import Link from 'next/link';
 
 export default function LiveScoring() {
@@ -111,13 +112,16 @@ export default function LiveScoring() {
 
   return (
     <div className="space-y-8">
+      {/* Tournament Countdown */}
+      <div className="px-4 sm:px-0">
+        <TournamentCountdown />
+      </div>
+
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 px-4 sm:px-0">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Tournament Scoring</h1>
-          <p className="text-sm sm:text-base text-gray-600">4th Edition Patron's Cup 2025 - Pre-Tournament</p>
-        </div>
-        <div className="flex items-center space-x-2 self-start sm:self-auto">
+      <div className="text-center px-4 sm:px-0">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Tournament Scoring</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-2">4th Edition Patron's Cup 2025 - Pre-Tournament</p>
+        <div className="flex items-center justify-center space-x-2 mt-4">
           <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
           <span className="text-xs sm:text-sm font-medium text-blue-600">STARTS AUG 22</span>
         </div>
@@ -265,7 +269,7 @@ export default function LiveScoring() {
               <p>No matches found for the selected filters.</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredMatches.slice(0, 20).map((match) => {
                 const teamA = teams.find(t => t.id === match.teamAId);
                 const teamB = teams.find(t => t.id === match.teamBId);
@@ -277,125 +281,126 @@ export default function LiveScoring() {
                 const teamCPlayers = getMatchPlayers(match, match.teamCId, match.type === 'Singles' ? 1 : 2);
                 
                 return (
-                  <div key={match.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-                      <div className="flex-1">
-                        <div className="flex flex-wrap items-center gap-2 mb-3">
-                          <span className="text-sm font-medium text-gray-600">Game {match.gameNumber}</span>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getMatchTypeColor(match.type)}`}>
-                            {match.type}
+                  <div key={match.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow overflow-hidden">
+                    <div className="space-y-3">
+                      {/* Header with badges */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-medium text-gray-600">Game {match.gameNumber}</span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getMatchTypeColor(match.type)}`}>
+                          {match.type}
+                        </span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getMatchStatusColor(match.status)}`}>
+                          {match.status}
+                        </span>
+                        {match.isBye && (
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                            BYE
                           </span>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getMatchStatusColor(match.status)}`}>
-                            {match.status}
+                        )}
+                        {match.isPro && (
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            PRO
                           </span>
-                          {match.isBye && (
-                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                              BYE
-                            </span>
-                          )}
-                          {match.isPro && (
-                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                              PRO
-                            </span>
-                          )}
+                        )}
+                      </div>
+                      
+                      {/* Match details */}
+                      <div className="space-y-2">
+                        {match.isBye ? (
+                          <div>
+                            <div className="text-sm font-semibold text-gray-900 mb-1">
+                              {teamA?.name || 'Team A'} - BYE Match
+                            </div>
+                          </div>
+                        ) : match.isThreeWay ? (
+                          <div>
+                            <div className="text-sm font-semibold text-gray-900 mb-2">
+                              {teamA?.name || 'Team A'} vs {teamB?.name || 'Team B'} vs {teamC?.name || 'Team C'}
+                            </div>
+                            <div className="grid grid-cols-1 gap-2 text-xs">
+                              <div className="min-w-0">
+                                <div className="font-medium text-gray-700 truncate">{teamA?.name}</div>
+                                {teamAPlayers.map(player => (
+                                  <div key={player.id} className="text-gray-600 text-xs sm:text-sm truncate">
+                                    {player.name}
+                                    {player.isPro && <span className="text-yellow-600 ml-1">(Pro)</span>}
+                                  </div>
+                                ))}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="font-medium text-gray-700 truncate">{teamB?.name}</div>
+                                {teamBPlayers.map(player => (
+                                  <div key={player.id} className="text-gray-600 text-xs sm:text-sm truncate">
+                                    {player.name}
+                                    {player.isPro && <span className="text-yellow-600 ml-1">(Pro)</span>}
+                                  </div>
+                                ))}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="font-medium text-gray-700 truncate">{teamC?.name}</div>
+                                {teamCPlayers.map(player => (
+                                  <div key={player.id} className="text-gray-600 text-xs sm:text-sm truncate">
+                                    {player.name}
+                                    {player.isPro && <span className="text-yellow-600 ml-1">(Pro)</span>}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <div className="text-sm font-semibold text-gray-900 mb-2">
+                              {teamA?.name || 'Team A'} vs {teamB?.name || 'Team B'}
+                            </div>
+                            <div className="grid grid-cols-1 gap-2 text-xs">
+                              <div className="min-w-0">
+                                <div className="font-medium text-gray-700 truncate">{teamA?.name}</div>
+                                {teamAPlayers.map(player => (
+                                  <div key={player.id} className="text-gray-600 text-xs sm:text-sm truncate">
+                                    {player.name}
+                                    {player.isPro && <span className="text-yellow-600 ml-1">(Pro)</span>}
+                                    {player.isJunior && <span className="text-blue-600 ml-1">(Jnr)</span>}
+                                  </div>
+                                ))}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="font-medium text-gray-700 truncate">{teamB?.name}</div>
+                                {teamBPlayers.map(player => (
+                                  <div key={player.id} className="text-gray-600 text-xs sm:text-sm truncate">
+                                    {player.name}
+                                    {player.isPro && <span className="text-yellow-600 ml-1">(Pro)</span>}
+                                    {player.isJunior && <span className="text-blue-600 ml-1">(Jnr)</span>}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Match info and actions */}
+                      <div className="flex flex-col space-y-2 pt-2 border-t border-gray-100">
+                        <div className="text-xs text-gray-600 text-center">
+                          {match.date} • {match.teeTime} • Tee {match.tee}
                         </div>
                         
                         <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            {match.isBye ? (
-                              <div>
-                                <div className="text-lg font-semibold text-gray-900 mb-1">
-                                  {teamA?.name || 'Team A'} - BYE Match
-                                </div>
-                              </div>
-                            ) : match.isThreeWay ? (
-                              <div>
-                                <div className="text-lg font-semibold text-gray-900 mb-2">
-                                  {teamA?.name || 'Team A'} vs {teamB?.name || 'Team B'} vs {teamC?.name || 'Team C'}
-                                </div>
-                                <div className="grid grid-cols-3 gap-4 text-sm">
-                                  <div>
-                                    <div className="font-medium text-gray-700">{teamA?.name}</div>
-                                    {teamAPlayers.map(player => (
-                                      <div key={player.id} className="text-gray-600">
-                                        {player.name}
-                                        {player.isPro && <span className="text-yellow-600 ml-1">(Pro)</span>}
-                                      </div>
-                                    ))}
-                                  </div>
-                                  <div>
-                                    <div className="font-medium text-gray-700">{teamB?.name}</div>
-                                    {teamBPlayers.map(player => (
-                                      <div key={player.id} className="text-gray-600">
-                                        {player.name}
-                                        {player.isPro && <span className="text-yellow-600 ml-1">(Pro)</span>}
-                                      </div>
-                                    ))}
-                                  </div>
-                                  <div>
-                                    <div className="font-medium text-gray-700">{teamC?.name}</div>
-                                    {teamCPlayers.map(player => (
-                                      <div key={player.id} className="text-gray-600">
-                                        {player.name}
-                                        {player.isPro && <span className="text-yellow-600 ml-1">(Pro)</span>}
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                            ) : (
-                              <div>
-                                <div className="text-lg font-semibold text-gray-900 mb-2">
-                                  {teamA?.name || 'Team A'} vs {teamB?.name || 'Team B'}
-                                </div>
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                  <div>
-                                    <div className="font-medium text-gray-700">{teamA?.name}</div>
-                                    {teamAPlayers.map(player => (
-                                      <div key={player.id} className="text-gray-600">
-                                        {player.name}
-                                        {player.isPro && <span className="text-yellow-600 ml-1">(Pro)</span>}
-                                        {player.isJunior && <span className="text-blue-600 ml-1">(Jnr)</span>}
-                                      </div>
-                                    ))}
-                                  </div>
-                                  <div>
-                                    <div className="font-medium text-gray-700">{teamB?.name}</div>
-                                    {teamBPlayers.map(player => (
-                                      <div key={player.id} className="text-gray-600">
-                                        {player.name}
-                                        {player.isPro && <span className="text-yellow-600 ml-1">(Pro)</span>}
-                                        {player.isJunior && <span className="text-blue-600 ml-1">(Jnr)</span>}
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                            
-                            <div className="text-sm text-gray-600 mt-3">
-                              {match.date} • {match.teeTime} • Tee {match.tee} • {match.division} Division
+                          <div className="text-left">
+                            <div className="text-xs font-medium text-gray-900">
+                              {match.isBye ? 'BYE' : calculateMatchResult(match)}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {match.session} Session
                             </div>
                           </div>
                           
-                          <div className="flex items-center space-x-4">
-                            <div className="text-right">
-                              <div className="text-sm font-medium text-gray-900">
-                                {match.isBye ? 'BYE' : calculateMatchResult(match)}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {match.session} Session
-                              </div>
-                            </div>
-                            
-                            <Link 
-                              href={`/match/${match.id}`}
-                              className="flex items-center space-x-1 text-blue-600 hover:text-blue-800"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                              <span className="text-sm">View</span>
-                            </Link>
-                          </div>
+                          <Link 
+                            href={`/match/${match.id}`}
+                            className="flex items-center space-x-1 text-blue-600 hover:text-blue-800 text-xs"
+                          >
+                            <span className="font-medium">View</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </Link>
                         </div>
                       </div>
                     </div>

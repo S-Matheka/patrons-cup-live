@@ -2,6 +2,7 @@
 
 import { Team, Match, Hole } from '@/types';
 import { Clock, CheckCircle, Circle, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { calculateMatchPlayResult, getMatchStatusDescription, formatMatchPlayScore } from '@/utils/matchPlayScoring';
 
 interface LiveScorecardProps {
   match: Match;
@@ -52,49 +53,45 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
     return diff > 0 ? `+${diff}` : `${diff}`;
   };
 
+  const getMatchPlayResult = () => {
+    if (match.status === 'scheduled') return null;
+    
+    // Convert holes to the format expected by the match play calculator
+    const holesData = match.holes.map(hole => ({
+      holeNumber: hole.holeNumber,
+      par: hole.par || 4, // Default to par 4 if not specified
+      teamAStrokes: hole.teamAStrokes || 0,
+      teamBStrokes: hole.teamBStrokes || 0
+    }));
+
+    return calculateMatchPlayResult(holesData, 18);
+  };
+
   const getMatchStatus = () => {
     if (match.status === 'scheduled') return 'Match Not Started';
     
-    let teamAWins = 0;
-    let teamBWins = 0;
-    let holesPlayed = 0;
+    const result = getMatchPlayResult();
+    if (!result) return 'Starting Soon';
 
-    match.holes.forEach(hole => {
-      if (hole.teamAScore !== null && hole.teamBScore !== null) {
-        holesPlayed++;
-        if (hole.teamAScore < hole.teamBScore) {
-          teamAWins++;
-        } else if (hole.teamBScore < hole.teamAScore) {
-          teamBWins++;
-        }
+    // Format the match play result for display
+    const score = formatMatchPlayScore(result);
+    
+    if (result.status === 'completed') {
+      if (result.winner === 'halved') {
+        return 'Match Halved (AS)';
+      } else {
+        const winnerName = result.winner === 'teamA' ? teamA.name : teamB?.name;
+        return `${winnerName} wins ${score}`;
       }
-    });
-
-    if (holesPlayed === 0) return 'Not Started';
-    
-    const holesRemaining = match.holes.length - holesPlayed;
-    const leadDiff = Math.abs(teamAWins - teamBWins);
-    
-    if (match.status === 'completed') {
-      if (teamAWins > teamBWins) return `${teamA.name} Won ${leadDiff} UP`;
-      if (teamBWins > teamAWins) return `${teamB?.name} Won ${leadDiff} UP`;
-      return 'HALVED';
+    } else {
+      // Match in progress
+      if (result.result === 'AS') {
+        return 'All Square';
+      } else {
+        const leaderName = result.teamAHolesWon > result.teamBHolesWon ? teamA.name : teamB?.name;
+        return `${leaderName} ${score}`;
+      }
     }
-    
-    // Check for dormie or won situations during play
-    if (leadDiff > holesRemaining && match.status === 'in-progress') {
-      if (teamAWins > teamBWins) return `${teamA.name} Won ${leadDiff} UP`;
-      if (teamBWins > teamAWins) return `${teamB?.name} Won ${leadDiff} UP`;
-    }
-    
-    if (leadDiff === holesRemaining && leadDiff > 0 && match.status === 'in-progress') {
-      const leader = teamAWins > teamBWins ? teamA.name : teamB?.name;
-      return `${leader} Dormie ${leadDiff}`;
-    }
-    
-    if (teamAWins > teamBWins) return `${teamA.name} ${leadDiff} UP`;
-    if (teamBWins > teamAWins) return `${teamB?.name} ${leadDiff} UP`;
-    return 'All Square';
   };
 
   if (match.isBye || !teamB) {
@@ -123,68 +120,184 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
-        <div className="flex items-center justify-between">
+      {/* Mobile-Optimized Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
           <div className="text-white">
-            <h2 className="text-xl font-bold">{match.type} - {match.division}</h2>
-            <p className="text-green-100">{match.course} | {match.date} {match.session}</p>
+            <h2 className="text-lg sm:text-xl font-bold">Live Scorecard</h2>
+            <p className="text-blue-100 text-sm">{match.course} • {match.date}</p>
           </div>
-          <div className="text-right text-white">
-            <div className="text-lg font-bold">{getMatchStatus()}</div>
-            <div className="text-sm text-green-100">
-              Hole {match.holes.filter(h => h.status === 'completed').length + 1}
+          <div className="text-center sm:text-right text-white">
+            <div className="text-base sm:text-lg font-bold">{getMatchStatus()}</div>
+            <div className="text-sm text-blue-100">
+              Playing Hole {match.holes.filter(h => h.status === 'completed').length + 1}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Teams Header */}
-      <div className="grid grid-cols-2 gap-4 p-6 border-b">
-        <div className="flex items-center space-x-3">
-          <div 
-            className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold"
-            style={{ backgroundColor: teamA.color }}
-          >
-            {teamA.logo}
+      {/* Mobile-First Teams Summary */}
+      <div className="p-4 border-b bg-gray-50">
+        {/* Mobile Layout */}
+        <div className="block sm:hidden space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div 
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+                style={{ backgroundColor: teamA.color }}
+              >
+                {teamA.logo}
+              </div>
+              <div className="min-w-0">
+                <h3 className="font-bold text-gray-900 text-sm truncate">{teamA.name}</h3>
+                <p className="text-xs text-gray-600 truncate">{teamA.description}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-lg font-bold text-green-600">
+                {calculateStrokeDifferential(match.holes, 'teamA')}
+              </div>
+              <div className="text-xs text-gray-500">Score</div>
+            </div>
           </div>
-          <div>
-            <h3 className="font-bold text-gray-900">{teamA.name}</h3>
-            <p className="text-sm text-gray-600">{teamA.description}</p>
-            <div className="text-lg font-bold text-green-600">
-              {calculateStrokeDifferential(match.holes, 'teamA')}
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div 
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+                style={{ backgroundColor: teamB.color }}
+              >
+                {teamB.logo}
+              </div>
+              <div className="min-w-0">
+                <h3 className="font-bold text-gray-900 text-sm truncate">{teamB.name}</h3>
+                <p className="text-xs text-gray-600 truncate">{teamB.description}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-lg font-bold text-green-600">
+                {calculateStrokeDifferential(match.holes, 'teamB')}
+              </div>
+              <div className="text-xs text-gray-500">Score</div>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center space-x-3 justify-end">
-          <div className="text-right">
-            <h3 className="font-bold text-gray-900">{teamB.name}</h3>
-            <p className="text-sm text-gray-600">{teamB.description}</p>
-            <div className="text-lg font-bold text-green-600">
-              {calculateStrokeDifferential(match.holes, 'teamB')}
+        {/* Desktop Layout */}
+        <div className="hidden sm:grid sm:grid-cols-2 gap-6">
+          <div className="flex items-center space-x-4">
+            <div 
+              className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0"
+              style={{ backgroundColor: teamA.color }}
+            >
+              {teamA.logo}
+            </div>
+            <div className="min-w-0">
+              <h3 className="font-bold text-gray-900">{teamA.name}</h3>
+              <p className="text-sm text-gray-600 truncate">{teamA.description}</p>
+              <div className="text-xl font-bold text-green-600">
+                {calculateStrokeDifferential(match.holes, 'teamA')}
+              </div>
             </div>
           </div>
-          <div 
-            className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold"
-            style={{ backgroundColor: teamB.color }}
-          >
-            {teamB.logo}
+
+          <div className="flex items-center space-x-4 justify-end">
+            <div className="text-right min-w-0">
+              <h3 className="font-bold text-gray-900">{teamB.name}</h3>
+              <p className="text-sm text-gray-600 truncate">{teamB.description}</p>
+              <div className="text-xl font-bold text-green-600">
+                {calculateStrokeDifferential(match.holes, 'teamB')}
+              </div>
+            </div>
+            <div 
+              className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0"
+              style={{ backgroundColor: teamB.color }}
+            >
+              {teamB.logo}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Hole-by-Hole Scorecard */}
-      <div className="p-6">
-        <div className="overflow-x-auto">
+      <div className="p-3 sm:p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Hole-by-Hole Scores</h3>
+        
+        {/* Mobile: Card Layout */}
+        <div className="block sm:hidden space-y-3">
+          {match.holes.map((hole, index) => {
+            const teamAIndicator = getScoreIndicator(hole.teamAStrokes, hole.par);
+            const teamBIndicator = getScoreIndicator(hole.teamBStrokes, hole.par);
+            
+            return (
+              <div key={hole.number} className="border rounded-lg p-3 bg-gray-50">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                      {hole.number}
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">Hole {hole.number}</div>
+                      <div className="text-xs text-gray-600">Par {hole.par}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    {getHoleStatus(hole)}
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-xs text-gray-600 mb-1">{teamA.name}</div>
+                    <div className="flex items-center justify-center space-x-2">
+                      {hole.teamAStrokes !== null ? (
+                        <>
+                          <span className="text-lg font-bold text-gray-900">{hole.teamAStrokes}</span>
+                          {teamAIndicator && (
+                            <span className={`px-1.5 py-0.5 rounded text-xs ${teamAIndicator.class}`}>
+                              {teamAIndicator.symbol}
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="text-gray-400 text-lg">-</span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="text-xs text-gray-600 mb-1">{teamB.name}</div>
+                    <div className="flex items-center justify-center space-x-2">
+                      {hole.teamBStrokes !== null ? (
+                        <>
+                          <span className="text-lg font-bold text-gray-900">{hole.teamBStrokes}</span>
+                          {teamBIndicator && (
+                            <span className={`px-1.5 py-0.5 rounded text-xs ${teamBIndicator.class}`}>
+                              {teamBIndicator.symbol}
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="text-gray-400 text-lg">-</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop: Table Layout */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b">
-                <th className="text-left py-2 font-medium text-gray-600">Hole</th>
-                <th className="text-center py-2 font-medium text-gray-600">Par</th>
-                <th className="text-center py-2 font-medium text-gray-600">{teamA.name}</th>
-                <th className="text-center py-2 font-medium text-gray-600">{teamB.name}</th>
-                <th className="text-center py-2 font-medium text-gray-600">Status</th>
+              <tr className="border-b-2 border-gray-200">
+                <th className="text-left py-3 px-2 font-semibold text-gray-700">Hole</th>
+                <th className="text-center py-3 px-2 font-semibold text-gray-700">Par</th>
+                <th className="text-center py-3 px-2 font-semibold text-gray-700">{teamA.name}</th>
+                <th className="text-center py-3 px-2 font-semibold text-gray-700">{teamB.name}</th>
+                <th className="text-center py-3 px-2 font-semibold text-gray-700">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -193,38 +306,38 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
                 const teamBIndicator = getScoreIndicator(hole.teamBStrokes, hole.par);
                 
                 return (
-                  <tr key={hole.number} className="border-b hover:bg-gray-50">
-                    <td className="py-3 font-medium">{hole.number}</td>
-                    <td className="text-center py-3">{hole.par}</td>
-                    <td className="text-center py-3">
+                  <tr key={hole.number} className="border-b border-gray-100 hover:bg-blue-50 transition-colors">
+                    <td className="py-4 px-2 font-semibold text-gray-900">{hole.number}</td>
+                    <td className="text-center py-4 px-2 font-medium text-gray-600">{hole.par}</td>
+                    <td className="text-center py-4 px-2">
                       {hole.teamAStrokes !== null ? (
                         <div className="flex items-center justify-center space-x-2">
-                          <span className="font-bold">{hole.teamAStrokes}</span>
+                          <span className="font-bold text-lg">{hole.teamAStrokes}</span>
                           {teamAIndicator && (
-                            <span className={`px-2 py-1 rounded text-xs ${teamAIndicator.class}`}>
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${teamAIndicator.class}`}>
                               {teamAIndicator.symbol}
                             </span>
                           )}
                         </div>
                       ) : (
-                        <span className="text-gray-400">-</span>
+                        <span className="text-gray-400 text-lg">-</span>
                       )}
                     </td>
-                    <td className="text-center py-3">
+                    <td className="text-center py-4 px-2">
                       {hole.teamBStrokes !== null ? (
                         <div className="flex items-center justify-center space-x-2">
-                          <span className="font-bold">{hole.teamBStrokes}</span>
+                          <span className="font-bold text-lg">{hole.teamBStrokes}</span>
                           {teamBIndicator && (
-                            <span className={`px-2 py-1 rounded text-xs ${teamBIndicator.class}`}>
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${teamBIndicator.class}`}>
                               {teamBIndicator.symbol}
                             </span>
                           )}
                         </div>
                       ) : (
-                        <span className="text-gray-400">-</span>
+                        <span className="text-gray-400 text-lg">-</span>
                       )}
                     </td>
-                    <td className="text-center py-3">
+                    <td className="text-center py-4 px-2">
                       {getHoleStatus(hole)}
                     </td>
                   </tr>

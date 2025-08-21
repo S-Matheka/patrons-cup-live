@@ -3,7 +3,7 @@
 import { useTournament } from '@/context/TournamentContext';
 import { Score, Team } from '@/types';
 import { useState } from 'react';
-import { Trophy, Medal, TrendingUp, Minus } from 'lucide-react';
+import { Trophy, Medal, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 export default function Standings() {
   const { teams, scores } = useTournament();
@@ -26,8 +26,19 @@ export default function Standings() {
   };
 
   const getTrendIcon = (score: Score) => {
-    // This would be based on previous performance, for now showing static
-    return <TrendingUp className="w-4 h-4 text-green-500" />;
+    // Show trend based on positionChange property
+    if (!score.positionChange || score.positionChange === 'same') {
+      return <Minus className="w-4 h-4 text-gray-400" />;
+    }
+    
+    switch (score.positionChange) {
+      case 'up':
+        return <TrendingUp className="w-4 h-4 text-green-500" />;
+      case 'down':
+        return <TrendingDown className="w-4 h-4 text-red-500" />;
+      default:
+        return <Minus className="w-4 h-4 text-gray-400" />;
+    }
   };
 
   const calculateWinRate = (matchesWon: number, matchesPlayed: number) => {
@@ -48,7 +59,9 @@ export default function Standings() {
         const aWinRate = calculateWinRate(a.matchesWon, a.matchesPlayed);
         const bWinRate = calculateWinRate(b.matchesWon, b.matchesPlayed);
         if (aWinRate !== bWinRate) return bWinRate - aWinRate;
-        return b.holesWon - a.holesWon;
+        // If win rates are equal, sort by matches won, then by matches played (fewer is better)
+        if (b.matchesWon !== a.matchesWon) return b.matchesWon - a.matchesWon;
+        return a.matchesPlayed - b.matchesPlayed;
       });
   };
 
@@ -141,8 +154,8 @@ export default function Standings() {
                         <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
                         <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matches</th>
                         <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wins</th>
-                        <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Win Rate</th>
-                        <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Holes Won</th>
+                        <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Losses</th>
+                        <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AS</th>
                         <th className="hidden lg:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trend</th>
                       </tr>
                     </thead>
@@ -167,8 +180,8 @@ export default function Standings() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{calculateWinRate(score.matchesWon, score.matchesPlayed)}%</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.holesWon}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
                         </tr>
                       ))}
@@ -188,8 +201,8 @@ export default function Standings() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matches</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wins</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Win Rate</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Holes Won</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Losses</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AS</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trend</th>
                       </tr>
                     </thead>
@@ -214,8 +227,8 @@ export default function Standings() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{calculateWinRate(score.matchesWon, score.matchesPlayed)}%</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.holesWon}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
                         </tr>
                       ))}
@@ -235,8 +248,8 @@ export default function Standings() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matches</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wins</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Win Rate</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Holes Won</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Losses</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AS</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trend</th>
                       </tr>
                     </thead>
@@ -261,8 +274,8 @@ export default function Standings() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{calculateWinRate(score.matchesWon, score.matchesPlayed)}%</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.holesWon}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
                         </tr>
                       ))}
@@ -282,8 +295,8 @@ export default function Standings() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matches</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wins</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Win Rate</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Holes Won</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Losses</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AS</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trend</th>
                       </tr>
                     </thead>
@@ -308,8 +321,8 @@ export default function Standings() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{calculateWinRate(score.matchesWon, score.matchesPlayed)}%</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.holesWon}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
                         </tr>
                       ))}
@@ -329,8 +342,8 @@ export default function Standings() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matches</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wins</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Win Rate</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Holes Won</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Losses</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AS</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trend</th>
                       </tr>
                     </thead>
@@ -355,8 +368,8 @@ export default function Standings() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{calculateWinRate(score.matchesWon, score.matchesPlayed)}%</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.holesWon}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
                         </tr>
                       ))}
@@ -403,8 +416,8 @@ export default function Standings() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{calculateWinRate(score.matchesWon, score.matchesPlayed)}%</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.holesWon}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
                     </tr>
                   ))}
@@ -449,8 +462,8 @@ export default function Standings() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{calculateWinRate(score.matchesWon, score.matchesPlayed)}%</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.holesWon}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
                     </tr>
                   ))}
@@ -495,8 +508,8 @@ export default function Standings() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{calculateWinRate(score.matchesWon, score.matchesPlayed)}%</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.holesWon}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
                     </tr>
                   ))}
@@ -541,8 +554,8 @@ export default function Standings() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{calculateWinRate(score.matchesWon, score.matchesPlayed)}%</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.holesWon}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
                     </tr>
                   ))}
@@ -587,8 +600,8 @@ export default function Standings() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{calculateWinRate(score.matchesWon, score.matchesPlayed)}%</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.holesWon}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
                     </tr>
                   ))}

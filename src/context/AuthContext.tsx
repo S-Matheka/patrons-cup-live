@@ -2,9 +2,17 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
+interface User {
+  username: string;
+  role: string;
+}
+
 interface AuthContextType {
+  user: User | null;
   isAuthenticated: boolean;
   isOfficial: boolean;
+  isAdmin: boolean;
+  isScorer: boolean;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   checkAuth: () => boolean;
@@ -14,10 +22,19 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Tournament Official Credentials (in production, this would be in a secure backend)
 const OFFICIAL_CREDENTIALS = {
-  'tournament-director': 'PatronsCup2025!',
-  'head-official': 'Muthaiga2025@',
-  'scoring-official': 'LiveScore#2025',
-  'course-marshal': 'GolfCourse$2025'
+  'admin': 'MuthaigaTournament#Director$2025',
+  'scorer': 'PatronsCupScorer2025!'
+};
+
+const getRoleDisplayName = (username: string): string => {
+  switch (username) {
+    case 'admin':
+      return 'Administrator';
+    case 'scorer':
+      return 'Official Scorer';
+    default:
+      return 'Official';
+  }
 };
 
 interface AuthProviderProps {
@@ -25,15 +42,19 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isOfficial, setIsOfficial] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isScorer, setIsScorer] = useState(false);
 
   useEffect(() => {
     // Check if user is already authenticated on app load
     const authStatus = localStorage.getItem('tournament-auth');
     const authTimestamp = localStorage.getItem('tournament-auth-time');
+    const officialRole = localStorage.getItem('tournament-official-role');
     
-    if (authStatus === 'authenticated' && authTimestamp) {
+    if (authStatus === 'authenticated' && authTimestamp && officialRole) {
       const loginTime = parseInt(authTimestamp);
       const currentTime = Date.now();
       const sessionDuration = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
@@ -42,6 +63,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (currentTime - loginTime < sessionDuration) {
         setIsAuthenticated(true);
         setIsOfficial(true);
+        setIsAdmin(officialRole === 'admin');
+        setIsScorer(officialRole === 'scorer');
+        setUser({
+          username: officialRole,
+          role: getRoleDisplayName(officialRole)
+        });
       } else {
         // Session expired
         localStorage.removeItem('tournament-auth');
@@ -59,6 +86,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (OFFICIAL_CREDENTIALS[username as keyof typeof OFFICIAL_CREDENTIALS] === password) {
       setIsAuthenticated(true);
       setIsOfficial(true);
+      setIsAdmin(username === 'admin');
+      setIsScorer(username === 'scorer');
+      setUser({
+        username,
+        role: getRoleDisplayName(username)
+      });
       
       // Store authentication state
       localStorage.setItem('tournament-auth', 'authenticated');
@@ -74,6 +107,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = () => {
     setIsAuthenticated(false);
     setIsOfficial(false);
+    setIsAdmin(false);
+    setIsScorer(false);
+    setUser(null);
     
     // Clear authentication state
     localStorage.removeItem('tournament-auth');
@@ -86,8 +122,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const value = {
+    user,
     isAuthenticated,
     isOfficial,
+    isAdmin,
+    isScorer,
     login,
     logout,
     checkAuth

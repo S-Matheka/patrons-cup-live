@@ -3,6 +3,7 @@
 import { Match, Team, Hole } from '@/types';
 import { Save, Edit, CheckCircle, Circle, Clock } from 'lucide-react';
 import { useState } from 'react';
+import { calculateMatchPlayResult, getMatchStatusDescription, formatMatchPlayScore } from '@/utils/matchPlayScoring';
 
 interface ScoreCardProps {
   match: Match;
@@ -19,48 +20,34 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
   });
 
   const calculateMatchStatus = () => {
-    let teamAWins = 0;
-    let teamBWins = 0;
-    let holesPlayed = 0;
+    // Convert holes to the format expected by the match play calculator
+    const holesData = match.holes.map(hole => ({
+      holeNumber: hole.holeNumber,
+      par: hole.par || 4, // Default to par 4 if not specified
+      teamAStrokes: hole.teamAStrokes || 0,
+      teamBStrokes: hole.teamBStrokes || 0
+    }));
 
-    match.holes.forEach(hole => {
-      if (hole.teamAScore !== null && hole.teamBScore !== null) {
-        holesPlayed++;
-        if (hole.teamAScore < hole.teamBScore) {
-          teamAWins++;
-        } else if (hole.teamBScore < hole.teamAScore) {
-          teamBWins++;
-        }
-      }
-    });
-
-    // Handle edge case where no holes have been played
-    if (holesPlayed === 0) {
-      return 'Not Started';
-    }
-
-    const remainingHoles = 9 - holesPlayed;
-    const maxPossibleWins = Math.max(teamAWins, teamBWins) + remainingHoles;
-
-    if (teamAWins > teamBWins + remainingHoles) {
-      const margin = teamAWins - teamBWins;
-      const holesLeft = holesPlayed - teamAWins;
-      return `${margin}&${Math.max(0, holesLeft)}`;
-    } else if (teamBWins > teamAWins + remainingHoles) {
-      const margin = teamBWins - teamAWins;
-      const holesLeft = holesPlayed - teamBWins;
-      return `${margin}&${Math.max(0, holesLeft)}`;
-    } else if (holesPlayed === 9) {
-      if (teamAWins > teamBWins) {
-        return `${teamAWins - teamBWins} UP`;
-      } else if (teamBWins > teamAWins) {
-        return `${teamBWins - teamAWins} UP`;
+    const result = calculateMatchPlayResult(holesData, 18);
+    
+    // Format the match play result for display with actual team names
+    const score = formatMatchPlayScore(result);
+    
+    if (result.status === 'completed') {
+      if (result.winner === 'halved') {
+        return 'Match Halved (AS)';
       } else {
-        return 'HALVED';
+        const winnerName = result.winner === 'teamA' ? teamA.name : teamB.name;
+        return `${winnerName} wins ${score}`;
       }
     } else {
-      const margin = teamAWins > teamBWins ? teamAWins - teamBWins : teamBWins - teamAWins;
-      return `${margin} UP`;
+      // Match in progress
+      if (result.result === 'AS') {
+        return 'All Square';
+      } else {
+        const leaderName = result.teamAHolesWon > result.teamBHolesWon ? teamA.name : teamB.name;
+        return `${leaderName} ${score}`;
+      }
     }
   };
 
@@ -164,51 +151,53 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
 
       {/* Score Grid */}
       <div className="p-6">
-        <div className="grid grid-cols-11 gap-2 mb-4">
-          <div className="text-center font-medium text-gray-600">Hole</div>
-          {match.holes.map(hole => (
-            <div key={hole.number} className="text-center font-medium text-gray-600">
-              {hole.number}
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-11 gap-2 mb-4">
-          <div className="text-center font-medium text-gray-600">Team A</div>
-          {match.holes.map(hole => (
-            <div key={hole.number} className="text-center">
-              {hole.teamAScore !== null ? hole.teamAScore : '-'}
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-11 gap-2 mb-4">
-          <div className="text-center font-medium text-gray-600">Team B</div>
-          {match.holes.map(hole => (
-            <div key={hole.number} className="text-center">
-              {hole.teamBScore !== null ? hole.teamBScore : '-'}
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-11 gap-2 mb-6">
-          <div className="text-center font-medium text-gray-600">Winner</div>
-          {match.holes.map(hole => {
-            const winner = getHoleWinner(hole);
-            return (
-              <div key={hole.number} className="text-center">
-                {winner === 'A' ? (
-                  <span className="text-blue-600 font-bold">A</span>
-                ) : winner === 'B' ? (
-                  <span className="text-red-600 font-bold">B</span>
-                ) : winner === 'TIE' ? (
-                  <span className="text-gray-500">T</span>
-                ) : (
-                  <span className="text-gray-400">-</span>
-                )}
+        <div className="overflow-x-auto">
+          <div className="grid grid-cols-11 gap-2 mb-4 min-w-max">
+            <div className="text-center font-medium text-gray-600">Hole</div>
+            {match.holes.map(hole => (
+              <div key={hole.number} className="text-center font-medium text-gray-600 min-w-8">
+                {hole.number}
               </div>
-            );
-          })}
+            ))}
+          </div>
+
+          <div className="grid grid-cols-11 gap-2 mb-4 min-w-max">
+            <div className="text-center font-medium text-gray-600">Team A</div>
+            {match.holes.map(hole => (
+              <div key={hole.number} className="text-center min-w-8">
+                {hole.teamAScore !== null ? hole.teamAScore : '-'}
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-11 gap-2 mb-4 min-w-max">
+            <div className="text-center font-medium text-gray-600">Team B</div>
+            {match.holes.map(hole => (
+              <div key={hole.number} className="text-center min-w-8">
+                {hole.teamBScore !== null ? hole.teamBScore : '-'}
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-11 gap-2 mb-6 min-w-max">
+            <div className="text-center font-medium text-gray-600">Winner</div>
+            {match.holes.map(hole => {
+              const winner = getHoleWinner(hole);
+              return (
+                <div key={hole.number} className="text-center min-w-8">
+                  {winner === 'A' ? (
+                    <span className="text-blue-600 font-bold">A</span>
+                  ) : winner === 'B' ? (
+                    <span className="text-red-600 font-bold">B</span>
+                  ) : winner === 'TIE' ? (
+                    <span className="text-gray-500">T</span>
+                  ) : (
+                    <span className="text-gray-400">-</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Hole-by-Hole Editing */}

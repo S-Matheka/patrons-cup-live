@@ -5,16 +5,17 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useTournament } from '@/context/TournamentContext';
 import { Match } from '@/types';
-import { ArrowLeft, AlertCircle, Shield, Lock } from 'lucide-react';
+import { ArrowLeft, AlertCircle, Shield, Lock, Clock, Play, CheckCircle } from 'lucide-react';
 import ScoreCard from '@/components/ScoreCard';
 import LiveScorecard from '@/components/LiveScorecard';
+import { canScoreMatch } from '@/utils/matchTiming';
 import Link from 'next/link';
 
 export default function AdminMatchDetail() {
   const params = useParams();
   const router = useRouter();
   const matchId = parseInt(params.id as string);
-  const { isAuthenticated, isOfficial } = useAuth();
+  const { isAuthenticated, isOfficial, isAdmin } = useAuth();
   
   const { 
     getMatchById, 
@@ -23,6 +24,7 @@ export default function AdminMatchDetail() {
   } = useTournament();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isStartingMatch, setIsStartingMatch] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated || !isOfficial) {
@@ -141,6 +143,58 @@ export default function AdminMatchDetail() {
     updateMatch(matchId, updatedMatch);
   };
 
+  const handleStartMatch = async () => {
+    if (!isAdmin || isStartingMatch) return;
+    
+    setIsStartingMatch(true);
+    try {
+      const updatedMatch = {
+        ...match,
+        status: 'in-progress'
+      };
+      
+      await updateMatch(matchId, updatedMatch);
+    } catch (error) {
+      console.error('Failed to start match:', error);
+    } finally {
+      setIsStartingMatch(false);
+    }
+  };
+
+  // Get match timing information
+  const timingInfo = canScoreMatch(
+    match.status,
+    match.date,
+    match.teeTime,
+    isAdmin
+  );
+
+  const getStatusIcon = () => {
+    switch (match.status) {
+      case 'scheduled':
+        return <Clock className="w-5 h-5" />;
+      case 'in-progress':
+        return <Play className="w-5 h-5" />;
+      case 'completed':
+        return <CheckCircle className="w-5 h-5" />;
+      default:
+        return <Clock className="w-5 h-5" />;
+    }
+  };
+
+  const getStatusColor = () => {
+    switch (match.status) {
+      case 'scheduled':
+        return timingInfo.isOverdue ? 'text-red-600' : 'text-yellow-600';
+      case 'in-progress':
+        return 'text-green-600';
+      case 'completed':
+        return 'text-blue-600';
+      default:
+        return 'text-gray-600';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -156,14 +210,48 @@ export default function AdminMatchDetail() {
                 <span>Back to Scoring</span>
               </Link>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-2 text-green-600">
                 <Shield className="w-5 h-5" />
                 <span className="text-sm font-medium">Official Access</span>
               </div>
+              
+              {/* Match Status */}
+              <div className={`flex items-center space-x-2 ${getStatusColor()}`}>
+                {getStatusIcon()}
+                <span className="text-sm font-medium capitalize">
+                  {match.status.replace('-', ' ')}
+                  {timingInfo.isOverdue && ' (Overdue)'}
+                </span>
+              </div>
+              
+              {/* Start Match Button */}
+              {isAdmin && match.status === 'scheduled' && !timingInfo.canScore && (
+                <button
+                  onClick={handleStartMatch}
+                  disabled={isStartingMatch}
+                  className="inline-flex items-center px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                >
+                  {isStartingMatch ? (
+                    <>
+                      <Clock className="w-4 h-4 mr-1 animate-spin" />
+                      Starting...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-4 h-4 mr-1" />
+                      Start Early
+                    </>
+                  )}
+                </button>
+              )}
+              
               <div className="text-right">
                 <div className="text-sm text-gray-600">Match #{match.id}</div>
                 <div className="text-sm text-gray-600">{match.date} at {match.teeTime}</div>
+                {!timingInfo.canScore && timingInfo.timeUntilStart && (
+                  <div className="text-xs text-gray-500">Starts in {timingInfo.timeUntilStart}</div>
+                )}
               </div>
             </div>
           </div>

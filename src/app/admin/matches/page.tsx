@@ -8,6 +8,9 @@ import { Match, Team } from '@/types';
 import MatchEditModal from '@/components/admin/MatchEditModal';
 import RoleGuard from '@/components/admin/RoleGuard';
 import MatchStatusMonitor from '@/components/admin/MatchStatusMonitor';
+import TournamentResetButton from '@/components/admin/TournamentResetButton';
+import QuickResetButton from '@/components/admin/QuickResetButton';
+import AutomationGuide from '@/components/admin/AutomationGuide';
 import { 
   Calendar, 
   Clock, 
@@ -164,9 +167,20 @@ export default function AdminMatchesPage() {
           </button>
         </div>
 
+        {/* Automation Guide */}
+        <div className="mb-8">
+          <AutomationGuide />
+        </div>
+
         {/* Match Status Monitor */}
         <div className="mb-8">
           <MatchStatusMonitor />
+        </div>
+        
+        {/* Reset Options */}
+        <div className="mb-8 space-y-4">
+          <QuickResetButton onComplete={() => window.location.reload()} />
+          <TournamentResetButton onComplete={() => window.location.reload()} />
         </div>
 
         {/* Stats Cards */}

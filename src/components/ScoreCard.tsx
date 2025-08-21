@@ -1,9 +1,13 @@
 'use client';
 
 import { Match, Team, Hole } from '@/types';
-import { Save, Edit, CheckCircle, Circle, Clock } from 'lucide-react';
+import { Save, Edit, CheckCircle, Circle, Clock, Play, AlertTriangle, Lock, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 import { calculateMatchPlayResult, getMatchStatusDescription, formatMatchPlayScore } from '@/utils/matchPlayScoring';
+import { canScoreMatch, MatchTimingInfo } from '@/utils/matchTiming';
+import { useAuth } from '@/context/AuthContext';
+import { useTournament } from '@/context/TournamentContext';
+import { supabase } from '@/lib/supabase';
 
 interface ScoreCardProps {
   match: Match;
@@ -18,6 +22,18 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
     teamA: null,
     teamB: null
   });
+  const [isStartingMatch, setIsStartingMatch] = useState(false);
+  
+  const { isAdmin } = useAuth();
+  const { updateMatch } = useTournament();
+
+  // Check if scoring is allowed
+  const timingInfo: MatchTimingInfo = canScoreMatch(
+    match.status,
+    match.date,
+    match.teeTime,
+    isAdmin
+  );
 
   const calculateMatchStatus = () => {
     // Convert holes to the format expected by the match play calculator
@@ -52,6 +68,11 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
   };
 
   const handleEditHole = (holeNumber: number) => {
+    // Prevent editing if scoring is not allowed
+    if (!timingInfo.canScore) {
+      return;
+    }
+    
     const hole = match.holes.find(h => h.number === holeNumber);
     setEditingHole(holeNumber);
     setTempScores({
@@ -60,7 +81,26 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
     });
   };
 
-  const handleSaveHole = () => {
+  const handleStartMatch = async () => {
+    if (!isAdmin || isStartingMatch) return;
+    
+    setIsStartingMatch(true);
+    try {
+      const updatedMatch = {
+        ...match,
+        status: 'in-progress'
+      };
+      
+      await updateMatch(updatedMatch);
+      onSave(updatedMatch);
+    } catch (error) {
+      console.error('Failed to start match:', error);
+    } finally {
+      setIsStartingMatch(false);
+    }
+  };
+
+  const handleSaveHole = async () => {
     if (editingHole && (tempScores.teamA !== null || tempScores.teamB !== null)) {
       const updatedHoles = match.holes.map(hole => 
         hole.number === editingHole 
@@ -73,15 +113,167 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
           : hole
       );
 
+      // Check if match is automatically completed due to match play rules
+      const holesData = updatedHoles.map(hole => ({
+        holeNumber: hole.number,
+        par: hole.par || 4,
+        teamAStrokes: hole.teamAScore || 0,
+        teamBStrokes: hole.teamBScore || 0
+      }));
+
+      const matchPlayResult = calculateMatchPlayResult(holesData, 18);
+      const isMatchComplete = matchPlayResult.status === 'completed';
+
       const updatedMatch: Match = {
         ...match,
         holes: updatedHoles,
-        status: updatedHoles.every(h => h.status === 'completed') ? 'completed' : 'in-progress'
+        status: isMatchComplete ? 'completed' : 'in-progress'
       };
 
+      // Save the match first
       onSave(updatedMatch);
+      await updateMatch(updatedMatch);
+
+      // If match is complete, update leaderboard automatically
+      if (isMatchComplete) {
+        console.log(`🏆 Match ${match.id} completed automatically!`);
+        console.log(`Result: ${matchPlayResult.result}, Winner: ${matchPlayResult.winner}`);
+        
+        // Update tournament standings
+        await updateTournamentStandings(updatedMatch, matchPlayResult);
+      }
+
       setEditingHole(null);
       setTempScores({ teamA: null, teamB: null });
+    }
+  };
+
+  const updateTournamentStandings = async (completedMatch: Match, result: any) => {
+    try {
+      console.log('📊 Updating tournament standings...');
+      
+      const teamAId = completedMatch.teamAId;
+      const teamBId = completedMatch.teamBId;
+      
+      if (!teamAId || !teamBId) return;
+
+      // Determine points based on result
+      let teamAPoints = 0;
+      let teamBPoints = 0;
+      let teamAWon = 0;
+      let teamBWon = 0;
+      let teamALost = 0;
+      let teamBLost = 0;
+      let teamAHalved = 0;
+      let teamBHalved = 0;
+
+      if (result.winner === 'teamA') {
+        teamAPoints = 1;
+        teamAWon = 1;
+        teamBLost = 1;
+      } else if (result.winner === 'teamB') {
+        teamBPoints = 1;
+        teamBWon = 1;
+        teamALost = 1;
+      } else if (result.winner === 'halved') {
+        teamAPoints = 0.5;
+        teamBPoints = 0.5;
+        teamAHalved = 1;
+        teamBHalved = 1;
+      }
+
+      // Update both teams' standings
+      await updateTeamStandings(teamAId, {
+        points: teamAPoints,
+        matchesPlayed: 1,
+        matchesWon: teamAWon,
+        matchesLost: teamALost,
+        matchesHalved: teamAHalved,
+        holesWon: result.teamAHolesWon,
+        holesLost: result.teamBHolesWon
+      });
+
+      await updateTeamStandings(teamBId, {
+        points: teamBPoints,
+        matchesPlayed: 1,
+        matchesWon: teamBWon,
+        matchesLost: teamBLost,
+        matchesHalved: teamBHalved,
+        holesWon: result.teamBHolesWon,
+        holesLost: result.teamAHolesWon
+      });
+
+      console.log('✅ Tournament standings updated successfully');
+      
+    } catch (error) {
+      console.error('❌ Failed to update tournament standings:', error);
+    }
+  };
+
+  const updateTeamStandings = async (teamId: number, matchResult: any) => {
+    try {
+      // Get current standings
+      const { data: currentStandings } = await supabase
+        .from('scores')
+        .select('*')
+        .eq('team_id', teamId)
+        .single();
+
+      if (currentStandings) {
+        // Update existing standings
+        const updatedStandings = {
+          points: currentStandings.points + matchResult.points,
+          matches_played: currentStandings.matches_played + matchResult.matchesPlayed,
+          matches_won: currentStandings.matches_won + matchResult.matchesWon,
+          matches_lost: currentStandings.matches_lost + matchResult.matchesLost,
+          matches_halved: currentStandings.matches_halved + matchResult.matchesHalved,
+          holes_won: currentStandings.holes_won + matchResult.holesWon,
+          holes_lost: currentStandings.holes_lost + matchResult.holesLost,
+          last_updated: new Date().toISOString()
+        };
+
+        await supabase
+          .from('scores')
+          .update(updatedStandings)
+          .eq('team_id', teamId);
+      }
+    } catch (error) {
+      console.error(`Failed to update standings for team ${teamId}:`, error);
+    }
+  };
+
+  const handleClearAllScores = async () => {
+    if (!isAdmin) return;
+    
+    if (!confirm('Clear all scores for this match and reset to scheduled?')) {
+      return;
+    }
+    
+    try {
+      const clearedHoles = match.holes.map(hole => ({
+        ...hole,
+        teamAScore: null,
+        teamBScore: null,
+        status: 'not-started' as const
+      }));
+
+      const clearedMatch: Match = {
+        ...match,
+        holes: clearedHoles,
+        status: 'scheduled'
+      };
+
+      await updateMatch(clearedMatch);
+      onSave(clearedMatch);
+      
+      // Force immediate UI refresh
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+      
+    } catch (error) {
+      console.error('Failed to clear scores:', error);
+      alert('Failed to clear scores. Please try again.');
     }
   };
 
@@ -105,12 +297,77 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
 
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+      {/* Match Status Alert */}
+      {!timingInfo.canScore && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              {timingInfo.hasStarted ? (
+                <AlertTriangle className="h-5 w-5 text-yellow-400" />
+              ) : (
+                <Lock className="h-5 w-5 text-yellow-400" />
+              )}
+            </div>
+            <div className="ml-3 flex-1">
+              <p className="text-sm font-medium text-yellow-800">
+                {timingInfo.hasStarted ? 'Match Status Update Required' : 'Match Not Started'}
+              </p>
+              <p className="text-sm text-yellow-700 mt-1">
+                {timingInfo.reason}
+              </p>
+            </div>
+            {isAdmin && !timingInfo.hasStarted && (
+              <div className="ml-4">
+                <button
+                  onClick={handleStartMatch}
+                  disabled={isStartingMatch}
+                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                >
+                  {isStartingMatch ? (
+                    <>
+                      <Clock className="h-4 w-4 mr-2 animate-spin" />
+                      Starting...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4 mr-2" />
+                      Start Match
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Match Header */}
       <div className="bg-gradient-to-r from-green-600 to-green-700 p-6 text-white">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Match #{match.id}</h2>
-          <div className="text-right">
-            <div className="text-sm opacity-90">{match.teeTime}</div>
+          <div className="flex items-center space-x-3">
+            {isAdmin && (
+              <button
+                onClick={handleClearAllScores}
+                className="inline-flex items-center px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                title="Clear all scores and reset to scheduled"
+              >
+                <RefreshCw className="w-3 h-3 mr-1" />
+                Clear All
+              </button>
+            )}
+            <div className="text-right">
+              <div className="text-sm opacity-90">{match.teeTime}</div>
+              <div className="text-xs opacity-75 capitalize">
+                {match.status.replace('-', ' ')}
+                {timingInfo.isOverdue && ' (Overdue)'}
+              </div>
+              {match.status === 'in-progress' && (
+                <div className="text-xs opacity-75 mt-1">
+                  🏆 Auto-completes when won
+                </div>
+              )}
+            </div>
           </div>
         </div>
         
@@ -212,13 +469,13 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
             {match.holes
               .sort((a, b) => a.number - b.number)
               .map(hole => (
-              <div key={hole.number} className="border rounded-lg p-4">
+              <div key={hole.number} className={`border rounded-lg p-4 ${!timingInfo.canScore ? 'opacity-60 bg-gray-50' : ''}`}>
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="font-medium">Hole {hole.number}</h4>
                   {getHoleStatusIcon(hole)}
                 </div>
                 
-                {editingHole === hole.number ? (
+                {editingHole === hole.number && timingInfo.canScore ? (
                   <div className="space-y-3">
                     <div className="flex space-x-2">
                       <input
@@ -270,10 +527,25 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
                     </div>
                     <button
                       onClick={() => handleEditHole(hole.number)}
-                      className="w-full flex items-center justify-center px-3 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                      disabled={!timingInfo.canScore}
+                      className={`w-full flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md transition-colors ${
+                        timingInfo.canScore 
+                          ? 'text-gray-700 hover:bg-gray-50' 
+                          : 'text-gray-400 cursor-not-allowed bg-gray-100'
+                      }`}
+                      title={timingInfo.canScore ? "Edit scores for this hole" : timingInfo.reason}
                     >
-                      <Edit className="w-4 h-4 mr-1" />
-                      Edit
+                      {timingInfo.canScore ? (
+                        <>
+                          <Edit className="w-4 h-4 mr-1" />
+                          Edit
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="w-4 h-4 mr-1" />
+                          Locked
+                        </>
+                      )}
                     </button>
                   </div>
                 )}
@@ -281,6 +553,26 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
             ))}
           </div>
         </div>
+
+        {/* Scoring Status Footer */}
+        {!timingInfo.canScore && (
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
+            <div className="flex items-center text-sm text-gray-600">
+              <Lock className="w-4 h-4 mr-2 text-gray-500" />
+              <span>
+                {timingInfo.hasStarted 
+                  ? 'Match status needs to be updated to enable scoring'
+                  : `Scoring will be enabled when the match starts${timingInfo.timeUntilStart ? ` (in ${timingInfo.timeUntilStart})` : ''}`
+                }
+              </span>
+            </div>
+            {!timingInfo.hasStarted && timingInfo.timeUntilStart && (
+              <div className="mt-2 text-xs text-gray-500">
+                Tee time: {match.teeTime} on {match.date}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

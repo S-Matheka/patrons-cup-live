@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { getAdminClient } from '@/lib/supabase-admin';
 import { Match, Team, Player } from '@/types';
 import { useTournament } from '@/context/TournamentContext';
 import { X, Save, Calendar, Clock, Users, MapPin, UserPlus, UserMinus, AlertCircle } from 'lucide-react';
@@ -217,14 +217,16 @@ export default function MatchEditModal({ match, isOpen, onClose, onSave }: Match
         teamC: selectedPlayers.teamC.length > 0 ? selectedPlayers.teamC : (formData.players?.teamC || [])
       };
 
+      // Prepare match data - exclude ID for new records
       const matchData = {
         game_number: formData.gameNumber,
         division: formData.division,
-        type: formData.type,
+        match_type: formData.type, // Correct column name
         session: formData.session,
-        date: formData.date,
-        tee_time: formData.teeTime,
+        match_date: formData.date, // Correct column name
+        tee_time: formData.teeTime, // Now expects TIME format (HH:MM:SS or HH:MM)
         tee: formData.tee,
+        course: formData.course || 'Muthaiga Golf Club', // Default course
         status: formData.status,
         team_a_id: formData.teamAId,
         team_b_id: formData.teamBId,
@@ -234,12 +236,18 @@ export default function MatchEditModal({ match, isOpen, onClose, onSave }: Match
         is_pro: formData.isPro,
         players: updatedPlayers,
         updated_at: new Date().toISOString()
+        // Note: ID is intentionally excluded - it should be auto-generated for new records
       };
+
+      const adminClient = getAdminClient();
+      if (!adminClient) {
+        throw new Error('Admin client not available');
+      }
 
       let result;
       if (match?.id) {
         // Update existing match
-        result = await supabase
+        result = await adminClient
           .from('matches')
           .update(matchData)
           .eq('id', match.id)
@@ -247,7 +255,7 @@ export default function MatchEditModal({ match, isOpen, onClose, onSave }: Match
           .single();
       } else {
         // Create new match
-        result = await supabase
+        result = await adminClient
           .from('matches')
           .insert(matchData)
           .select()
@@ -261,11 +269,12 @@ export default function MatchEditModal({ match, isOpen, onClose, onSave }: Match
         id: result.data.id,
         gameNumber: result.data.game_number,
         division: result.data.division,
-        type: result.data.type,
+        type: result.data.match_type, // Correct column name
         session: result.data.session,
-        date: result.data.date,
+        date: result.data.match_date, // Correct column name
         teeTime: result.data.tee_time,
         tee: result.data.tee,
+        course: result.data.course, // Add course field
         status: result.data.status,
         teamAId: result.data.team_a_id,
         teamBId: result.data.team_b_id,
@@ -281,7 +290,18 @@ export default function MatchEditModal({ match, isOpen, onClose, onSave }: Match
       onClose();
     } catch (error) {
       console.error('Error saving match:', error);
-      setErrors({ general: 'Failed to save match. Please try again.' });
+      console.error('Error details:', JSON.stringify(error, null, 2));
+      
+      let errorMessage = 'Failed to save match. Please try again.';
+      if (error && typeof error === 'object') {
+        if ('message' in error && error.message) {
+          errorMessage = `Failed to save match: ${error.message}`;
+        } else if ('details' in error && error.details) {
+          errorMessage = `Failed to save match: ${error.details}`;
+        }
+      }
+      
+      setErrors({ general: errorMessage });
     } finally {
       setIsLoading(false);
     }
@@ -296,7 +316,12 @@ export default function MatchEditModal({ match, isOpen, onClose, onSave }: Match
 
     setIsLoading(true);
     try {
-      const { error } = await supabase
+      const adminClient = getAdminClient();
+      if (!adminClient) {
+        throw new Error('Admin client not available');
+      }
+
+      const { error } = await adminClient
         .from('matches')
         .delete()
         .eq('id', match.id);

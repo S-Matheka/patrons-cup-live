@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useTournament } from '@/context/TournamentContext';
-import { Shield, ArrowLeft, Search, Filter, Edit3 } from 'lucide-react';
+import { Shield, ArrowLeft, Search, Filter, Edit3, Clock, Play, CheckCircle, Lock, AlertTriangle } from 'lucide-react';
+import { canScoreMatch } from '@/utils/matchTiming';
 import Link from 'next/link';
 
 export default function AdminScoring() {
-  const { isAuthenticated, isOfficial } = useAuth();
+  const { isAuthenticated, isOfficial, isAdmin } = useAuth();
   const { teams, matches } = useTournament();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,6 +25,50 @@ export default function AdminScoring() {
   if (!isAuthenticated || !isOfficial) {
     return <div>Loading...</div>;
   }
+
+  const getScoreabilityInfo = (match: any) => {
+    return canScoreMatch(match.status, match.date, match.teeTime, isAdmin);
+  };
+
+  const getScoreabilityIcon = (match: any) => {
+    const info = getScoreabilityInfo(match);
+    
+    if (info.canScore) {
+      if (match.status === 'in-progress') {
+        return <Play className="w-4 h-4 text-green-600" />;
+      } else if (match.status === 'completed') {
+        return <CheckCircle className="w-4 h-4 text-blue-600" />;
+      } else {
+        return <Clock className="w-4 h-4 text-yellow-600" />;
+      }
+    } else {
+      if (info.hasStarted && info.isOverdue) {
+        return <AlertTriangle className="w-4 h-4 text-red-600" />;
+      } else {
+        return <Lock className="w-4 h-4 text-gray-400" />;
+      }
+    }
+  };
+
+  const getScoreabilityText = (match: any) => {
+    const info = getScoreabilityInfo(match);
+    
+    if (info.canScore) {
+      if (match.status === 'in-progress') {
+        return 'Ready to Score';
+      } else if (match.status === 'completed') {
+        return 'Completed';
+      } else {
+        return 'Tee Time Reached';
+      }
+    } else {
+      if (info.hasStarted && info.isOverdue) {
+        return 'Overdue to Start';
+      } else {
+        return `Starts in ${info.timeUntilStart || 'Unknown'}`;
+      }
+    }
+  };
 
   const filteredMatches = matches.filter(match => {
     const matchesSearch = !searchTerm || 
@@ -195,6 +240,14 @@ export default function AdminScoring() {
                               PRO
                             </span>
                           )}
+                          
+                          {/* Scoring Status Indicator */}
+                          <div className="flex items-center space-x-1">
+                            {getScoreabilityIcon(match)}
+                            <span className="text-xs font-medium text-gray-600">
+                              {getScoreabilityText(match)}
+                            </span>
+                          </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -259,13 +312,31 @@ export default function AdminScoring() {
                       </div>
 
                       <div className="ml-6">
-                        <Link
-                          href={`/admin/match/${match.id}`}
-                          className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-                        >
-                          <Edit3 className="w-4 h-4" />
-                          <span>Edit Score</span>
-                        </Link>
+                        {(() => {
+                          const info = getScoreabilityInfo(match);
+                          const canScore = info.canScore;
+                          
+                          return (
+                            <Link
+                              href={`/admin/match/${match.id}`}
+                              className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+                                canScore 
+                                  ? 'bg-green-600 text-white hover:bg-green-700' 
+                                  : 'bg-gray-300 text-gray-600 hover:bg-gray-400'
+                              }`}
+                              title={canScore ? "Open scoring interface" : info.reason}
+                            >
+                              {canScore ? (
+                                <Edit3 className="w-4 h-4" />
+                              ) : (
+                                <Lock className="w-4 h-4" />
+                              )}
+                              <span>
+                                {canScore ? 'Score Match' : 'View Match'}
+                              </span>
+                            </Link>
+                          );
+                        })()}
                       </div>
                     </div>
                   </div>

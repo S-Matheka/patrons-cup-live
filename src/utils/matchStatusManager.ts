@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { getCurrentEAT, parseTeeTimeEAT, formatEATDateTime } from './timezone';
 import { Match } from '@/types';
 
 /**
@@ -55,10 +56,9 @@ export class MatchStatusManager {
       if (!supabase) return;
 
       // Get current time in Nairobi timezone (EAT - UTC+3)
-      const now = new Date();
-      const currentTime = new Date(now.getTime() + (3 * 60 * 60 * 1000)); // Add 3 hours for EAT
+      const currentTime = getCurrentEAT();
       
-      console.log(`🕐 Checking match statuses at ${currentTime.toISOString()}`);
+      console.log(`🕐 Checking match statuses at ${formatEATDateTime(currentTime)}`);
 
       // Get all scheduled matches
       const { data: scheduledMatches, error } = await supabase
@@ -107,22 +107,19 @@ export class MatchStatusManager {
    */
   private shouldTransitionToLive(match: any, currentTime: Date): boolean {
     try {
-      // Parse match date and tee time
-      const matchDate = new Date(match.match_date);
-      const [hours, minutes] = match.tee_time.split(':').map(Number);
+      // Parse tee time using EAT timezone utility
+      const matchDateTime = parseTeeTimeEAT(match.match_date, match.tee_time);
       
-      // Create the exact tee time
-      const teeTime = new Date(matchDate);
-      teeTime.setHours(hours, minutes, 0, 0);
+      if (!matchDateTime) {
+        console.error(`❌ Could not parse tee time for match ${match.game_number}`);
+        return false;
+      }
       
-      // Convert tee time to EAT (add 3 hours if it's in UTC)
-      // Assuming tee times are stored in local time (EAT)
-      
-      // Transition to live if current time >= tee time
-      const shouldTransition = currentTime >= teeTime;
+      // Transition to live if current EAT time >= tee time
+      const shouldTransition = currentTime >= matchDateTime;
       
       if (shouldTransition) {
-        console.log(`✅ Match ${match.game_number}: Tee time ${match.tee_time} on ${match.match_date} has arrived`);
+        console.log(`✅ Match ${match.game_number}: Tee time ${match.tee_time} on ${match.match_date} has arrived (EAT)`);
       }
       
       return shouldTransition;
@@ -132,6 +129,8 @@ export class MatchStatusManager {
       return false;
     }
   }
+
+
 
   /**
    * Update multiple matches to live status

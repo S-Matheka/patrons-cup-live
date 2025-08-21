@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { getAdminClient } from '@/lib/supabase-admin';
 import { Team } from '@/types';
 import { useTournament } from '@/context/TournamentContext';
 import { X, Save, Users, Trophy } from 'lucide-react';
@@ -102,9 +102,13 @@ export default function TeamEditModal({ team, isOpen, onClose, onSave }: TeamEdi
 
     setIsLoading(true);
     try {
+      // Prepare team data - exclude ID for new records
       const teamData = {
         name: formData.name,
         division: formData.division,
+        color: formData.color || '#10B981', // Default color if not provided
+        logo: formData.logo || formData.name?.substring(0, 2).toUpperCase() || 'TM', // Default logo
+        description: formData.description || null,
         seed: formData.seed,
         total_players: formData.totalPlayers,
         max_points_available: formData.maxPointsAvailable,
@@ -113,12 +117,18 @@ export default function TeamEditModal({ team, isOpen, onClose, onSave }: TeamEdi
         resting_per_session: formData.restingPerSession,
         points_per_match: formData.pointsPerMatch,
         updated_at: new Date().toISOString()
+        // Note: ID is intentionally excluded - it should be auto-generated for new records
       };
+
+      const adminClient = getAdminClient();
+      if (!adminClient) {
+        throw new Error('Admin client not available');
+      }
 
       let result;
       if (team?.id) {
         // Update existing team
-        result = await supabase
+        result = await adminClient
           .from('teams')
           .update(teamData)
           .eq('id', team.id)
@@ -126,7 +136,7 @@ export default function TeamEditModal({ team, isOpen, onClose, onSave }: TeamEdi
           .single();
       } else {
         // Create new team
-        result = await supabase
+        result = await adminClient
           .from('teams')
           .insert(teamData)
           .select()
@@ -140,6 +150,9 @@ export default function TeamEditModal({ team, isOpen, onClose, onSave }: TeamEdi
         id: result.data.id,
         name: result.data.name,
         division: result.data.division,
+        color: result.data.color,
+        logo: result.data.logo,
+        description: result.data.description,
         seed: result.data.seed,
         totalPlayers: result.data.total_players,
         maxPointsAvailable: result.data.max_points_available,
@@ -168,10 +181,15 @@ export default function TeamEditModal({ team, isOpen, onClose, onSave }: TeamEdi
 
     setIsLoading(true);
     try {
-      const { error } = await supabase
-        .from('teams')
-        .delete()
-        .eq('id', team.id);
+          const adminClient = getAdminClient();
+    if (!adminClient) {
+      throw new Error('Admin client not available');
+    }
+
+    const { error } = await adminClient
+      .from('teams')
+      .delete()
+      .eq('id', team.id);
 
       if (error) throw error;
 

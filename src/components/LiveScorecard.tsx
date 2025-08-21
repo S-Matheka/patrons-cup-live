@@ -40,7 +40,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
     let totalPar = 0;
     
     holes.forEach(hole => {
-      const strokes = teamKey === 'teamA' ? hole.teamAStrokes : hole.teamBStrokes;
+      const strokes = teamKey === 'teamA' ? hole.teamAScore : hole.teamBScore;
       if (strokes !== null) {
         totalStrokes += strokes;
         totalPar += hole.par;
@@ -58,10 +58,10 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
     
     // Convert holes to the format expected by the match play calculator
     const holesData = match.holes.map(hole => ({
-      holeNumber: hole.holeNumber,
+      holeNumber: hole.number,
       par: hole.par || 4, // Default to par 4 if not specified
-      teamAStrokes: hole.teamAStrokes || 0,
-      teamBStrokes: hole.teamBStrokes || 0
+      teamAStrokes: hole.teamAScore || 0,
+      teamBStrokes: hole.teamBScore || 0
     }));
 
     return calculateMatchPlayResult(holesData, 18);
@@ -304,17 +304,17 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
               {match.holes
                 .sort((a, b) => a.number - b.number) // Ensure holes are sorted by number
                 .map((hole, index) => {
-                const teamAIndicator = getScoreIndicator(hole.teamAStrokes, hole.par);
-                const teamBIndicator = getScoreIndicator(hole.teamBStrokes, hole.par);
+                const teamAIndicator = getScoreIndicator(hole.teamAScore, hole.par);
+                const teamBIndicator = getScoreIndicator(hole.teamBScore, hole.par);
                 
                 return (
                   <tr key={hole.number} className="border-b border-gray-100 hover:bg-blue-50 transition-colors">
                     <td className="py-4 px-2 font-semibold text-gray-900">{hole.number}</td>
                     <td className="text-center py-4 px-2 font-medium text-gray-600">{hole.par}</td>
                     <td className="text-center py-4 px-2">
-                      {hole.teamAStrokes !== null ? (
+                      {hole.teamAScore !== null ? (
                         <div className="flex items-center justify-center space-x-2">
-                          <span className="font-bold text-lg">{hole.teamAStrokes}</span>
+                          <span className="font-bold text-lg">{hole.teamAScore}</span>
                           {teamAIndicator && (
                             <span className={`px-2 py-1 rounded text-xs font-medium ${teamAIndicator.class}`}>
                               {teamAIndicator.symbol}
@@ -326,9 +326,9 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
                       )}
                     </td>
                     <td className="text-center py-4 px-2">
-                      {hole.teamBStrokes !== null ? (
+                      {hole.teamBScore !== null ? (
                         <div className="flex items-center justify-center space-x-2">
-                          <span className="font-bold text-lg">{hole.teamBStrokes}</span>
+                          <span className="font-bold text-lg">{hole.teamBScore}</span>
                           {teamBIndicator && (
                             <span className={`px-2 py-1 rounded text-xs font-medium ${teamBIndicator.class}`}>
                               {teamBIndicator.symbol}

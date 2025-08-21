@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Clock, Calendar } from 'lucide-react';
+import { getCurrentEAT, TOURNAMENT_CONFIG } from '@/utils/timezone';
 
 interface TournamentCountdownProps {
   startDate?: string;
@@ -9,7 +10,7 @@ interface TournamentCountdownProps {
 }
 
 export default function TournamentCountdown({ 
-  startDate = '2025-08-22T07:00:00+03:00', // First game starts at 7:00 AM EAT
+  startDate = TOURNAMENT_CONFIG.TOURNAMENT_START, // First game starts at 7:00 AM EAT
   className = '' 
 }: TournamentCountdownProps) {
   const [timeLeft, setTimeLeft] = useState<{
@@ -29,7 +30,8 @@ export default function TournamentCountdown({
     if (!isMounted) return; // Only run on client side after mount
     
     const calculateTimeLeft = () => {
-      const now = new Date().getTime();
+      // Get current time in EAT (Nairobi, Kenya - UTC+3)
+      const now = getCurrentEAT().getTime();
       const tournamentStart = new Date(startDate).getTime();
       const difference = tournamentStart - now;
 

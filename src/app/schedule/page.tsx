@@ -69,15 +69,46 @@ export default function Schedule() {
     return date.toLocaleDateString('en-US', { weekday: 'long' });
   };
 
-  // Helper function to get sample players for a match
+  // Helper function to get actual assigned players or sample players for a match
   const getMatchPlayers = (match: Match, teamId: number | null, count: number = 2) => {
     if (!teamId) return [];
     const teamPlayers = players.filter(player => player.teamId === teamId);
     
     if (teamPlayers.length === 0) return [];
     
-    // For pre-tournament display, show a consistent sample of players based on match ID
-    // This ensures the same players are always shown for the same match
+    // First, try to get actual assigned players from match data
+    let assignedPlayerIds: string[] = [];
+    
+    if (match.players) {
+      if (teamId === match.teamAId && match.players.teamA) {
+        assignedPlayerIds = match.players.teamA;
+      } else if (teamId === match.teamBId && match.players.teamB) {
+        assignedPlayerIds = match.players.teamB;
+      } else if (teamId === match.teamCId && match.players.teamC) {
+        assignedPlayerIds = match.players.teamC;
+      }
+    }
+    
+    // If we have assigned players, try to resolve them
+    if (assignedPlayerIds && assignedPlayerIds.length > 0) {
+      const resolvedPlayers = assignedPlayerIds
+        .map(playerId => {
+          // Try to find player by ID first, then by name (for legacy data)
+          return teamPlayers.find(p => 
+            p.id.toString() === playerId || 
+            p.name === playerId
+          );
+        })
+        .filter(player => player !== undefined);
+      
+      // If we successfully resolved some players, use them
+      if (resolvedPlayers.length > 0) {
+        return resolvedPlayers.slice(0, count);
+      }
+    }
+    
+    // Fallback: Generate consistent sample players based on match ID (original logic)
+    // This ensures the same players are always shown for the same match when no assignments exist
     const startIndex = (match.id * teamId) % teamPlayers.length;
     const selectedPlayers = [];
     

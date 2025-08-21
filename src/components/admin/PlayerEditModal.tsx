@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { getAdminClient } from '@/lib/supabase-admin';
 import { Player, Team } from '@/types';
 import { useTournament } from '@/context/TournamentContext';
 import { X, Save, User, UserPlus } from 'lucide-react';
@@ -66,6 +66,7 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
 
     setIsLoading(true);
     try {
+      // Prepare player data - exclude ID for new records
       const playerData = {
         name: formData.name,
         team_id: formData.teamId,
@@ -75,15 +76,19 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
         is_junior: formData.isJunior,
         email: formData.email || null,
         phone: formData.phone || null,
-        position: formData.position || null,
-        medical_info: formData.medicalInfo || null,
         updated_at: new Date().toISOString()
+        // Note: ID is intentionally excluded - it should be auto-generated for new records
       };
+
+      const adminClient = getAdminClient();
+      if (!adminClient) {
+        throw new Error('Admin client not available');
+      }
 
       let result;
       if (player?.id) {
         // Update existing player
-        result = await supabase
+        result = await adminClient
           .from('players')
           .update(playerData)
           .eq('id', player.id)
@@ -91,7 +96,7 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
           .single();
       } else {
         // Create new player
-        result = await supabase
+        result = await adminClient
           .from('players')
           .insert(playerData)
           .select()
@@ -110,9 +115,7 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
         isExOfficio: result.data.is_ex_officio,
         isJunior: result.data.is_junior,
         email: result.data.email,
-        phone: result.data.phone,
-        position: result.data.position,
-        medicalInfo: result.data.medical_info
+        phone: result.data.phone
       };
 
       onSave(savedPlayer);
@@ -134,10 +137,15 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
 
     setIsLoading(true);
     try {
-      const { error } = await supabase
-        .from('players')
-        .delete()
-        .eq('id', player.id);
+          const adminClient = getAdminClient();
+    if (!adminClient) {
+      throw new Error('Admin client not available');
+    }
+
+    const { error } = await adminClient
+      .from('players')
+      .delete()
+      .eq('id', player.id);
 
       if (error) throw error;
 

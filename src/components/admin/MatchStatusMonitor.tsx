@@ -5,6 +5,7 @@ import { matchStatusManager } from '@/utils/matchStatusManager';
 import { useTournament } from '@/context/TournamentContext';
 import { supabase } from '@/lib/supabase';
 import { Play, Pause, RotateCcw, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { getCurrentEAT, parseTeeTimeEAT } from '@/utils/timezone';
 
 export default function MatchStatusMonitor() {
   const { matches, getTeamById } = useTournament();
@@ -27,22 +28,28 @@ export default function MatchStatusMonitor() {
   }, [matches]);
 
   const updateMatchLists = () => {
-    const now = new Date();
-    const currentTime = new Date(now.getTime() + (3 * 60 * 60 * 1000)); // EAT timezone
+    // Get current time in EAT (Nairobi, Kenya - UTC+3)
+    const currentTime = getCurrentEAT();
     
     const scheduled = matches.filter(match => 
       match.status === 'scheduled' && !match.isBye
     ).map(match => {
-      const matchDate = new Date(match.date);
-      const [hours, minutes] = match.teeTime.split(':').map(Number);
-      const teeTime = new Date(matchDate);
-      teeTime.setHours(hours, minutes, 0, 0);
+      const teeDateTime = parseTeeTimeEAT(match.date, match.teeTime);
+      
+      if (!teeDateTime) {
+        return {
+          ...match,
+          teeDateTime: new Date(),
+          minutesUntilTee: 0,
+          shouldBeLive: false
+        };
+      }
       
       return {
         ...match,
-        teeDateTime: teeTime,
-        minutesUntilTee: Math.round((teeTime.getTime() - currentTime.getTime()) / (1000 * 60)),
-        shouldBeLive: currentTime >= teeTime
+        teeDateTime,
+        minutesUntilTee: Math.round((teeDateTime.getTime() - currentTime.getTime()) / (1000 * 60)),
+        shouldBeLive: currentTime >= teeDateTime
       };
     }).sort((a, b) => a.teeDateTime.getTime() - b.teeDateTime.getTime());
     
@@ -57,9 +64,36 @@ export default function MatchStatusMonitor() {
     setIsMonitoring(true);
   };
 
-  const handleStopMonitoring = () => {
-    matchStatusManager.stopMonitoring();
-    setIsMonitoring(false);
+  const handleStopMonitoring = async () => {
+    try {
+      // Stop the automatic monitoring
+      matchStatusManager.stopMonitoring();
+      setIsMonitoring(false);
+      
+      // Reset all in-progress matches back to scheduled
+      const inProgressMatches = matches.filter(match => match.status === 'in-progress');
+      
+      if (inProgressMatches.length > 0) {
+        console.log(`Resetting ${inProgressMatches.length} in-progress matches to scheduled...`);
+        
+        const { error } = await supabase
+          .from('matches')
+          .update({ status: 'scheduled' })
+          .eq('status', 'in-progress');
+        
+        if (error) {
+          console.error('Error resetting matches:', error);
+          alert('Failed to reset some matches. Please refresh and try again.');
+        } else {
+          console.log('All in-progress matches reset to scheduled');
+          // Force immediate UI update
+          updateMatchLists();
+        }
+      }
+    } catch (error) {
+      console.error('Error stopping monitoring:', error);
+      alert('Error stopping monitoring. Please try again.');
+    }
   };
 
   const handleManualTransition = async (matchId: number) => {

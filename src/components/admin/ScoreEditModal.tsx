@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { getAdminClient } from '@/lib/supabase-admin';
 import { Score, Team } from '@/types';
 import { useTournament } from '@/context/TournamentContext';
 import { X, Save, Calculator, TrendingUp } from 'lucide-react';
@@ -75,7 +75,12 @@ export default function ScoreEditModal({ score, isOpen, onClose, onSave }: Score
         last_updated: new Date().toISOString()
       };
 
-      const { error, data } = await supabase
+      const adminClient = getAdminClient();
+      if (!adminClient) {
+        throw new Error('Admin client not available');
+      }
+
+      const { error, data } = await adminClient
         .from('scores')
         .update(scoreData)
         .eq('team_id', score.teamId)

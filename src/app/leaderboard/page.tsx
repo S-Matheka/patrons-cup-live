@@ -166,7 +166,7 @@ export default function LeaderboardPage() {
                     <th className="text-left py-3 px-4 font-medium text-gray-600">Position</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-600">Team</th>
                     <th className="text-center py-3 px-4 font-medium text-gray-600">Points</th>
-                    <th className="text-center py-3 px-4 font-medium text-gray-600">Played</th>
+
                     <th className="text-center py-3 px-4 font-medium text-gray-600">Wins</th>
                     <th className="text-center py-3 px-4 font-medium text-gray-600">Loss</th>
                     <th className="text-center py-3 px-4 font-medium text-gray-600">Tied</th>
@@ -204,14 +204,7 @@ export default function LeaderboardPage() {
                             {standing.points.toFixed(1)}
                           </span>
                         </td>
-                        <td className="py-4 px-4 text-center text-gray-900">
-                          {standing.matchesPlayed + standing.matchesInProgress}
-                          {standing.matchesInProgress > 0 && (
-                            <div className="text-xs text-blue-600 mt-1">
-                              {standing.matchesInProgress} live
-                            </div>
-                          )}
-                        </td>
+
                         <td className="py-4 px-4 text-center">
                           <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
                             {standing.matchesWon}

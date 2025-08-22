@@ -171,7 +171,7 @@ export default function Dashboard() {
                     <th className="text-left py-3 px-2 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Position</th>
                     <th className="text-left py-3 px-2 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Team</th>
                     <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Points</th>
-                    <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm hidden xs:table-cell">Played</th>
+
                     <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Wins</th>
                     <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Loss</th>
                     <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Tied</th>
@@ -198,13 +198,7 @@ export default function Dashboard() {
                             <div className="min-w-0">
                               <div className="font-medium text-gray-900 text-xs sm:text-sm truncate">{standing.team.name}</div>
                               <div className="text-xs text-gray-500 hidden sm:block">Seed #{standing.team.seed}</div>
-                              {/* Show live match status if available */}
-                              {standing.liveMatchStatus.length > 0 && (
-                                <div className="text-xs text-blue-600 font-medium mt-1">
-                                  <Clock className="w-3 h-3 inline mr-1" />
-                                  {standing.liveMatchStatus[0]}
-                                </div>
-                              )}
+
                             </div>
                           </div>
                         </td>
@@ -213,9 +207,7 @@ export default function Dashboard() {
                             {standing.points.toFixed(1)}
                           </span>
                         </td>
-                        <td className="py-3 sm:py-4 px-1 sm:px-4 text-center text-gray-900 text-xs sm:text-sm hidden xs:table-cell">
-                          {standing.matchesPlayed}
-                        </td>
+
                         <td className="py-3 sm:py-4 px-1 sm:px-4 text-center">
                           <span className="inline-flex px-1 sm:px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
                             {standing.matchesWon}

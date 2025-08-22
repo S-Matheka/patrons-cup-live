@@ -154,7 +154,7 @@ export default function Standings() {
                         <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
                         <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
                         <th className="px-1 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
-                        <th className="px-1 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Played</th>
+
                         <th className="px-1 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wins</th>
                         <th className="px-1 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loss</th>
                         <th className="px-1 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tied</th>
@@ -180,7 +180,7 @@ export default function Standings() {
                             </div>
                           </td>
                           <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 font-bold">{standing.points}</td>
-                          <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">{standing.matchesPlayed}</td>
+
                           <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">{standing.matchesWon}</td>
                           <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">{standing.matchesLost}</td>
                           <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">{standing.matchesHalved}</td>
@@ -201,7 +201,7 @@ export default function Standings() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Played</th>
+
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wins</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loss</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tied</th>
@@ -227,7 +227,7 @@ export default function Standings() {
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>
@@ -248,7 +248,7 @@ export default function Standings() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Played</th>
+
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wins</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loss</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tied</th>
@@ -274,7 +274,7 @@ export default function Standings() {
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>
@@ -295,7 +295,7 @@ export default function Standings() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Played</th>
+
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wins</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loss</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tied</th>
@@ -321,7 +321,7 @@ export default function Standings() {
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>
@@ -342,7 +342,7 @@ export default function Standings() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Played</th>
+
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wins</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loss</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tied</th>
@@ -368,7 +368,7 @@ export default function Standings() {
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>
@@ -390,7 +390,7 @@ export default function Standings() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Played</th>
+
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wins</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loss</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tied</th>
@@ -416,7 +416,7 @@ export default function Standings() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>
@@ -436,7 +436,7 @@ export default function Standings() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Played</th>
+
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wins</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loss</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tied</th>
@@ -462,7 +462,7 @@ export default function Standings() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>
@@ -482,7 +482,7 @@ export default function Standings() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Played</th>
+
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wins</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loss</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tied</th>
@@ -508,7 +508,7 @@ export default function Standings() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>
@@ -528,7 +528,7 @@ export default function Standings() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Played</th>
+
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wins</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loss</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tied</th>
@@ -554,7 +554,7 @@ export default function Standings() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>
@@ -574,7 +574,7 @@ export default function Standings() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Played</th>
+
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wins</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loss</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tied</th>
@@ -600,7 +600,7 @@ export default function Standings() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>

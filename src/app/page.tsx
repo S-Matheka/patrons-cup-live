@@ -4,9 +4,10 @@ import { useTournament } from '@/context/TournamentContext';
 import { useState, useMemo } from 'react';
 import { Trophy, Medal, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import TournamentCountdown from '@/components/TournamentCountdown';
+import { calculateLiveStandings } from '@/utils/liveStandingsCalculator';
 
 export default function Dashboard() {
-  const { teams, scores, matches, getTeamById } = useTournament();
+  const { teams, matches, getTeamById } = useTournament();
   const [activeDivision, setActiveDivision] = useState<'Trophy' | 'Shield' | 'Plaque' | 'Bowl' | 'Mug'>('Trophy');
 
   // Get recent match results for a team (last 5 matches)
@@ -44,17 +45,10 @@ export default function Dashboard() {
     });
   };
 
-  // Get live standings for the selected division
+  // Get live standings for the selected division using the new calculation
   const divisionStandings = useMemo(() => {
-    return scores
-      .filter(score => score.division === activeDivision)
-      .sort((a, b) => {
-        // Sort by points (descending), then by matches played (ascending), then by holes won (descending)
-        if (b.points !== a.points) return b.points - a.points;
-        if (a.matchesPlayed !== b.matchesPlayed) return a.matchesPlayed - b.matchesPlayed;
-        return b.holesWon - a.holesWon;
-      });
-  }, [scores, activeDivision]);
+    return calculateLiveStandings(matches, teams, activeDivision);
+  }, [matches, teams, activeDivision]);
 
   // Get tournament statistics
   const tournamentStats = useMemo(() => {
@@ -185,57 +179,61 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {divisionStandings.map((score, index) => {
-                    const team = getTeamById(score.teamId);
-                    const position = index + 1;
-                    
+                  {divisionStandings.map((standing) => {
                     return (
-                      <tr key={score.teamId} className="border-b border-gray-100 hover:bg-gray-50">
+                      <tr key={standing.teamId} className="border-b border-gray-100 hover:bg-gray-50">
                         <td className="py-3 sm:py-4 px-2 sm:px-4">
                           <div className="flex items-center space-x-1 sm:space-x-2">
-                            <span className="text-sm sm:text-lg font-bold text-gray-900">#{position}</span>
+                            <span className="text-sm sm:text-lg font-bold text-gray-900">#{standing.position}</span>
                             <div className="hidden xs:block">
-                              {getPositionIcon(score.positionChange || 'same')}
+                              {getPositionIcon(standing.positionChange || 'same')}
                             </div>
                           </div>
                         </td>
                         <td className="py-3 sm:py-4 px-2 sm:px-4">
                           <div className="flex items-center space-x-2 sm:space-x-3">
                             <div className="hidden xs:block">
-                              {getDivisionIcon(score.division)}
+                              {getDivisionIcon(standing.division)}
                             </div>
                             <div className="min-w-0">
-                              <div className="font-medium text-gray-900 text-xs sm:text-sm truncate">{team?.name}</div>
-                              <div className="text-xs text-gray-500 hidden sm:block">Seed #{team?.seed}</div>
+                              <div className="font-medium text-gray-900 text-xs sm:text-sm truncate">{standing.team.name}</div>
+                              <div className="text-xs text-gray-500 hidden sm:block">Seed #{standing.team.seed}</div>
+                              {/* Show live match status if available */}
+                              {standing.liveMatchStatus.length > 0 && (
+                                <div className="text-xs text-blue-600 font-medium mt-1">
+                                  <Clock className="w-3 h-3 inline mr-1" />
+                                  {standing.liveMatchStatus[0]}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </td>
                         <td className="py-3 sm:py-4 px-1 sm:px-4 text-center">
                           <span className="text-sm sm:text-xl font-bold text-green-600">
-                            {score.points.toFixed(1)}
+                            {standing.points.toFixed(1)}
                           </span>
                         </td>
                         <td className="py-3 sm:py-4 px-1 sm:px-4 text-center text-gray-900 text-xs sm:text-sm hidden xs:table-cell">
-                          {score.matchesPlayed}
+                          {standing.matchesPlayed}
                         </td>
                         <td className="py-3 sm:py-4 px-1 sm:px-4 text-center">
                           <span className="inline-flex px-1 sm:px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                            {score.matchesWon}
+                            {standing.matchesWon}
                           </span>
                         </td>
                         <td className="py-3 sm:py-4 px-1 sm:px-4 text-center">
                           <span className="inline-flex px-1 sm:px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-                            {score.matchesLost}
+                            {standing.matchesLost}
                           </span>
                         </td>
                         <td className="py-3 sm:py-4 px-1 sm:px-4 text-center">
                           <span className="inline-flex px-1 sm:px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                            {score.matchesHalved}
+                            {standing.matchesHalved}
                           </span>
                         </td>
                         <td className="py-3 sm:py-4 px-1 sm:px-4 text-center hidden sm:table-cell">
                           <div className="flex items-center justify-center space-x-1">
-                            {getTeamForm(score.teamId).map((result, idx) => (
+                            {standing.trend.split('-').map((result, idx) => (
                               <span
                                 key={idx}
                                 className={`inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 text-xs font-bold rounded-full ${

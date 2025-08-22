@@ -42,7 +42,6 @@ export interface Player {
   id: number;
   name: string;
   teamId: number;
-  position?: string;
   isPro?: boolean;
   isExOfficio?: boolean;
   isJunior?: boolean;

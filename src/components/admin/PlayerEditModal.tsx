@@ -227,6 +227,8 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
 
 
 
+
+
           {/* Position/Role */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Position/Role</label>

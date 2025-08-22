@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS players (
   handicap INTEGER DEFAULT 0 CHECK (handicap >= 0),
   email VARCHAR(255),
   phone VARCHAR(20),
+  position VARCHAR(50), -- Added position column
   is_pro BOOLEAN DEFAULT FALSE,
   is_ex_officio BOOLEAN DEFAULT FALSE,
   is_junior BOOLEAN DEFAULT FALSE,

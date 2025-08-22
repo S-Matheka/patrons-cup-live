@@ -128,3 +128,38 @@ export function calculateTournamentProgress(matches: Match[]) {
     livePercentage: totalMatches > 0 ? Math.round((inProgressMatches / totalMatches) * 100) : 0
   };
 }
+
+/**
+ * Get live tournament statistics for display
+ */
+export function getLiveTournamentStats(matches: Match[]) {
+  const totalMatches = matches.length;
+  const completedMatches = matches.filter(m => m.status === 'completed').length;
+  const inProgressMatches = matches.filter(m => m.status === 'in-progress').length;
+  const scheduledMatches = matches.filter(m => m.status === 'scheduled').length;
+
+  // Calculate completion percentage
+  const completionPercentage = totalMatches > 0 ? Math.round((completedMatches / totalMatches) * 100) : 0;
+  const livePercentage = totalMatches > 0 ? Math.round((inProgressMatches / totalMatches) * 100) : 0;
+
+  // Get current tournament day info
+  const today = new Date().toISOString().split('T')[0];
+  const todayMatches = matches.filter(m => m.date === today);
+  const todayCompleted = todayMatches.filter(m => m.status === 'completed').length;
+  const todayInProgress = todayMatches.filter(m => m.status === 'in-progress').length;
+
+  return {
+    totalMatches,
+    completedMatches,
+    inProgressMatches,
+    scheduledMatches,
+    completionPercentage,
+    livePercentage,
+    todayMatches: todayMatches.length,
+    todayCompleted,
+    todayInProgress,
+    tournamentStatus: completionPercentage === 100 ? 'completed' : 
+                     inProgressMatches > 0 ? 'live' : 
+                     'scheduled'
+  };
+}

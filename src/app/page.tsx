@@ -245,7 +245,7 @@ export default function Dashboard() {
                                 {result}
                               </span>
                             ))}
-                            {getTeamForm(score.teamId).length === 0 && (
+                            {standing.trend === '-' && (
                               <span className="text-xs text-gray-400">-</span>
                             )}
                           </div>

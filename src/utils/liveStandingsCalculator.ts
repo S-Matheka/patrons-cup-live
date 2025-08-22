@@ -173,12 +173,21 @@ export function calculateLiveStandings(
           // Team A is ahead - award 0.1 points per hole advantage (clean decimals)
           const partialPoints = Math.round((holeAdvantage * 0.1) * 10) / 10; // Round to 1 decimal
           teamAStats.points += partialPoints;
+          // REAL-TIME WIN: Team A is currently winning this match
+          teamAStats.matchesWon++;
+          teamBStats.matchesLost++;
         } else if (holeAdvantage < 0) {
           // Team B is ahead - award 0.1 points per hole advantage
           const partialPoints = Math.round((Math.abs(holeAdvantage) * 0.1) * 10) / 10; // Round to 1 decimal
           teamBStats.points += partialPoints;
+          // REAL-TIME WIN: Team B is currently winning this match
+          teamBStats.matchesWon++;
+          teamAStats.matchesLost++;
+        } else {
+          // REAL-TIME TIE: Match is currently tied (All Square)
+          teamAStats.matchesHalved++;
+          teamBStats.matchesHalved++;
         }
-        // If tied (AS), no partial points awarded
       }
     }
 
@@ -196,7 +205,7 @@ export function calculateLiveStandings(
       team,
       division: team.division,
       points: Math.round(stats.points * 10) / 10, // Clean decimal display
-      matchesPlayed: stats.matchesPlayed,
+      matchesPlayed: stats.matchesPlayed + stats.matchesInProgress, // Count in-progress as "played"
       matchesWon: stats.matchesWon,
       matchesLost: stats.matchesLost,
       matchesHalved: stats.matchesHalved,

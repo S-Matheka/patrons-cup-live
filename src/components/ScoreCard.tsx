@@ -186,7 +186,15 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
         console.error('❌ Failed to save match to database:', error);
         // Still update local state to provide immediate feedback
         onSave(updatedMatch);
-        alert('Warning: Failed to save to database. Your changes may not be visible to other users.');
+        
+        // Provide specific error message for Team C database issues
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        if (errorMessage.includes('team_c_score') || errorMessage.includes('team_c_strokes') || 
+            errorMessage.includes('column') && errorMessage.includes('does not exist')) {
+          alert('Database schema needs to be updated for 3-team matches. Please run the database migration script in Supabase SQL Editor.');
+        } else {
+          alert('Warning: Failed to save to database. Your changes may not be visible to other users.');
+        }
       }
 
       // If match is complete, update tournament standings

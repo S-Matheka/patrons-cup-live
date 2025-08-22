@@ -259,6 +259,25 @@ export function calculateLiveStandings(
     teamBStats.recentResults = teamBStats.recentResults.slice(0, 5);
   });
 
+  // Calculate sessions played for each team (not individual matches)
+  const calculateSessionsPlayed = (teamId: number): number => {
+    const teamMatches = divisionMatches.filter(m => 
+      (m.teamAId === teamId || m.teamBId === teamId || m.teamCId === teamId) && 
+      !m.isBye
+    );
+    
+    // Group matches by session (date + session + type)
+    const sessions = new Set<string>();
+    teamMatches.forEach(match => {
+      if (match.status === 'completed' || match.status === 'in-progress') {
+        const sessionKey = `${match.date}-${match.session}-${match.type}`;
+        sessions.add(sessionKey);
+      }
+    });
+    
+    return sessions.size;
+  };
+
   // Convert to standings entries and sort
   const standings: LiveStandingEntry[] = divisionTeams.map(team => {
     const stats = teamStats[team.id];
@@ -268,7 +287,7 @@ export function calculateLiveStandings(
       team,
       division: team.division,
       points: Math.round(stats.points * 10) / 10, // Clean decimal display
-      matchesPlayed: stats.matchesPlayed + stats.matchesInProgress, // Count in-progress as "played"
+      matchesPlayed: calculateSessionsPlayed(team.id), // Count sessions, not individual matches
       matchesWon: stats.matchesWon,
       matchesLost: stats.matchesLost,
       matchesHalved: stats.matchesHalved,

@@ -268,11 +268,7 @@ export function calculateLiveStandings(
           const teamBName = teams.find(t => t.id === match.teamBId)?.name || 'TeamB';
           const teamCName = teams.find(t => t.id === match.teamCId)?.name || 'TeamC';
 
-          // Create live status strings
-          const holesPlayed = completedHoles.length;
-          teamAStats.liveMatchStatus.push(`3-way: ${liveResult.result} (${holesPlayed} holes)`);
-          teamBStats.liveMatchStatus.push(`3-way: ${liveResult.result} (${holesPlayed} holes)`);
-          teamCStats.liveMatchStatus.push(`3-way: ${liveResult.result} (${holesPlayed} holes)`);
+          // Live status not needed for display
 
           // Award live points based on current position
           const scores = [
@@ -291,24 +287,12 @@ export function calculateLiveStandings(
             s.stats.matchesHalved = 0;
           });
 
-          // Award live points: leader gets full, others get partial
-          scores[0].stats.points += fullSessionPoints; // 1st place
-          scores[0].stats.matchesWon++;
-
-          if (scores[0].total === scores[1].total) {
-            scores[1].stats.points += halfSessionPoints;
-            scores[1].stats.matchesHalved++;
-          } else {
-            scores[1].stats.points += halfSessionPoints;
-            scores[1].stats.matchesHalved++;
-          }
-
-          if (scores[1].total === scores[2].total) {
-            scores[2].stats.points += halfSessionPoints;
-            scores[2].stats.matchesHalved++;
-          } else {
-            scores[2].stats.matchesLost++;
-          }
+          // IN-PROGRESS 3-TEAM MATCHES: No points awarded until completion
+          // Do NOT award points for in-progress matches
+          // Points are only awarded when matches are completed
+          
+          // Track current position for statistics only (not points)
+          // No points added, no wins/losses/halves counted until completion
         } else {
           // 2-team match play live scoring
           const holesData = completedHoles.map(hole => ({
@@ -324,16 +308,7 @@ export function calculateLiveStandings(
 
           // Create live status strings with hole progress
           const holesPlayed = completedHoles.length;
-          if (liveResult.winner === 'teamA') {
-            teamAStats.liveMatchStatus.push(`${liveResult.result} vs ${teamBName} (${holesPlayed} holes)`);
-            teamBStats.liveMatchStatus.push(`${liveResult.result.replace('up', 'down')} vs ${teamAName} (${holesPlayed} holes)`);
-          } else if (liveResult.winner === 'teamB') {
-            teamBStats.liveMatchStatus.push(`${liveResult.result} vs ${teamAName} (${holesPlayed} holes)`);
-            teamAStats.liveMatchStatus.push(`${liveResult.result.replace('up', 'down')} vs ${teamBName} (${holesPlayed} holes)`);
-          } else {
-            teamAStats.liveMatchStatus.push(`AS vs ${teamBName} (${holesPlayed} holes)`);
-            teamBStats.liveMatchStatus.push(`AS vs ${teamAName} (${holesPlayed} holes)`);
-          }
+          // Live match status not needed for display
 
           // Count holes won/lost so far
           teamAStats.holesWon += liveResult.teamAHolesWon;
@@ -341,34 +316,23 @@ export function calculateLiveStandings(
           teamBStats.holesWon += liveResult.teamBHolesWon;
           teamBStats.holesLost += liveResult.teamAHolesWon;
 
-          // CRITICAL REAL-TIME SCORING LOGIC:
-          // Team that is UP = Gets FULL session points
-          // Team that is DOWN = Gets 0 points  
-          // If ALL SQUARE = Both teams get HALF session points
+          // IN-PROGRESS MATCHES: No points awarded until completion
+          // Only track match status for display purposes
           const holeAdvantage = liveResult.teamAHolesWon - liveResult.teamBHolesWon;
-          const fullSessionPoints = getMatchPoints(match, 'win');
-          const halfSessionPoints = getMatchPoints(match, 'tie');
           
+          // Do NOT award points for in-progress matches
+          // Points are only awarded when matches are completed
+          
+          // Track current match status for statistics only (not points)
           if (holeAdvantage > 0) {
-            // Team A is UP (leading) = Gets FULL session points
-            teamAStats.points += fullSessionPoints;
-            // Team B is DOWN (trailing) = Gets 0 points (no points added)
-            // REAL-TIME WIN: Team A is currently winning this match
-            teamAStats.matchesWon++;
-            teamBStats.matchesLost++;
+            // Team A is currently leading (but no points until completion)
+            // No points added, no wins/losses counted
           } else if (holeAdvantage < 0) {
-            // Team B is UP (leading) = Gets FULL session points
-            teamBStats.points += fullSessionPoints;
-            // Team A is DOWN (trailing) = Gets 0 points (no points added)
-            // REAL-TIME WIN: Team B is currently winning this match
-            teamBStats.matchesWon++;
-            teamAStats.matchesLost++;
+            // Team B is currently leading (but no points until completion)
+            // No points added, no wins/losses counted
           } else {
-            // ALL SQUARE (tied) = Both teams get HALF session points
-            teamAStats.points += halfSessionPoints;
-            teamBStats.points += halfSessionPoints;
-            teamAStats.matchesHalved++;
-            teamBStats.matchesHalved++;
+            // Currently tied (but no points until completion)
+            // No points added, no halves counted
           }
         }
       }

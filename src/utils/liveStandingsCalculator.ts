@@ -222,30 +222,32 @@ export function calculateLiveStandings(
         teamBStats.holesWon += liveResult.teamBHolesWon;
         teamBStats.holesLost += liveResult.teamAHolesWon;
 
-        // REAL-TIME POINTS: Award proportional points based on current advantage using proper tournament system
+        // CRITICAL REAL-TIME SCORING LOGIC:
+        // Team that is UP = Gets FULL session points
+        // Team that is DOWN = Gets 0 points  
+        // If ALL SQUARE = Both teams get HALF session points
         const holeAdvantage = liveResult.teamAHolesWon - liveResult.teamBHolesWon;
-        const maxWinPoints = getMatchPoints(match, 'win');
-        const maxTiePoints = getMatchPoints(match, 'tie');
+        const fullSessionPoints = getMatchPoints(match, 'win');
+        const halfSessionPoints = getMatchPoints(match, 'tie');
         
         if (holeAdvantage > 0) {
-          // Team A is ahead - award proportional points based on advantage
-          const proportionalPoints = Math.round((holeAdvantage / 9) * maxWinPoints * 10) / 10; // Max at 50% of full points
-          teamAStats.points += Math.min(proportionalPoints, maxWinPoints * 0.5);
+          // Team A is UP (leading) = Gets FULL session points
+          teamAStats.points += fullSessionPoints;
+          // Team B is DOWN (trailing) = Gets 0 points (no points added)
           // REAL-TIME WIN: Team A is currently winning this match
           teamAStats.matchesWon++;
           teamBStats.matchesLost++;
         } else if (holeAdvantage < 0) {
-          // Team B is ahead - award proportional points based on advantage
-          const proportionalPoints = Math.round((Math.abs(holeAdvantage) / 9) * maxWinPoints * 10) / 10;
-          teamBStats.points += Math.min(proportionalPoints, maxWinPoints * 0.5);
+          // Team B is UP (leading) = Gets FULL session points
+          teamBStats.points += fullSessionPoints;
+          // Team A is DOWN (trailing) = Gets 0 points (no points added)
           // REAL-TIME WIN: Team B is currently winning this match
           teamBStats.matchesWon++;
           teamAStats.matchesLost++;
         } else {
-          // REAL-TIME TIE: Match is currently tied (All Square) - award partial tie points
-          const partialTiePoints = Math.round(maxTiePoints * 0.3 * 10) / 10; // 30% of tie points for being tied
-          teamAStats.points += partialTiePoints;
-          teamBStats.points += partialTiePoints;
+          // ALL SQUARE (tied) = Both teams get HALF session points
+          teamAStats.points += halfSessionPoints;
+          teamBStats.points += halfSessionPoints;
           teamAStats.matchesHalved++;
           teamBStats.matchesHalved++;
         }

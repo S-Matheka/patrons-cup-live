@@ -111,22 +111,22 @@ export default function AdminScoring() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header */}
+      {/* Mobile-Optimized Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 space-y-2 sm:space-y-0">
             <div className="flex items-center space-x-4">
               <Link
                 href="/admin/dashboard"
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
+                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>Back to Dashboard</span>
+                <span className="text-sm sm:text-base">Back to Dashboard</span>
               </Link>
             </div>
             <div className="flex items-center space-x-2">
-              <Shield className="w-6 h-6 text-green-600" />
-              <h1 className="text-xl font-semibold text-gray-900">Live Scoring Management</h1>
+              <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+              <h1 className="text-lg sm:text-xl font-semibold text-gray-900">Live Scoring Management</h1>
             </div>
           </div>
         </div>
@@ -135,10 +135,10 @@ export default function AdminScoring() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        {/* Filters */}
-        <div className="bg-white rounded-lg shadow mb-6 p-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
+        {/* Mobile-Optimized Filters */}
+        <div className="bg-white rounded-lg shadow mb-6 p-4 sm:p-6">
+          <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4">
+            <div className="sm:col-span-2 lg:col-span-1">
               <label className="block text-sm font-medium text-gray-700 mb-2">Search Matches</label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -147,7 +147,7 @@ export default function AdminScoring() {
                   placeholder="Match ID, Game #, or Team..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="pl-10 w-full px-3 py-3 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
             </div>
@@ -157,7 +157,7 @@ export default function AdminScoring() {
               <select
                 value={selectedDivision}
                 onChange={(e) => setSelectedDivision(e.target.value as any)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-3 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 <option value="all">All Divisions</option>
                 <option value="Trophy">Trophy</option>
@@ -173,7 +173,7 @@ export default function AdminScoring() {
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value as any)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-3 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 <option value="all">All Status</option>
                 <option value="scheduled">Scheduled</option>
@@ -189,7 +189,7 @@ export default function AdminScoring() {
                   setSelectedDivision('all');
                   setSelectedStatus('all');
                 }}
-                className="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+                className="w-full px-4 py-3 sm:py-2 text-base sm:text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
               >
                 Clear Filters
               </button>
@@ -197,9 +197,9 @@ export default function AdminScoring() {
           </div>
         </div>
 
-        {/* Matches List */}
+        {/* Mobile-Optimized Matches List */}
         <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">
               Tournament Matches ({filteredMatches.length})
             </h2>
@@ -217,12 +217,13 @@ export default function AdminScoring() {
                 const teamC = teams.find(t => t.id === match.teamCId);
 
                 return (
-                  <div key={match.id} className="p-6 hover:bg-gray-50">
-                    <div className="flex items-center justify-between">
+                  <div key={match.id} className="p-4 sm:p-6 hover:bg-gray-50">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
                       <div className="flex-1">
-                        <div className="flex items-center space-x-4 mb-3">
-                          <span className="text-sm font-medium text-gray-900">
-                            Game #{match.gameNumber} • Match ID: {match.id}
+                        {/* Mobile-optimized badges */}
+                        <div className="flex flex-wrap items-center gap-2 mb-3">
+                          <span className="text-sm font-medium text-gray-900 bg-gray-100 px-2 py-1 rounded">
+                            Game #{match.gameNumber}
                           </span>
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getMatchTypeColor(match.type)}`}>
                             {match.type}
@@ -240,35 +241,36 @@ export default function AdminScoring() {
                               PRO
                             </span>
                           )}
-                          
-                          {/* Scoring Status Indicator */}
-                          <div className="flex items-center space-x-1">
-                            {getScoreabilityIcon(match)}
-                            <span className="text-xs font-medium text-gray-600">
-                              {getScoreabilityText(match)}
-                            </span>
-                          </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Scoring Status Indicator - More prominent on mobile */}
+                        <div className="flex items-center space-x-2 mb-4 p-2 bg-gray-50 rounded-lg sm:bg-transparent sm:p-0 sm:mb-3">
+                          {getScoreabilityIcon(match)}
+                          <span className="text-sm font-medium text-gray-700">
+                            {getScoreabilityText(match)}
+                          </span>
+                        </div>
+
+                        {/* Mobile-optimized team layout */}
+                        <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4">
                           {/* Team A */}
                           <div className="flex items-center space-x-3">
                             <div 
-                              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                              className="w-10 h-10 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
                               style={{ backgroundColor: teamA?.color }}
                             >
                               {teamA?.logo}
                             </div>
-                            <div>
-                              <div className="font-medium text-gray-900">{teamA?.name}</div>
-                              <div className="text-sm text-gray-600">{teamA?.description}</div>
+                            <div className="min-w-0 flex-1">
+                              <div className="font-medium text-gray-900 truncate">{teamA?.name}</div>
+                              <div className="text-sm text-gray-600 truncate">{teamA?.description}</div>
                             </div>
                           </div>
 
                           {/* VS/3-WAY */}
-                          <div className="flex items-center justify-center">
+                          <div className="flex items-center justify-center sm:justify-center">
                             <div className="text-center">
-                              <div className="font-bold text-gray-400">
+                              <div className="font-bold text-gray-400 text-lg sm:text-base">
                                 {match.isThreeWay ? '3-WAY' : 'vs'}
                               </div>
                               <div className="text-xs text-gray-500">{match.division}</div>
@@ -276,13 +278,13 @@ export default function AdminScoring() {
                           </div>
 
                           {/* Team B */}
-                          <div className="flex items-center space-x-3 justify-end">
-                            <div className="text-right">
-                              <div className="font-medium text-gray-900">{teamB?.name}</div>
-                              <div className="text-sm text-gray-600">{teamB?.description}</div>
+                          <div className="flex items-center space-x-3 sm:justify-end">
+                            <div className="min-w-0 flex-1 sm:text-right">
+                              <div className="font-medium text-gray-900 truncate">{teamB?.name}</div>
+                              <div className="text-sm text-gray-600 truncate">{teamB?.description}</div>
                             </div>
                             <div 
-                              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                              className="w-10 h-10 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
                               style={{ backgroundColor: teamB?.color }}
                             >
                               {teamB?.logo}
@@ -306,12 +308,18 @@ export default function AdminScoring() {
                           </div>
                         )}
 
-                        <div className="mt-3 text-sm text-gray-600">
-                          {match.date} • {match.teeTime} • Tee {match.tee}
+                        {/* Match details */}
+                        <div className="mt-3 text-sm text-gray-600 flex flex-wrap gap-2">
+                          <span>{match.date}</span>
+                          <span>•</span>
+                          <span>{match.teeTime}</span>
+                          <span>•</span>
+                          <span>Tee {match.tee}</span>
                         </div>
                       </div>
 
-                      <div className="ml-6">
+                      {/* Mobile-optimized action button */}
+                      <div className="w-full sm:w-auto sm:ml-6">
                         {(() => {
                           const info = getScoreabilityInfo(match);
                           const canScore = info.canScore;
@@ -319,7 +327,7 @@ export default function AdminScoring() {
                           return (
                             <Link
                               href={`/admin/match/${match.id}`}
-                              className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+                              className={`w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3 sm:px-4 sm:py-2 rounded-md transition-colors text-base sm:text-sm font-medium ${
                                 canScore 
                                   ? 'bg-green-600 text-white hover:bg-green-700' 
                                   : 'bg-gray-300 text-gray-600 hover:bg-gray-400'
@@ -327,9 +335,9 @@ export default function AdminScoring() {
                               title={canScore ? "Open scoring interface" : info.reason}
                             >
                               {canScore ? (
-                                <Edit3 className="w-4 h-4" />
+                                <Edit3 className="w-5 h-5 sm:w-4 sm:h-4" />
                               ) : (
-                                <Lock className="w-4 h-4" />
+                                <Lock className="w-5 h-5 sm:w-4 sm:h-4" />
                               )}
                               <span>
                                 {canScore ? 'Score Match' : 'View Match'}

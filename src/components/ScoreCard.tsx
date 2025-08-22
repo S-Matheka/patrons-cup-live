@@ -134,10 +134,11 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
   };
 
   const handleSaveHole = async () => {
-    const hasValidScores = tempScores.teamA !== null || tempScores.teamB !== null || 
-                          (match.isThreeWay && tempScores.teamC !== null);
+    // Allow saving even with empty/zero values for holes that weren't played
+    const hasAnyInput = tempScores.teamA !== null || tempScores.teamB !== null || 
+                       (match.isThreeWay && tempScores.teamC !== null);
     
-    if (editingHole && hasValidScores) {
+    if (editingHole !== null) {
       console.log('💾 Saving hole scores:', {
         holeNumber: editingHole,
         teamAScore: tempScores.teamA,
@@ -153,8 +154,7 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
               teamAScore: tempScores.teamA,
               teamBScore: tempScores.teamB,
               ...(match.isThreeWay && { teamCScore: tempScores.teamC }),
-              status: (tempScores.teamA !== null && tempScores.teamB !== null && 
-                      (!match.isThreeWay || tempScores.teamC !== null)) ? 'completed' as const : 'in-progress' as const
+              status: 'completed' as const // Allow saving with null values for holes not played
             }
           : hole
       );
@@ -596,13 +596,13 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
                         </label>
                         <input
                           type="number"
-                          min="1"
+                          min="0"
                           max="10"
-                          placeholder="Enter score"
-                          value={tempScores.teamA || ''}
+                          placeholder="Score or leave blank"
+                          value={tempScores.teamA === null ? '' : tempScores.teamA}
                           onChange={(e) => setTempScores(prev => ({ 
                             ...prev, 
-                            teamA: e.target.value ? parseInt(e.target.value) : null 
+                            teamA: e.target.value === '' ? null : parseInt(e.target.value) || 0
                           }))}
                           className="w-full px-4 py-3 text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                         />
@@ -613,13 +613,13 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
                         </label>
                         <input
                           type="number"
-                          min="1"
+                          min="0"
                           max="10"
-                          placeholder="Enter score"
-                          value={tempScores.teamB || ''}
+                          placeholder="Score or leave blank"
+                          value={tempScores.teamB === null ? '' : tempScores.teamB}
                           onChange={(e) => setTempScores(prev => ({ 
                             ...prev, 
-                            teamB: e.target.value ? parseInt(e.target.value) : null 
+                            teamB: e.target.value === '' ? null : parseInt(e.target.value) || 0
                           }))}
                           className="w-full px-4 py-3 text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                         />
@@ -631,19 +631,30 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
                           </label>
                           <input
                             type="number"
-                            min="1"
+                            min="0"
                             max="10"
-                            placeholder="Enter score"
-                            value={tempScores.teamC || ''}
+                            placeholder="Score or leave blank"
+                            value={tempScores.teamC === null ? '' : tempScores.teamC}
                             onChange={(e) => setTempScores(prev => ({ 
                               ...prev, 
-                              teamC: e.target.value ? parseInt(e.target.value) : null 
+                              teamC: e.target.value === '' ? null : parseInt(e.target.value) || 0
                             }))}
                             className="w-full px-4 py-3 text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                           />
                         </div>
                       )}
                     </div>
+                    
+                    {/* Helper text for empty/zero values */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm text-blue-700">
+                      <p className="font-medium mb-1">💡 Scoring Tips:</p>
+                      <ul className="text-xs space-y-1">
+                        <li>• <strong>Leave blank</strong> for holes not played (match ended early)</li>
+                        <li>• <strong>Enter 0</strong> for holes where no score was recorded</li>
+                        <li>• <strong>Enter actual score</strong> for completed holes</li>
+                      </ul>
+                    </div>
+                    
                     <div className="flex space-x-2">
                       <button
                         onClick={handleSaveHole}

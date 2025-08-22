@@ -74,10 +74,11 @@ export async function POST(request: NextRequest) {
       console.error('❌ Database error:', error);
       return NextResponse.json(
         { 
-          error: 'Failed to create player',
+          error: `Database error: ${error.message}`,
           details: error.message,
           hint: error.hint,
-          code: error.code
+          code: error.code,
+          fullError: error
         },
         { status: 400 }
       );

@@ -111,7 +111,15 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
         result = await response.json();
         if (!response.ok) {
           console.error('❌ API Error Response:', result);
-          throw new Error(result.error || 'Failed to create player');
+          console.error('❌ Full error details:', {
+            status: response.status,
+            statusText: response.statusText,
+            error: result.error,
+            details: result.details,
+            code: result.code,
+            hint: result.hint
+          });
+          throw new Error(`${result.error || 'Failed to create player'} (Code: ${result.code})`);
         }
       }
       

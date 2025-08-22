@@ -34,44 +34,58 @@ export default function MatchDetail() {
   const teamA = getTeamById(match.teamAId);
   const teamB = getTeamById(match.teamBId);
 
-  // Get match players using the same logic as schedule/live pages
+  // Get match players using the EXACT same logic as live scoring page
   const getMatchPlayers = (teamId: number, count: number = 2) => {
-    // First, try to get assigned players from match.players
-    let assignedPlayerIds: number[] = [];
-    let hasExplicitAssignment = false;
+    const teamPlayers = players.filter(player => player.teamId === teamId);
+    
+    if (teamPlayers.length === 0) return [];
+    
+    // First, try to get actual assigned players from match data
+    let assignedPlayerIds: string[] = [];
     
     if (match.players) {
+      if (teamId === match.teamAId && match.players.teamA) {
+        assignedPlayerIds = match.players.teamA;
+      } else if (teamId === match.teamBId && match.players.teamB) {
+        assignedPlayerIds = match.players.teamB;
+      } else if (teamId === match.teamCId && match.players.teamC) {
+        assignedPlayerIds = match.players.teamC;
+      }
+    }
+    
+    // Check if players were explicitly assigned (even if empty)
+    let hasExplicitAssignment = false;
+    if (match.players) {
       if (teamId === match.teamAId && match.players.teamA !== undefined) {
-        assignedPlayerIds = match.players.teamA || [];
         hasExplicitAssignment = true;
       } else if (teamId === match.teamBId && match.players.teamB !== undefined) {
-        assignedPlayerIds = match.players.teamB || [];
         hasExplicitAssignment = true;
       } else if (teamId === match.teamCId && match.players.teamC !== undefined) {
-        assignedPlayerIds = match.players.teamC || [];
         hasExplicitAssignment = true;
       }
     }
-
+    
     // If we have explicit assignment (even empty), use it
     if (hasExplicitAssignment) {
       if (assignedPlayerIds && assignedPlayerIds.length > 0) {
-        // Resolve player IDs to actual player objects
         const resolvedPlayers = assignedPlayerIds
-          .map(id => players.find(p => p.id === id))
-          .filter(p => p !== undefined);
+          .map(playerId => {
+            // Try to find player by ID first, then by name (for legacy data)
+            return teamPlayers.find(p => 
+              p.id.toString() === playerId || 
+              p.name === playerId
+            );
+          })
+          .filter(player => player !== undefined);
+        
         return resolvedPlayers.slice(0, count);
       } else {
         // Explicitly assigned empty array - show no players
         return [];
       }
     }
-
+    
     // Fallback: Generate consistent sample players based on match ID
-    const teamPlayers = players.filter(p => p.teamId === teamId);
-    if (teamPlayers.length === 0) return [];
-
-    // Use match ID as seed for consistent selection
     const seed = match.id + teamId;
     const shuffled = [...teamPlayers].sort(() => 0.5 - Math.sin(seed * 9999));
     return shuffled.slice(0, count);

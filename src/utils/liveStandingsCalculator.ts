@@ -124,7 +124,7 @@ export function calculateLiveStandings(
       teamBStats.holesLost += result.teamAHolesWon;
 
     } else if (match.status === 'in-progress') {
-      // Live match - show current status
+      // Live match - show current status AND award partial points for holes won
       teamAStats.matchesInProgress++;
       teamBStats.matchesInProgress++;
       teamAStats.recentResults.unshift('IP');
@@ -147,16 +147,17 @@ export function calculateLiveStandings(
         const teamAName = teams.find(t => t.id === match.teamAId)?.name || 'TeamA';
         const teamBName = teams.find(t => t.id === match.teamBId)?.name || 'TeamB';
 
-        // Create live status strings
+        // Create live status strings with hole progress
+        const holesPlayed = completedHoles.length;
         if (liveResult.winner === 'teamA') {
-          teamAStats.liveMatchStatus.push(`${liveResult.result} vs ${teamBName}`);
-          teamBStats.liveMatchStatus.push(`${liveResult.result.replace('up', 'down')} vs ${teamAName}`);
+          teamAStats.liveMatchStatus.push(`${liveResult.result} vs ${teamBName} (${holesPlayed} holes)`);
+          teamBStats.liveMatchStatus.push(`${liveResult.result.replace('up', 'down')} vs ${teamAName} (${holesPlayed} holes)`);
         } else if (liveResult.winner === 'teamB') {
-          teamBStats.liveMatchStatus.push(`${liveResult.result} vs ${teamAName}`);
-          teamAStats.liveMatchStatus.push(`${liveResult.result.replace('up', 'down')} vs ${teamBName}`);
+          teamBStats.liveMatchStatus.push(`${liveResult.result} vs ${teamAName} (${holesPlayed} holes)`);
+          teamAStats.liveMatchStatus.push(`${liveResult.result.replace('up', 'down')} vs ${teamBName} (${holesPlayed} holes)`);
         } else {
-          teamAStats.liveMatchStatus.push(`AS vs ${teamBName}`);
-          teamBStats.liveMatchStatus.push(`AS vs ${teamAName}`);
+          teamAStats.liveMatchStatus.push(`AS vs ${teamBName} (${holesPlayed} holes)`);
+          teamBStats.liveMatchStatus.push(`AS vs ${teamAName} (${holesPlayed} holes)`);
         }
 
         // Count holes won/lost so far
@@ -164,6 +165,22 @@ export function calculateLiveStandings(
         teamAStats.holesLost += liveResult.teamBHolesWon;
         teamBStats.holesWon += liveResult.teamBHolesWon;
         teamBStats.holesLost += liveResult.teamAHolesWon;
+
+        // REAL-TIME POINTS: Award fractional points based on current hole advantage
+        // This makes the leaderboard truly dynamic as holes are won/lost
+        const holeAdvantage = liveResult.teamAHolesWon - liveResult.teamBHolesWon;
+        const maxPossibleHoles = 18;
+        
+        if (holeAdvantage > 0) {
+          // Team A is ahead - award partial points based on advantage
+          const partialPoints = (holeAdvantage / maxPossibleHoles) * 0.5; // Max 0.5 points for being ahead
+          teamAStats.points += partialPoints;
+        } else if (holeAdvantage < 0) {
+          // Team B is ahead - award partial points based on advantage  
+          const partialPoints = (Math.abs(holeAdvantage) / maxPossibleHoles) * 0.5;
+          teamBStats.points += partialPoints;
+        }
+        // If tied (AS), no partial points awarded
       }
     }
 

@@ -31,7 +31,7 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
         isPro: false,
         isExOfficio: false,
         isJunior: false,
-        position: ''
+        position: 'Regular Player'
       });
     }
     setErrors({});
@@ -238,49 +238,28 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
             <select
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               value={formData.position || ''}
-              onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+              onChange={(e) => {
+                const position = e.target.value;
+                setFormData({ 
+                  ...formData, 
+                  position,
+                  // Auto-set designations based on position
+                  isPro: position === 'Professional Player (Pro)',
+                  isExOfficio: position === 'Ex-Officio Member',
+                  isJunior: position === 'Junior Player'
+                });
+              }}
             >
               <option value="">Select Position</option>
               <option value="Captain">Captain</option>
               <option value="Vice Captain">Vice Captain</option>
               <option value="Lady Player">Lady Player</option>
               <option value="Medical Professional">Medical Professional</option>
+              <option value="Professional Player (Pro)">Professional Player (Pro)</option>
+              <option value="Ex-Officio Member">Ex-Officio Member</option>
+              <option value="Junior Player">Junior Player</option>
               <option value="Regular Player">Regular Player</option>
             </select>
-          </div>
-
-          {/* Player Designations */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Player Designations</label>
-            <div className="space-y-2">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                  checked={formData.isPro || false}
-                  onChange={(e) => setFormData({ ...formData, isPro: e.target.checked })}
-                />
-                <span className="ml-2 text-sm text-gray-700">Professional Player (Pro)</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                  checked={formData.isExOfficio || false}
-                  onChange={(e) => setFormData({ ...formData, isExOfficio: e.target.checked })}
-                />
-                <span className="ml-2 text-sm text-gray-700">Ex-Officio Member</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                  checked={formData.isJunior || false}
-                  onChange={(e) => setFormData({ ...formData, isJunior: e.target.checked })}
-                />
-                <span className="ml-2 text-sm text-gray-700">Junior Player</span>
-              </label>
-            </div>
           </div>
 
 

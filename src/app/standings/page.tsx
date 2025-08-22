@@ -162,9 +162,9 @@ export default function Standings() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {sortedScores(trophyScores).map((score, index) => (
-                        <tr key={score.teamId} className="hover:bg-gray-50">
-                          <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
+                      {trophyStandings.map((standing, index) => (
+                        <tr key={standing.teamId} className="hover:bg-gray-50">
+                          <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{standing.position}</td>
                           <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div 
@@ -209,7 +209,7 @@ export default function Standings() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {sortedScores(shieldScores).map((score, index) => (
+                      {shieldStandings.map((standing, index) => (
                         <tr key={score.teamId} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -256,7 +256,7 @@ export default function Standings() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {sortedScores(plaqueScores).map((score, index) => (
+                      {plaqueStandings.map((standing, index) => (
                         <tr key={score.teamId} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -303,7 +303,7 @@ export default function Standings() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {sortedScores(bowlScores).map((score, index) => (
+                      {bowlStandings.map((standing, index) => (
                         <tr key={score.teamId} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -350,7 +350,7 @@ export default function Standings() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {sortedScores(mugScores).map((score, index) => (
+                      {mugStandings.map((standing, index) => (
                         <tr key={score.teamId} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
                           <td className="px-6 py-4 whitespace-nowrap">

@@ -60,8 +60,8 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
     const holesData = match.holes.map(hole => ({
       holeNumber: hole.number,
       par: hole.par || 4, // Default to par 4 if not specified
-      teamAStrokes: hole.teamAScore || 0,
-      teamBStrokes: hole.teamBScore || 0
+      teamAStrokes: hole.teamAScore ?? 0,
+      teamBStrokes: hole.teamBScore ?? 0
     }));
 
     return calculateMatchPlayResult(holesData, 18);
@@ -237,8 +237,8 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
         {/* Mobile: Card Layout */}
         <div className="block sm:hidden space-y-3">
           {match.holes.map((hole, index) => {
-            const teamAIndicator = getScoreIndicator(hole.teamAStrokes, hole.par);
-            const teamBIndicator = getScoreIndicator(hole.teamBStrokes, hole.par);
+            const teamAIndicator = getScoreIndicator(hole.teamAScore, hole.par);
+            const teamBIndicator = getScoreIndicator(hole.teamBScore, hole.par);
             
             return (
               <div key={hole.number} className="border rounded-lg p-3 bg-gray-50">
@@ -261,9 +261,9 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
                   <div className="text-center">
                     <div className="text-xs text-gray-600 mb-1">{teamA.name}</div>
                     <div className="flex items-center justify-center space-x-2">
-                      {hole.teamAStrokes !== null ? (
+                      {hole.teamAScore !== null ? (
                         <>
-                          <span className="text-lg font-bold text-gray-900">{hole.teamAStrokes}</span>
+                          <span className="text-lg font-bold text-gray-900">{hole.teamAScore}</span>
                           {teamAIndicator && (
                             <span className={`px-1.5 py-0.5 rounded text-xs ${teamAIndicator.class}`}>
                               {teamAIndicator.symbol}
@@ -279,9 +279,9 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
                   <div className="text-center">
                     <div className="text-xs text-gray-600 mb-1">{teamB.name}</div>
                     <div className="flex items-center justify-center space-x-2">
-                      {hole.teamBStrokes !== null ? (
+                      {hole.teamBScore !== null ? (
                         <>
-                          <span className="text-lg font-bold text-gray-900">{hole.teamBStrokes}</span>
+                          <span className="text-lg font-bold text-gray-900">{hole.teamBScore}</span>
                           {teamBIndicator && (
                             <span className={`px-1.5 py-0.5 rounded text-xs ${teamBIndicator.class}`}>
                               {teamBIndicator.symbol}

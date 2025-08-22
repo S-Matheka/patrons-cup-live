@@ -82,12 +82,22 @@ export default function LiveScoring() {
     });
 
     if (holesPlayed === 0) return 'Not Started';
+    
+    const teamA = teams.find(t => t.id === match.teamAId);
+    const teamB = teams.find(t => t.id === match.teamBId);
+    
     if (holesPlayed === 9 || holesPlayed === 18) {
-      if (teamAWins > teamBWins) return `${teamAWins - teamBWins} UP`;
-      if (teamBWins > teamAWins) return `${teamBWins - teamAWins} UP`;
-      return 'HALVED';
+      if (teamAWins > teamBWins) return `${teamA?.name || 'Team A'} ${teamAWins - teamBWins} UP`;
+      if (teamBWins > teamAWins) return `${teamB?.name || 'Team B'} ${teamBWins - teamAWins} UP`;
+      return 'ALL SQUARE';
     }
-    return `${teamAWins > teamBWins ? teamAWins - teamBWins : teamBWins - teamAWins} UP`;
+    
+    if (teamAWins > teamBWins) {
+      return `${teamA?.name || 'Team A'} ${teamAWins - teamBWins} UP`;
+    } else if (teamBWins > teamAWins) {
+      return `${teamB?.name || 'Team B'} ${teamBWins - teamAWins} UP`;
+    }
+    return 'ALL SQUARE';
   };
 
   // Helper function to get actual assigned players or sample players for a match

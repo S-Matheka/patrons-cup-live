@@ -10,7 +10,7 @@ export default function MatchDetail() {
   const params = useParams();
   const matchId = parseInt(params.id as string);
   
-  const { getMatchById, getTeamById } = useTournament();
+  const { getMatchById, getTeamById, players } = useTournament();
 
   const match = getMatchById(matchId);
   
@@ -33,6 +33,52 @@ export default function MatchDetail() {
 
   const teamA = getTeamById(match.teamAId);
   const teamB = getTeamById(match.teamBId);
+
+  // Get match players using the same logic as schedule/live pages
+  const getMatchPlayers = (teamId: number, count: number = 2) => {
+    // First, try to get assigned players from match.players
+    let assignedPlayerIds: number[] = [];
+    let hasExplicitAssignment = false;
+    
+    if (match.players) {
+      if (teamId === match.teamAId && match.players.teamA !== undefined) {
+        assignedPlayerIds = match.players.teamA || [];
+        hasExplicitAssignment = true;
+      } else if (teamId === match.teamBId && match.players.teamB !== undefined) {
+        assignedPlayerIds = match.players.teamB || [];
+        hasExplicitAssignment = true;
+      } else if (teamId === match.teamCId && match.players.teamC !== undefined) {
+        assignedPlayerIds = match.players.teamC || [];
+        hasExplicitAssignment = true;
+      }
+    }
+
+    // If we have explicit assignment (even empty), use it
+    if (hasExplicitAssignment) {
+      if (assignedPlayerIds && assignedPlayerIds.length > 0) {
+        // Resolve player IDs to actual player objects
+        const resolvedPlayers = assignedPlayerIds
+          .map(id => players.find(p => p.id === id))
+          .filter(p => p !== undefined);
+        return resolvedPlayers.slice(0, count);
+      } else {
+        // Explicitly assigned empty array - show no players
+        return [];
+      }
+    }
+
+    // Fallback: Generate consistent sample players based on match ID
+    const teamPlayers = players.filter(p => p.teamId === teamId);
+    if (teamPlayers.length === 0) return [];
+
+    // Use match ID as seed for consistent selection
+    const seed = match.id + teamId;
+    const shuffled = [...teamPlayers].sort(() => 0.5 - Math.sin(seed * 9999));
+    return shuffled.slice(0, count);
+  };
+
+  const teamAPlayers = getMatchPlayers(match.teamAId, match.type === 'Singles' ? 1 : 2);
+  const teamBPlayers = getMatchPlayers(match.teamBId, match.type === 'Singles' ? 1 : 2);
 
   if (!teamA || !teamB) {
     return (
@@ -95,6 +141,12 @@ export default function MatchDetail() {
                 <div className="min-w-0">
                   <div className="font-bold text-white text-lg truncate">{teamA.name}</div>
                   <div className="text-green-100 text-sm truncate">{teamA.description}</div>
+                  <div className="text-green-100 text-xs mt-1">
+                    {teamAPlayers.length > 0 
+                      ? teamAPlayers.map(p => `${p.name}${p.isPro ? ' (Pro)' : ''}${p.isJunior ? ' (Jnr)' : ''}`).join(', ')
+                      : 'Players TBD'
+                    }
+                  </div>
                 </div>
               </div>
             </div>
@@ -116,6 +168,12 @@ export default function MatchDetail() {
                 <div className="min-w-0">
                   <div className="font-bold text-white text-lg truncate">{teamB.name}</div>
                   <div className="text-green-100 text-sm truncate">{teamB.description}</div>
+                  <div className="text-green-100 text-xs mt-1">
+                    {teamBPlayers.length > 0 
+                      ? teamBPlayers.map(p => `${p.name}${p.isPro ? ' (Pro)' : ''}${p.isJunior ? ' (Jnr)' : ''}`).join(', ')
+                      : 'Players TBD'
+                    }
+                  </div>
                 </div>
               </div>
             </div>
@@ -140,6 +198,12 @@ export default function MatchDetail() {
                 <div className="min-w-0">
                   <div className="font-bold text-white text-xl truncate">{teamA.name}</div>
                   <div className="text-green-100 text-sm truncate">{teamA.description}</div>
+                  <div className="text-green-100 text-xs mt-1">
+                    {teamAPlayers.length > 0 
+                      ? teamAPlayers.map(p => `${p.name}${p.isPro ? ' (Pro)' : ''}${p.isJunior ? ' (Jnr)' : ''}`).join(', ')
+                      : 'Players TBD'
+                    }
+                  </div>
                 </div>
               </div>
               
@@ -151,6 +215,12 @@ export default function MatchDetail() {
                 <div className="text-right min-w-0">
                   <div className="font-bold text-white text-xl truncate">{teamB.name}</div>
                   <div className="text-green-100 text-sm truncate">{teamB.description}</div>
+                  <div className="text-green-100 text-xs mt-1">
+                    {teamBPlayers.length > 0 
+                      ? teamBPlayers.map(p => `${p.name}${p.isPro ? ' (Pro)' : ''}${p.isJunior ? ' (Jnr)' : ''}`).join(', ')
+                      : 'Players TBD'
+                    }
+                  </div>
                 </div>
                 <div 
                   className="w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold flex-shrink-0"

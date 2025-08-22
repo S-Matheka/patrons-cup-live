@@ -103,6 +103,7 @@ export default function AdminMatchDetail() {
 
   const teamA = getTeamById(match.teamAId);
   const teamB = getTeamById(match.teamBId);
+  const teamC = match.teamCId ? getTeamById(match.teamCId) : null;
 
   if (!teamA || !teamB) {
     return (
@@ -341,6 +342,7 @@ export default function AdminMatchDetail() {
               match={match} 
               teamA={teamA} 
               teamB={teamB} 
+              teamC={teamC}
               onSave={handleSaveMatch}
             />
           </div>

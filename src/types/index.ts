@@ -52,8 +52,10 @@ export interface Hole {
   par: number;
   teamAScore: number | null;
   teamBScore: number | null;
+  teamCScore?: number | null; // For 3-way matches
   teamAStrokes: number | null; // Individual strokes taken
   teamBStrokes: number | null;
+  teamCStrokes?: number | null; // For 3-way matches
   status: 'not-started' | 'in-progress' | 'completed';
   lastUpdated?: string; // For real-time tracking
 }

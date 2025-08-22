@@ -70,8 +70,10 @@ CREATE TABLE IF NOT EXISTS holes (
   par INTEGER NOT NULL CHECK (par BETWEEN 3 AND 5) DEFAULT 4,
   team_a_score INTEGER CHECK (team_a_score IS NULL OR team_a_score > 0),
   team_b_score INTEGER CHECK (team_b_score IS NULL OR team_b_score > 0),
+  team_c_score INTEGER CHECK (team_c_score IS NULL OR team_c_score > 0), -- For 3-way matches
   team_a_strokes INTEGER CHECK (team_a_strokes IS NULL OR team_a_strokes > 0),
   team_b_strokes INTEGER CHECK (team_b_strokes IS NULL OR team_b_strokes > 0),
+  team_c_strokes INTEGER CHECK (team_c_strokes IS NULL OR team_c_strokes > 0), -- For 3-way matches
   status VARCHAR(20) DEFAULT 'not-started' CHECK (status IN ('not-started', 'in-progress', 'completed')),
   last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(match_id, hole_number)

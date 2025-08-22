@@ -13,14 +13,20 @@ interface ScoreCardProps {
   match: Match;
   teamA: Team;
   teamB: Team;
+  teamC?: Team | null; // For 3-way matches
   onSave: (updatedMatch: Match) => void;
 }
 
-const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) => {
+const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSave }) => {
   const [editingHole, setEditingHole] = useState<number | null>(null);
-  const [tempScores, setTempScores] = useState<{ teamA: number | null; teamB: number | null }>({
+  const [tempScores, setTempScores] = useState<{ 
+    teamA: number | null; 
+    teamB: number | null; 
+    teamC?: number | null;
+  }>({
     teamA: null,
-    teamB: null
+    teamB: null,
+    ...(match.isThreeWay && { teamC: null })
   });
   const [isStartingMatch, setIsStartingMatch] = useState(false);
   
@@ -74,11 +80,12 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
     }
     
     const hole = match.holes.find(h => h.number === holeNumber);
-    setEditingHole(holeNumber);
     setTempScores({
       teamA: hole?.teamAScore || null,
-      teamB: hole?.teamBScore || null
+      teamB: hole?.teamBScore || null,
+      ...(match.isThreeWay && { teamC: hole?.teamCScore || null })
     });
+    setEditingHole(holeNumber);
   };
 
   const handleStartMatch = async () => {
@@ -101,20 +108,27 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
   };
 
   const handleSaveHole = async () => {
-    if (editingHole && (tempScores.teamA !== null || tempScores.teamB !== null)) {
+    const hasValidScores = tempScores.teamA !== null || tempScores.teamB !== null || 
+                          (match.isThreeWay && tempScores.teamC !== null);
+    
+    if (editingHole && hasValidScores) {
       console.log('💾 Saving hole scores:', {
         holeNumber: editingHole,
         teamAScore: tempScores.teamA,
         teamBScore: tempScores.teamB,
+        ...(match.isThreeWay && { teamCScore: tempScores.teamC }),
         matchId: match.id
       });
+      
       const updatedHoles = match.holes.map(hole => 
         hole.number === editingHole 
           ? {
               ...hole,
               teamAScore: tempScores.teamA,
               teamBScore: tempScores.teamB,
-              status: tempScores.teamA !== null && tempScores.teamB !== null ? 'completed' as const : 'in-progress' as const
+              ...(match.isThreeWay && { teamCScore: tempScores.teamC }),
+              status: (tempScores.teamA !== null && tempScores.teamB !== null && 
+                      (!match.isThreeWay || tempScores.teamC !== null)) ? 'completed' as const : 'in-progress' as const
             }
           : hole
       );
@@ -159,7 +173,11 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
       }
 
       setEditingHole(null);
-      setTempScores({ teamA: null, teamB: null });
+      setTempScores({ 
+        teamA: null, 
+        teamB: null,
+        ...(match.isThreeWay && { teamC: null })
+      });
     }
   };
 
@@ -572,6 +590,25 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
                           className="w-full px-4 py-3 text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                         />
                       </div>
+                      {match.isThreeWay && teamC && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {teamC.name} Score
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="10"
+                            placeholder="Enter score"
+                            value={tempScores.teamC || ''}
+                            onChange={(e) => setTempScores(prev => ({ 
+                              ...prev, 
+                              teamC: e.target.value ? parseInt(e.target.value) : null 
+                            }))}
+                            className="w-full px-4 py-3 text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                          />
+                        </div>
+                      )}
                     </div>
                     <div className="flex space-x-2">
                       <button
@@ -600,6 +637,12 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
                         <span className="text-sm font-medium">{teamB.name}:</span>
                         <span className="text-lg font-bold text-red-600">{hole.teamBScore !== null ? hole.teamBScore : '-'}</span>
                       </div>
+                      {match.isThreeWay && teamC && (
+                        <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                          <span className="text-sm font-medium">{teamC.name}:</span>
+                          <span className="text-lg font-bold text-purple-600">{hole.teamCScore !== null ? hole.teamCScore : '-'}</span>
+                        </div>
+                      )}
                     </div>
                     <button
                       onClick={() => handleEditHole(hole.number)}

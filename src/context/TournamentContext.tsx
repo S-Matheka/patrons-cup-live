@@ -188,8 +188,10 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
           par: hole.par,
           teamAScore: hole.team_a_score,
           teamBScore: hole.team_b_score,
+          teamCScore: hole.team_c_score,
           teamAStrokes: hole.team_a_strokes,
           teamBStrokes: hole.team_b_strokes,
+          teamCStrokes: hole.team_c_strokes,
           status: hole.status,
           lastUpdated: hole.last_updated
         }))
@@ -319,17 +321,19 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
             status: h.status 
           })));
           
-          const holesData = updatedMatch.holes.map(hole => ({
-            match_id: matchId,
-            hole_number: hole.number,
-            par: hole.par,
-            team_a_score: hole.teamAScore,
-            team_b_score: hole.teamBScore,
-            team_a_strokes: hole.teamAStrokes,
-            team_b_strokes: hole.teamBStrokes,
-            status: hole.status,
-            last_updated: new Date().toISOString()
-          }));
+                              const holesData = updatedMatch.holes.map(hole => ({
+                      match_id: matchId,
+                      hole_number: hole.number,
+                      par: hole.par,
+                      team_a_score: hole.teamAScore,
+                      team_b_score: hole.teamBScore,
+                      team_c_score: hole.teamCScore,
+                      team_a_strokes: hole.teamAStrokes,
+                      team_b_strokes: hole.teamBStrokes,
+                      team_c_strokes: hole.teamCStrokes,
+                      status: hole.status,
+                      last_updated: new Date().toISOString()
+                    }));
 
           const { error: holesError } = await supabase
             .from('holes')

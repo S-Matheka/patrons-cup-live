@@ -2,18 +2,20 @@
 
 import { useTournament } from '@/context/TournamentContext';
 import { Score, Team } from '@/types';
-import { useState } from 'react';
-import { Trophy, Medal, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Trophy, Medal, TrendingUp, TrendingDown, Minus, Clock } from 'lucide-react';
+import { calculateLiveStandings } from '@/utils/liveStandingsCalculator';
 
 export default function Standings() {
-  const { teams, scores } = useTournament();
+  const { teams, matches } = useTournament();
   const [selectedDivision, setSelectedDivision] = useState<'Trophy' | 'Shield' | 'Plaque' | 'Bowl' | 'Mug' | 'all'>('all');
 
-  const trophyScores = scores.filter(score => score.division === 'Trophy');
-  const shieldScores = scores.filter(score => score.division === 'Shield');
-  const plaqueScores = scores.filter(score => score.division === 'Plaque');
-  const bowlScores = scores.filter(score => score.division === 'Bowl');
-  const mugScores = scores.filter(score => score.division === 'Mug');
+  // Calculate LIVE standings from current match data
+  const trophyStandings = useMemo(() => calculateLiveStandings(matches, teams, 'Trophy'), [matches, teams]);
+  const shieldStandings = useMemo(() => calculateLiveStandings(matches, teams, 'Shield'), [matches, teams]);
+  const plaqueStandings = useMemo(() => calculateLiveStandings(matches, teams, 'Plaque'), [matches, teams]);
+  const bowlStandings = useMemo(() => calculateLiveStandings(matches, teams, 'Bowl'), [matches, teams]);
+  const mugStandings = useMemo(() => calculateLiveStandings(matches, teams, 'Mug'), [matches, teams]);
 
 
 

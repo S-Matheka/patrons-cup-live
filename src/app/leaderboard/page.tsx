@@ -2,8 +2,9 @@
 
 import { useTournament } from '@/context/TournamentContext';
 import { useState, useMemo } from 'react';
-import { Trophy, Medal, TrendingUp, TrendingDown, Minus, Clock } from 'lucide-react';
+import { Trophy, Medal, TrendingUp, TrendingDown, Minus, Clock, CheckCircle } from 'lucide-react';
 import TournamentCountdown from '@/components/TournamentCountdown';
+import { calculateLiveStandings, getLiveTournamentStats } from '@/utils/liveStandingsCalculator';
 
 export default function LeaderboardPage() {
   const { teams, scores, matches, getTeamById } = useTournament();
@@ -44,32 +45,14 @@ export default function LeaderboardPage() {
     });
   };
 
-  // Get live standings for the selected division
+  // Get LIVE standings calculated from current match data
   const divisionStandings = useMemo(() => {
-    return scores
-      .filter(score => score.division === activeDivision)
-      .sort((a, b) => {
-        // Sort by points (descending), then by matches played (ascending), then by holes won (descending)
-        if (b.points !== a.points) return b.points - a.points;
-        if (a.matchesPlayed !== b.matchesPlayed) return a.matchesPlayed - b.matchesPlayed;
-        return b.holesWon - a.holesWon;
-      });
-  }, [scores, activeDivision]);
+    return calculateLiveStandings(matches, teams, activeDivision);
+  }, [matches, teams, activeDivision]);
 
-  // Get tournament statistics
+  // Get LIVE tournament statistics
   const tournamentStats = useMemo(() => {
-    const totalMatches = matches.length;
-    const completedMatches = matches.filter(m => m.status === 'completed').length;
-    const inProgressMatches = matches.filter(m => m.status === 'in-progress').length;
-    const scheduledMatches = matches.filter(m => m.status === 'scheduled').length;
-
-    return {
-      totalMatches,
-      completedMatches,
-      inProgressMatches,
-      scheduledMatches,
-      completionPercentage: totalMatches > 0 ? Math.round((completedMatches / totalMatches) * 100) : 0
-    };
+    return getLiveTournamentStats(matches);
   }, [matches]);
 
   const getPositionIcon = (change: string) => {
@@ -191,65 +174,75 @@ export default function LeaderboardPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {divisionStandings.map((score, index) => {
-                    const team = getTeamById(score.teamId);
-                    const position = index + 1;
-                    
+                  {divisionStandings.map((standing) => {
                     return (
-                      <tr key={score.teamId} className="border-b border-gray-100 hover:bg-gray-50">
+                      <tr key={standing.teamId} className="border-b border-gray-100 hover:bg-gray-50">
                         <td className="py-4 px-4">
                           <div className="flex items-center space-x-2">
-                            <span className="text-lg font-bold text-gray-900">#{position}</span>
-                            {getPositionIcon(score.positionChange || 'same')}
+                            <span className="text-lg font-bold text-gray-900">#{standing.position}</span>
+                            {getPositionIcon(standing.positionChange)}
                           </div>
                         </td>
                         <td className="py-4 px-4">
                           <div className="flex items-center space-x-3">
-                            {getDivisionIcon(score.division)}
+                            {getDivisionIcon(standing.division)}
                             <div>
-                              <div className="font-medium text-gray-900">{team?.name}</div>
-                              <div className="text-sm text-gray-500">Seed #{team?.seed}</div>
+                              <div className="font-medium text-gray-900">{standing.team.name}</div>
+                              <div className="text-sm text-gray-500">Seed #{standing.team.seed}</div>
+                              {/* Show live match status */}
+                              {standing.liveMatchStatus.length > 0 && (
+                                <div className="text-xs text-blue-600 font-medium mt-1">
+                                  <Clock className="w-3 h-3 inline mr-1" />
+                                  {standing.liveMatchStatus[0]}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </td>
                         <td className="py-4 px-4 text-center">
                           <span className="text-xl font-bold text-green-600">
-                            {score.points.toFixed(1)}
+                            {standing.points.toFixed(1)}
                           </span>
                         </td>
                         <td className="py-4 px-4 text-center text-gray-900">
-                          {score.matchesPlayed}
+                          {standing.matchesPlayed + standing.matchesInProgress}
+                          {standing.matchesInProgress > 0 && (
+                            <div className="text-xs text-blue-600 mt-1">
+                              {standing.matchesInProgress} live
+                            </div>
+                          )}
                         </td>
                         <td className="py-4 px-4 text-center">
                           <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                            {score.matchesWon}
+                            {standing.matchesWon}
                           </span>
                         </td>
                         <td className="py-4 px-4 text-center">
                           <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-                            {score.matchesLost}
+                            {standing.matchesLost}
                           </span>
                         </td>
                         <td className="py-4 px-4 text-center">
                           <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                            {score.matchesHalved}
+                            {standing.matchesHalved}
                           </span>
                         </td>
                         <td className="py-4 px-4 text-center">
                           <div className="flex items-center justify-center space-x-1">
-                            {getTeamForm(score.teamId).map((result, idx) => (
+                            {standing.trend !== '-' ? standing.trend.split('-').slice(0, 5).map((result, idx) => (
                               <span
                                 key={idx}
                                 className={`inline-flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full ${
                                   result === 'W' ? 'bg-green-100 text-green-800' :
                                   result === 'L' ? 'bg-red-100 text-red-800' :
-                                  'bg-gray-100 text-gray-800'
+                                  result === 'H' ? 'bg-gray-100 text-gray-800' :
+                                  result === 'IP' ? 'bg-blue-100 text-blue-800' :
+                                  'bg-gray-100 text-gray-600'
                                 }`}
                               >
-                                {result}
+                                {result === 'IP' ? '●' : result}
                               </span>
-                            ))}
-                            {getTeamForm(score.teamId).length === 0 && (
+                            )) : (
                               <span className="text-xs text-gray-400">-</span>
                             )}
                           </div>

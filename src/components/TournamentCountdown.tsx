@@ -10,7 +10,7 @@ interface TournamentCountdownProps {
 }
 
 export default function TournamentCountdown({ 
-  startDate = TOURNAMENT_CONFIG.TOURNAMENT_START, // First game starts at 7:00 AM EAT
+  startDate = TOURNAMENT_CONFIG.TOURNAMENT_START, // First game starts at 7:30 AM EAT
   className = '' 
 }: TournamentCountdownProps) {
   const [timeLeft, setTimeLeft] = useState<{
@@ -105,7 +105,7 @@ export default function TournamentCountdown({
         <div className="flex items-center justify-center text-green-100">
           <Clock className="w-4 h-4 mr-2" />
           <span className="text-sm">
-            4th Edition Patron's Cup • Friday, August 22nd, 2025 at 7:00 AM
+            4th Edition Patron's Cup • Friday, August 22nd, 2025 at 7:30 AM
           </span>
         </div>
       </div>

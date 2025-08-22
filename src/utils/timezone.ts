@@ -165,7 +165,7 @@ export const TOURNAMENT_CONFIG = {
   TIMEZONE: 'Africa/Nairobi',
   TIMEZONE_OFFSET: '+03:00',
   TIMEZONE_NAME: 'EAT',
-  TOURNAMENT_START: '2025-08-22T07:00:00+03:00', // 7:00 AM EAT on August 22nd
+  TOURNAMENT_START: '2025-08-22T07:30:00+03:00', // 7:30 AM EAT on August 22nd
   LOCATION: 'Nairobi, Kenya'
 };
 

@@ -101,24 +101,43 @@ export function calculateSessionBasedStandings(matches: Match[], teams: Team[], 
     });
 
     // Award session points based on overall performance
+    // Find the team(s) with the most wins in this session
+    const teamWins = divisionTeams.map(team => ({
+      team,
+      wins: teamSessionResults[team.id].wins,
+      losses: teamSessionResults[team.id].losses,
+      halves: teamSessionResults[team.id].halves
+    }));
+    
+    // Sort by wins (descending), then by losses (ascending)
+    teamWins.sort((a, b) => {
+      if (b.wins !== a.wins) return b.wins - a.wins;
+      return a.losses - b.losses;
+    });
+    
+    const maxWins = teamWins[0].wins;
+    const winners = teamWins.filter(t => t.wins === maxWins);
+    
+    // Award session points
     divisionTeams.forEach(team => {
       const teamId = team.id;
       const results = teamSessionResults[teamId];
+      const teamWinData = teamWins.find(t => t.team.id === teamId)!;
       
-      if (results.wins > results.losses) {
-        // Team won more matches than they lost in this session
+      if (winners.length === 1 && winners[0].team.id === teamId) {
+        // Clear winner of the session
         teamStats[teamId].points += sessionPoints.win;
         teamStats[teamId].matchesWon++;
         teamStats[teamId].recentResults.unshift('W');
-      } else if (results.losses > results.wins) {
-        // Team lost more matches than they won in this session
-        teamStats[teamId].matchesLost++;
-        teamStats[teamId].recentResults.unshift('L');
-      } else {
-        // Team tied overall in this session
+      } else if (winners.some(w => w.team.id === teamId)) {
+        // Tied for best performance in session
         teamStats[teamId].points += sessionPoints.tie;
         teamStats[teamId].matchesHalved++;
         teamStats[teamId].recentResults.unshift('H');
+      } else {
+        // Lost the session
+        teamStats[teamId].matchesLost++;
+        teamStats[teamId].recentResults.unshift('L');
       }
 
       // Add hole statistics
@@ -255,17 +274,31 @@ function processInProgressMatch(
 
     const result = calculateThreeWayResult(holesData, 18);
     
-    // Award temporary wins/losses based on current position
+    // Award wins/losses based on current position (stroke play)
     const scores = [
       { teamId: match.teamAId, total: result.teamATotal },
       { teamId: match.teamBId, total: result.teamBTotal },
       { teamId: match.teamCId!, total: result.teamCTotal }
     ].sort((a, b) => a.total - b.total);
 
-    // Current leader gets a win, others get losses
-    teamSessionResults[scores[0].teamId].wins++;
-    teamSessionResults[scores[1].teamId].losses++;
-    teamSessionResults[scores[2].teamId].losses++;
+    // In stroke play: lowest score wins, highest score loses
+    teamSessionResults[scores[0].teamId].wins++; // 1st place (lowest score)
+    
+    if (scores[0].total === scores[1].total) {
+      // Tied for 1st
+      teamSessionResults[scores[1].teamId].halves++;
+    } else {
+      // 2nd place
+      teamSessionResults[scores[1].teamId].halves++;
+    }
+    
+    if (scores[1].total === scores[2].total) {
+      // Tied for 2nd
+      teamSessionResults[scores[2].teamId].halves++;
+    } else {
+      // 3rd place (highest score)
+      teamSessionResults[scores[2].teamId].losses++;
+    }
   } else {
     // 2-team match play (in-progress)
     const holesData = completedHoles.map(hole => ({

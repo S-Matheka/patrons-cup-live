@@ -80,36 +80,42 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
 
       console.log('📊 Player data to save:', playerData);
       
-      const adminClient = getAdminClient();
-      if (!adminClient) {
-        throw new Error('Admin client not available');
-      }
-
       let result;
       if (player?.id) {
-        // Update existing player
+        // Update existing player via API
         console.log('🔄 Updating existing player:', player.id);
-        result = await adminClient
-          .from('players')
-          .update(playerData)
-          .eq('id', player.id)
-          .select()
-          .single();
-      } else {
-        // Create new player - ensure absolutely no ID is included
-        console.log('🔄 Creating new player');
-        console.log('📊 Data being inserted:', playerData);
+        const response = await fetch('/api/admin/players', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: player.id,
+            ...playerData
+          }),
+        });
         
-        result = await adminClient
-          .from('players')
-          .insert(playerData)
-          .select()
-          .single();
+        result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Failed to update player');
+      } else {
+        // Create new player via API - guaranteed no ID conflicts
+        console.log('🔄 Creating new player via API');
+        const response = await fetch('/api/admin/players', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(playerData),
+        });
+        
+        result = await response.json();
+        if (!response.ok) {
+          console.error('❌ API Error Response:', result);
+          throw new Error(result.error || 'Failed to create player');
+        }
       }
       
-      console.log('📊 Database result:', result);
-
-      if (result.error) throw result.error;
+      console.log('📊 API result:', result);
 
       // Convert back to frontend format
       const savedPlayer: Player = {

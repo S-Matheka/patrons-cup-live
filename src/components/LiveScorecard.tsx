@@ -356,7 +356,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
           <div className="flex items-center justify-center space-x-2">
             <Clock className="w-4 h-4 text-yellow-600 animate-pulse" />
             <span className="text-sm font-medium text-yellow-800">
-              Live - Updates every 30 seconds
+              Live - Updates every 10 seconds
             </span>
           </div>
         </div>

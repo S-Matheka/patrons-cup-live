@@ -312,6 +312,13 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
 
         // Update holes if they exist
         if (updatedMatch.holes && updatedMatch.holes.length > 0) {
+          console.log('🔄 Updating holes data:', updatedMatch.holes.map(h => ({ 
+            hole: h.number, 
+            teamAScore: h.teamAScore, 
+            teamBScore: h.teamBScore,
+            status: h.status 
+          })));
+          
           const holesData = updatedMatch.holes.map(hole => ({
             match_id: matchId,
             hole_number: hole.number,
@@ -328,19 +335,27 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
             .from('holes')
             .upsert(holesData, { onConflict: 'match_id,hole_number' });
 
-          if (holesError) throw holesError;
+          if (holesError) {
+            console.error('❌ Error updating holes:', holesError);
+            throw holesError;
+          }
+          
+          console.log('✅ All holes updated successfully in database');
         }
       } catch (error) {
-        console.error('Error updating match in Supabase:', error);
+        console.error('❌ Error updating match in Supabase:', error);
+        throw error; // Re-throw to handle in calling component
       }
-    } else {
-      // Update locally
-      setMatches(prevMatches => 
-        prevMatches.map(match => 
-          match.id === matchId ? updatedMatch : match
-        )
-      );
     }
+    
+    // Always update local state regardless of Supabase status
+    setMatches(prevMatches => 
+      prevMatches.map(match => 
+        match.id === matchId ? updatedMatch : match
+      )
+    );
+    
+    console.log('✅ Local state updated for match', matchId);
   };
 
   const updateScore = async (teamId: number, updatedScore: Score) => {

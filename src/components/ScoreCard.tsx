@@ -138,11 +138,18 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
 
       // Save the match to database first
       console.log('🔄 Updating match in database...');
-      await updateMatch(updatedMatch.id, updatedMatch);
-      console.log('✅ Match updated in database successfully');
-      onSave(updatedMatch); // This updates local state
+      try {
+        await updateMatch(updatedMatch.id, updatedMatch);
+        console.log('✅ Match updated in database successfully');
+        onSave(updatedMatch); // This updates local state
+      } catch (error) {
+        console.error('❌ Failed to save match to database:', error);
+        // Still update local state to provide immediate feedback
+        onSave(updatedMatch);
+        alert('Warning: Failed to save to database. Your changes may not be visible to other users.');
+      }
 
-      // If match is complete, update leaderboard automatically
+      // If match is complete, update tournament standings
       if (isMatchComplete) {
         console.log(`🏆 Match ${match.id} completed automatically!`);
         console.log(`Result: ${matchPlayResult.result}, Winner: ${matchPlayResult.winner}`);
@@ -155,6 +162,8 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
       setTempScores({ teamA: null, teamB: null });
     }
   };
+
+
 
   const updateTournamentStandings = async (completedMatch: Match, result: any) => {
     try {

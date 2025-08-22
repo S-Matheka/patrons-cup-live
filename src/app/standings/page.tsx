@@ -27,13 +27,13 @@ export default function Standings() {
     return division === 'Trophy' ? Trophy : Medal;
   };
 
-  const getTrendIcon = (score: Score) => {
+  const getTrendIcon = (standing: any) => {
     // Show trend based on positionChange property
-    if (!score.positionChange || score.positionChange === 'same') {
+    if (!standing.positionChange || standing.positionChange === 'same') {
       return <Minus className="w-4 h-4 text-gray-400" />;
     }
     
-    switch (score.positionChange) {
+    switch (standing.positionChange) {
       case 'up':
         return <TrendingUp className="w-4 h-4 text-green-500" />;
       case 'down':
@@ -51,7 +51,7 @@ export default function Standings() {
   const sortedScores = (divisionScores: Score[]) => {
     return divisionScores
       .map(score => {
-        const team = getTeamById(score.teamId);
+        const team = getTeamById(standing.teamId);
         return team ? { ...score, team } : null;
       })
       .filter((item): item is Score & { team: Team } => item !== null)
@@ -169,22 +169,22 @@ export default function Standings() {
                             <div className="flex items-center">
                               <div 
                                 className="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-bold mr-2 sm:mr-3 flex-shrink-0"
-                                style={{ backgroundColor: score.team.color }}
+                                style={{ backgroundColor: standing.team.color }}
                               >
-                                {score.team.logo}
+                                {standing.team.logo}
                               </div>
                               <div className="min-w-0">
-                                <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">{score.team.name}</div>
-                                <div className="text-xs text-gray-500 hidden sm:block truncate">{score.team.description}</div>
+                                <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">{standing.team.name}</div>
+                                <div className="text-xs text-gray-500 hidden sm:block truncate">{standing.team.description}</div>
                               </div>
                             </div>
                           </td>
-                          <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 font-bold">{score.points}</td>
-                          <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">{score.matchesPlayed}</td>
-                          <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">{score.matchesWon}</td>
-                          <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">{score.matchesLost}</td>
-                          <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">{score.matchesHalved}</td>
-                          <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
+                          <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 font-bold">{standing.points}</td>
+                          <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">{standing.matchesPlayed}</td>
+                          <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">{standing.matchesWon}</td>
+                          <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">{standing.matchesLost}</td>
+                          <td className="px-1 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">{standing.matchesHalved}</td>
+                          <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(standing)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -210,28 +210,28 @@ export default function Standings() {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {shieldStandings.map((standing, index) => (
-                        <tr key={score.teamId} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
+                        <tr key={standing.teamId} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{standing.position}</td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div 
                                 className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3"
-                                style={{ backgroundColor: score.team.color }}
+                                style={{ backgroundColor: standing.team.color }}
                               >
-                                {score.team.logo}
+                                {standing.team.logo}
                               </div>
                               <div>
-                                <div className="text-sm font-medium text-gray-900">{score.team.name}</div>
-                                <div className="text-sm text-gray-500">{score.team.description}</div>
+                                <div className="text-sm font-medium text-gray-900">{standing.team.name}</div>
+                                <div className="text-sm text-gray-500">{standing.team.description}</div>
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(standing)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -257,28 +257,28 @@ export default function Standings() {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {plaqueStandings.map((standing, index) => (
-                        <tr key={score.teamId} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
+                        <tr key={standing.teamId} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{standing.position}</td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div 
                                 className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3"
-                                style={{ backgroundColor: score.team.color }}
+                                style={{ backgroundColor: standing.team.color }}
                               >
-                                {score.team.logo}
+                                {standing.team.logo}
                               </div>
                               <div>
-                                <div className="text-sm font-medium text-gray-900">{score.team.name}</div>
-                                <div className="text-sm text-gray-500">{score.team.description}</div>
+                                <div className="text-sm font-medium text-gray-900">{standing.team.name}</div>
+                                <div className="text-sm text-gray-500">{standing.team.description}</div>
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(standing)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -304,28 +304,28 @@ export default function Standings() {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {bowlStandings.map((standing, index) => (
-                        <tr key={score.teamId} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
+                        <tr key={standing.teamId} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{standing.position}</td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div 
                                 className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3"
-                                style={{ backgroundColor: score.team.color }}
+                                style={{ backgroundColor: standing.team.color }}
                               >
-                                {score.team.logo}
+                                {standing.team.logo}
                               </div>
                               <div>
-                                <div className="text-sm font-medium text-gray-900">{score.team.name}</div>
-                                <div className="text-sm text-gray-500">{score.team.description}</div>
+                                <div className="text-sm font-medium text-gray-900">{standing.team.name}</div>
+                                <div className="text-sm text-gray-500">{standing.team.description}</div>
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(standing)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -351,28 +351,28 @@ export default function Standings() {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {mugStandings.map((standing, index) => (
-                        <tr key={score.teamId} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
+                        <tr key={standing.teamId} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{standing.position}</td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div 
                                 className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3"
-                                style={{ backgroundColor: score.team.color }}
+                                style={{ backgroundColor: standing.team.color }}
                               >
-                                {score.team.logo}
+                                {standing.team.logo}
                               </div>
                               <div>
-                                <div className="text-sm font-medium text-gray-900">{score.team.name}</div>
-                                <div className="text-sm text-gray-500">{score.team.description}</div>
+                                <div className="text-sm font-medium text-gray-900">{standing.team.name}</div>
+                                <div className="text-sm text-gray-500">{standing.team.description}</div>
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(standing)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -398,29 +398,29 @@ export default function Standings() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {sortedScores(trophyScores).map((score, index) => (
-                    <tr key={score.teamId} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
+                  {trophyStandings.map((standing, index) => (
+                    <tr key={standing.teamId} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{standing.position}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div 
                             className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3"
-                            style={{ backgroundColor: score.team.color }}
+                            style={{ backgroundColor: standing.team.color }}
                           >
-                            {score.team.logo}
+                            {standing.team.logo}
                           </div>
                           <div>
-                            <div className="text-sm font-medium text-gray-900">{score.team.name}</div>
-                            <div className="text-sm text-gray-500">{score.team.description}</div>
+                            <div className="text-sm font-medium text-gray-900">{standing.team.name}</div>
+                            <div className="text-sm text-gray-500">{standing.team.description}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(standing)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -444,29 +444,29 @@ export default function Standings() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {sortedScores(shieldScores).map((score, index) => (
-                    <tr key={score.teamId} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
+                  {shieldStandings.map((standing, index) => (
+                    <tr key={standing.teamId} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{standing.position}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div 
                             className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3"
-                            style={{ backgroundColor: score.team.color }}
+                            style={{ backgroundColor: standing.team.color }}
                           >
-                            {score.team.logo}
+                            {standing.team.logo}
                           </div>
                           <div>
-                            <div className="text-sm font-medium text-gray-900">{score.team.name}</div>
-                            <div className="text-sm text-gray-500">{score.team.description}</div>
+                            <div className="text-sm font-medium text-gray-900">{standing.team.name}</div>
+                            <div className="text-sm text-gray-500">{standing.team.description}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(standing)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -490,29 +490,29 @@ export default function Standings() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {sortedScores(plaqueScores).map((score, index) => (
-                    <tr key={score.teamId} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
+                  {plaqueStandings.map((standing, index) => (
+                    <tr key={standing.teamId} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{standing.position}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div 
                             className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3"
-                            style={{ backgroundColor: score.team.color }}
+                            style={{ backgroundColor: standing.team.color }}
                           >
-                            {score.team.logo}
+                            {standing.team.logo}
                           </div>
                           <div>
-                            <div className="text-sm font-medium text-gray-900">{score.team.name}</div>
-                            <div className="text-sm text-gray-500">{score.team.description}</div>
+                            <div className="text-sm font-medium text-gray-900">{standing.team.name}</div>
+                            <div className="text-sm text-gray-500">{standing.team.description}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(standing)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -536,29 +536,29 @@ export default function Standings() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {sortedScores(bowlScores).map((score, index) => (
-                    <tr key={score.teamId} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
+                  {bowlStandings.map((standing, index) => (
+                    <tr key={standing.teamId} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{standing.position}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div 
                             className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3"
-                            style={{ backgroundColor: score.team.color }}
+                            style={{ backgroundColor: standing.team.color }}
                           >
-                            {score.team.logo}
+                            {standing.team.logo}
                           </div>
                           <div>
-                            <div className="text-sm font-medium text-gray-900">{score.team.name}</div>
-                            <div className="text-sm text-gray-500">{score.team.description}</div>
+                            <div className="text-sm font-medium text-gray-900">{standing.team.name}</div>
+                            <div className="text-sm text-gray-500">{standing.team.description}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(standing)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -582,29 +582,29 @@ export default function Standings() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {sortedScores(mugScores).map((score, index) => (
-                    <tr key={score.teamId} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
+                  {mugStandings.map((standing, index) => (
+                    <tr key={standing.teamId} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{standing.position}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div 
                             className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3"
-                            style={{ backgroundColor: score.team.color }}
+                            style={{ backgroundColor: standing.team.color }}
                           >
-                            {score.team.logo}
+                            {standing.team.logo}
                           </div>
                           <div>
-                            <div className="text-sm font-medium text-gray-900">{score.team.name}</div>
-                            <div className="text-sm text-gray-500">{score.team.description}</div>
+                            <div className="text-sm font-medium text-gray-900">{standing.team.name}</div>
+                            <div className="text-sm text-gray-500">{standing.team.description}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{score.points}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesPlayed}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesWon}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesLost}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{score.matchesHalved}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(score)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{standing.points}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesPlayed}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesWon}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesLost}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{standing.matchesHalved}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTrendIcon(standing)}</td>
                     </tr>
                   ))}
                 </tbody>

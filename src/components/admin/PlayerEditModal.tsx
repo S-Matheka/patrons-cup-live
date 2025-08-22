@@ -24,15 +24,18 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
     if (player) {
       setFormData(player);
     } else {
-      // New player defaults
-      setFormData({
+      // New player defaults - ensure completely clean slate
+      const cleanFormData = {
         name: '',
         teamId: teamId || 0,
         isPro: false,
         isExOfficio: false,
         isJunior: false,
         position: 'Regular Player'
-      });
+      };
+      // Explicitly ensure no ID field exists
+      delete (cleanFormData as any).id;
+      setFormData(cleanFormData);
     }
     setErrors({});
   }, [player, teamId]);
@@ -61,17 +64,19 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
 
     setIsLoading(true);
     try {
-      // Prepare player data - exclude ID for new records
+      // Prepare player data - NEVER include ID for new records
       const playerData = {
         name: formData.name?.trim(),
         team_id: formData.teamId,
         is_pro: formData.isPro || false,
         is_ex_officio: formData.isExOfficio || false,
         is_junior: formData.isJunior || false,
-        position: formData.position || null,
+        position: formData.position || 'Regular Player',
         updated_at: new Date().toISOString()
-        // Note: ID is intentionally excluded - it should be auto-generated for new records
       };
+      
+      // Explicitly remove any ID field that might exist
+      delete (playerData as any).id;
 
       console.log('📊 Player data to save:', playerData);
       
@@ -91,14 +96,13 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
           .select()
           .single();
       } else {
-        // Create new player - ensure no ID is included
+        // Create new player - ensure absolutely no ID is included
         console.log('🔄 Creating new player');
-        const newPlayerData = { ...playerData };
-        delete newPlayerData.id; // Ensure no ID field is sent
+        console.log('📊 Data being inserted:', playerData);
         
         result = await adminClient
           .from('players')
-          .insert(newPlayerData)
+          .insert(playerData)
           .select()
           .single();
       }

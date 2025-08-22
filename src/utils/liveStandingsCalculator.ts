@@ -277,6 +277,7 @@ export function calculateLiveStandings(
             { team: 'teamC', total: liveResult.teamCTotal, stats: teamCStats }
           ].sort((a, b) => a.total - b.total);
 
+          // DYNAMIC 3-TEAM LIVE SCORING: Current leader gets full points immediately
           const fullSessionPoints = getMatchPoints(match, 'win');
           const halfSessionPoints = getMatchPoints(match, 'tie');
 
@@ -287,12 +288,28 @@ export function calculateLiveStandings(
             s.stats.matchesHalved = 0;
           });
 
-          // IN-PROGRESS 3-TEAM MATCHES: No points awarded until completion
-          // Do NOT award points for in-progress matches
-          // Points are only awarded when matches are completed
-          
-          // Track current position for statistics only (not points)
-          // No points added, no wins/losses/halves counted until completion
+          // Award live points: current leader gets full, others get partial/none
+          scores[0].stats.points += fullSessionPoints; // 1st place (lowest score)
+          scores[0].stats.matchesWon++;
+
+          if (scores[0].total === scores[1].total) {
+            // Tied for first place
+            scores[1].stats.points += halfSessionPoints;
+            scores[1].stats.matchesHalved++;
+          } else {
+            // Second place gets half points
+            scores[1].stats.points += halfSessionPoints;
+            scores[1].stats.matchesHalved++;
+          }
+
+          if (scores[1].total === scores[2].total) {
+            // Tied for second place
+            scores[2].stats.points += halfSessionPoints;
+            scores[2].stats.matchesHalved++;
+          } else {
+            // Third place gets nothing
+            scores[2].stats.matchesLost++;
+          }
         } else {
           // 2-team match play live scoring
           const holesData = completedHoles.map(hole => ({
@@ -316,23 +333,33 @@ export function calculateLiveStandings(
           teamBStats.holesWon += liveResult.teamBHolesWon;
           teamBStats.holesLost += liveResult.teamAHolesWon;
 
-          // IN-PROGRESS MATCHES: No points awarded until completion
-          // Only track match status for display purposes
+          // DYNAMIC LIVE SCORING: Team that is UP gets full session points immediately
+          // This gives real-time visibility to the audience
           const holeAdvantage = liveResult.teamAHolesWon - liveResult.teamBHolesWon;
+          const fullSessionPoints = getMatchPoints(match, 'win');
+          const halfSessionPoints = getMatchPoints(match, 'tie');
           
-          // Do NOT award points for in-progress matches
-          // Points are only awarded when matches are completed
-          
-          // Track current match status for statistics only (not points)
           if (holeAdvantage > 0) {
-            // Team A is currently leading (but no points until completion)
-            // No points added, no wins/losses counted
+            // Team A is UP (leading) = Gets FULL session points immediately
+            teamAStats.points += fullSessionPoints;
+            // Team B is DOWN (trailing) = Gets 0 points
+            // Count this as Team A winning this match (live)
+            teamAStats.matchesWon++;
+            teamBStats.matchesLost++;
           } else if (holeAdvantage < 0) {
-            // Team B is currently leading (but no points until completion)
-            // No points added, no wins/losses counted
+            // Team B is UP (leading) = Gets FULL session points immediately  
+            teamBStats.points += fullSessionPoints;
+            // Team A is DOWN (trailing) = Gets 0 points
+            // Count this as Team B winning this match (live)
+            teamBStats.matchesWon++;
+            teamAStats.matchesLost++;
           } else {
-            // Currently tied (but no points until completion)
-            // No points added, no halves counted
+            // ALL SQUARE (tied) = Both teams get HALF session points
+            teamAStats.points += halfSessionPoints;
+            teamBStats.points += halfSessionPoints;
+            // Count this as a tie for both teams
+            teamAStats.matchesHalved++;
+            teamBStats.matchesHalved++;
           }
         }
       }

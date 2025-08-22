@@ -2,10 +2,63 @@
  * REAL-TIME LIVE STANDINGS CALCULATOR
  * Calculates team standings from live match data as holes are played
  * Updates in real-time for audience engagement
+ * Uses proper tournament point allocation system
  */
 
 import { Match, Team, Score } from '@/types';
 import { calculateMatchPlayResult } from './matchPlayScoring';
+
+/**
+ * Get points for match based on tournament rules
+ */
+function getMatchPoints(match: Match, result: 'win' | 'tie' | 'loss'): number {
+  const { type, session, division, date } = match;
+  
+  // Determine day from date
+  const matchDate = new Date(date);
+  const dayOfWeek = matchDate.getDay(); // 0=Sunday, 5=Friday, 6=Saturday
+  
+  let day: 'Friday' | 'Saturday' | 'Sunday';
+  if (dayOfWeek === 5) day = 'Friday';
+  else if (dayOfWeek === 6) day = 'Saturday';
+  else day = 'Sunday';
+  
+  // Points based on division type
+  const isBowlMug = division === 'Bowl' || division === 'Mug';
+  
+  // Calculate points based on match type, day, session, and division
+  if (day === 'Friday') {
+    if (session === 'AM' && type === '4BBB') {
+      // Friday AM 4BBB: 5pts win, 2.5pts tie (all divisions)
+      return result === 'win' ? 5 : result === 'tie' ? 2.5 : 0;
+    } else if (session === 'PM' && type === 'Foursomes') {
+      // Friday PM Foursomes: Trophy/Shield/Plaque = 3pts win, 1.5pts tie | Bowl/Mug = 4pts win, 2pts tie
+      if (isBowlMug) {
+        return result === 'win' ? 4 : result === 'tie' ? 2 : 0;
+      } else {
+        return result === 'win' ? 3 : result === 'tie' ? 1.5 : 0;
+      }
+    }
+  } else if (day === 'Saturday') {
+    if (session === 'AM' && type === '4BBB') {
+      // Saturday AM 4BBB: 5pts win, 2.5pts tie (all divisions)
+      return result === 'win' ? 5 : result === 'tie' ? 2.5 : 0;
+    } else if (session === 'PM' && type === 'Foursomes') {
+      // Saturday PM Foursomes: Trophy/Shield/Plaque = 3pts win, 1.5pts tie | Bowl/Mug = 4pts win, 2pts tie
+      if (isBowlMug) {
+        return result === 'win' ? 4 : result === 'tie' ? 2 : 0;
+      } else {
+        return result === 'win' ? 3 : result === 'tie' ? 1.5 : 0;
+      }
+    }
+  } else if (day === 'Sunday' && type === 'Singles') {
+    // Sunday Singles: 3pts win, 1.5pts tie (all divisions)
+    return result === 'win' ? 3 : result === 'tie' ? 1.5 : 0;
+  }
+  
+  // Default fallback
+  return result === 'win' ? 1 : result === 'tie' ? 0.5 : 0;
+}
 
 export interface LiveStandingEntry {
   teamId: number;
@@ -94,23 +147,26 @@ export function calculateLiveStandings(
       teamAStats.matchesPlayed++;
       teamBStats.matchesPlayed++;
 
-      // Update points and wins/losses
+      // Update points and wins/losses using proper tournament point system
       if (result.winner === 'teamA') {
-        teamAStats.points += 1;
+        const winPoints = getMatchPoints(match, 'win');
+        teamAStats.points += winPoints;
         teamAStats.matchesWon++;
         teamBStats.matchesLost++;
         teamAStats.recentResults.unshift('W');
         teamBStats.recentResults.unshift('L');
       } else if (result.winner === 'teamB') {
-        teamBStats.points += 1;
+        const winPoints = getMatchPoints(match, 'win');
+        teamBStats.points += winPoints;
         teamBStats.matchesWon++;
         teamAStats.matchesLost++;
         teamAStats.recentResults.unshift('L');
         teamBStats.recentResults.unshift('W');
       } else {
-        // Halved
-        teamAStats.points += 0.5;
-        teamBStats.points += 0.5;
+        // Halved/Tied
+        const tiePoints = getMatchPoints(match, 'tie');
+        teamAStats.points += tiePoints;
+        teamBStats.points += tiePoints;
         teamAStats.matchesHalved++;
         teamBStats.matchesHalved++;
         teamAStats.recentResults.unshift('H');
@@ -166,25 +222,30 @@ export function calculateLiveStandings(
         teamBStats.holesWon += liveResult.teamBHolesWon;
         teamBStats.holesLost += liveResult.teamAHolesWon;
 
-        // REAL-TIME POINTS: Award clean fractional points based on current hole advantage
+        // REAL-TIME POINTS: Award proportional points based on current advantage using proper tournament system
         const holeAdvantage = liveResult.teamAHolesWon - liveResult.teamBHolesWon;
+        const maxWinPoints = getMatchPoints(match, 'win');
+        const maxTiePoints = getMatchPoints(match, 'tie');
         
         if (holeAdvantage > 0) {
-          // Team A is ahead - award 0.1 points per hole advantage (clean decimals)
-          const partialPoints = Math.round((holeAdvantage * 0.1) * 10) / 10; // Round to 1 decimal
-          teamAStats.points += partialPoints;
+          // Team A is ahead - award proportional points based on advantage
+          const proportionalPoints = Math.round((holeAdvantage / 9) * maxWinPoints * 10) / 10; // Max at 50% of full points
+          teamAStats.points += Math.min(proportionalPoints, maxWinPoints * 0.5);
           // REAL-TIME WIN: Team A is currently winning this match
           teamAStats.matchesWon++;
           teamBStats.matchesLost++;
         } else if (holeAdvantage < 0) {
-          // Team B is ahead - award 0.1 points per hole advantage
-          const partialPoints = Math.round((Math.abs(holeAdvantage) * 0.1) * 10) / 10; // Round to 1 decimal
-          teamBStats.points += partialPoints;
+          // Team B is ahead - award proportional points based on advantage
+          const proportionalPoints = Math.round((Math.abs(holeAdvantage) / 9) * maxWinPoints * 10) / 10;
+          teamBStats.points += Math.min(proportionalPoints, maxWinPoints * 0.5);
           // REAL-TIME WIN: Team B is currently winning this match
           teamBStats.matchesWon++;
           teamAStats.matchesLost++;
         } else {
-          // REAL-TIME TIE: Match is currently tied (All Square)
+          // REAL-TIME TIE: Match is currently tied (All Square) - award partial tie points
+          const partialTiePoints = Math.round(maxTiePoints * 0.3 * 10) / 10; // 30% of tie points for being tied
+          teamAStats.points += partialTiePoints;
+          teamBStats.points += partialTiePoints;
           teamAStats.matchesHalved++;
           teamBStats.matchesHalved++;
         }

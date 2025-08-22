@@ -361,7 +361,7 @@ export default function LiveScoring() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredMatches.slice(0, 20).map((match) => {
+              {filteredMatches.map((match) => {
                 const teamA = teams.find(t => t.id === match.teamAId);
                 const teamB = teams.find(t => t.id === match.teamBId);
                 const teamC = teams.find(t => t.id === match.teamCId);
@@ -498,14 +498,6 @@ export default function LiveScoring() {
                   </div>
                 );
               })}
-              
-              {filteredMatches.length > 20 && (
-                <div className="text-center pt-4">
-                  <p className="text-sm text-gray-500">
-                    Showing first 20 of {filteredMatches.length} matches. Use filters to narrow down results.
-                  </p>
-                </div>
-              )}
             </div>
           )}
         </div>

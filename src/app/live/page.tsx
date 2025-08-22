@@ -211,10 +211,10 @@ export default function LiveScoring() {
       {/* Header */}
       <div className="text-center px-4 sm:px-0">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Tournament Scoring</h1>
-        <p className="text-sm sm:text-base text-gray-600 mt-2">4th Edition Patron's Cup 2025 - Pre-Tournament</p>
+        <p className="text-sm sm:text-base text-gray-600 mt-2">4th Edition Patron's Cup 2025 - Live Tournament</p>
         <div className="flex items-center justify-center space-x-2 mt-4">
           <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-          <span className="text-xs sm:text-sm font-medium text-blue-600">STARTS AUG 22</span>
+          <span className="text-xs sm:text-sm font-medium text-blue-600">AUG 22-24, 2025</span>
         </div>
       </div>
 
@@ -305,7 +305,7 @@ export default function LiveScoring() {
         </div>
       </div>
 
-      {/* Pre-Tournament Leaderboard */}
+      {/* Live Tournament Leaderboard */}
       <div className="bg-white rounded-lg shadow-md">
         <div className="px-6 py-4 bg-gradient-to-r from-green-600 to-green-700">
           <h2 className="text-xl font-bold text-white flex items-center">

@@ -242,7 +242,7 @@ export default function AdminDashboard() {
               <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">4th Edition Patron&apos;s Cup 2025</h3>
               <p className="text-sm sm:text-base text-gray-600 mb-4">Muthaiga Golf Club • August 22-24, 2025</p>
               <div className="inline-flex items-center px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-blue-100 text-blue-800">
-                Pre-Tournament Phase
+                Live Tournament Phase
               </div>
             </div>
           </div>

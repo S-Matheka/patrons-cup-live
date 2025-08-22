@@ -135,7 +135,7 @@ const LiveTournamentFeed = () => {
             Tournament Updates
           </h2>
           <div className="text-purple-100 text-sm">
-            Pre-Tournament
+            Live Tournament
           </div>
         </div>
       </div>

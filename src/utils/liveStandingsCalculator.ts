@@ -166,18 +166,16 @@ export function calculateLiveStandings(
         teamBStats.holesWon += liveResult.teamBHolesWon;
         teamBStats.holesLost += liveResult.teamAHolesWon;
 
-        // REAL-TIME POINTS: Award fractional points based on current hole advantage
-        // This makes the leaderboard truly dynamic as holes are won/lost
+        // REAL-TIME POINTS: Award clean fractional points based on current hole advantage
         const holeAdvantage = liveResult.teamAHolesWon - liveResult.teamBHolesWon;
-        const maxPossibleHoles = 18;
         
         if (holeAdvantage > 0) {
-          // Team A is ahead - award partial points based on advantage
-          const partialPoints = (holeAdvantage / maxPossibleHoles) * 0.5; // Max 0.5 points for being ahead
+          // Team A is ahead - award 0.1 points per hole advantage (clean decimals)
+          const partialPoints = Math.round((holeAdvantage * 0.1) * 10) / 10; // Round to 1 decimal
           teamAStats.points += partialPoints;
         } else if (holeAdvantage < 0) {
-          // Team B is ahead - award partial points based on advantage  
-          const partialPoints = (Math.abs(holeAdvantage) / maxPossibleHoles) * 0.5;
+          // Team B is ahead - award 0.1 points per hole advantage
+          const partialPoints = Math.round((Math.abs(holeAdvantage) * 0.1) * 10) / 10; // Round to 1 decimal
           teamBStats.points += partialPoints;
         }
         // If tied (AS), no partial points awarded
@@ -197,7 +195,7 @@ export function calculateLiveStandings(
       teamId: team.id,
       team,
       division: team.division,
-      points: stats.points,
+      points: Math.round(stats.points * 10) / 10, // Clean decimal display
       matchesPlayed: stats.matchesPlayed,
       matchesWon: stats.matchesWon,
       matchesLost: stats.matchesLost,
@@ -209,7 +207,7 @@ export function calculateLiveStandings(
       liveMatchStatus: stats.liveMatchStatus,
       position: 0, // Will be set after sorting
       positionChange: 'same',
-      trend: stats.recentResults.join('-') || '-'
+      trend: stats.recentResults.length > 0 ? stats.recentResults.join('-') : '-'
     };
   });
 

@@ -120,8 +120,10 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
               par,
               team_a_score,
               team_b_score,
+              team_c_score,
               team_a_strokes,
               team_b_strokes,
+              team_c_strokes,
               status,
               last_updated
             )

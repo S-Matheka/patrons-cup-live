@@ -64,8 +64,10 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
               par,
               team_a_score,
               team_b_score,
+              team_c_score,
               team_a_strokes,
               team_b_strokes,
+              team_c_strokes,
               status,
               last_updated
             )
@@ -132,8 +134,10 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
           par: hole.par,
           teamAScore: hole.team_a_score,
           teamBScore: hole.team_b_score,
+          teamCScore: hole.team_c_score,
           teamAStrokes: hole.team_a_strokes,
           teamBStrokes: hole.team_b_strokes,
+          teamCStrokes: hole.team_c_strokes,
           status: hole.status,
           lastUpdated: hole.last_updated
         }))

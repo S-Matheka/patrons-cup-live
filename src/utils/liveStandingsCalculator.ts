@@ -6,7 +6,7 @@
  */
 
 import { Match, Team, Score } from '@/types';
-import { calculateMatchPlayResult } from './matchPlayScoring';
+import { calculateMatchPlayResult, calculateThreeWayResult } from './matchPlayScoring';
 
 /**
  * Get points for match based on tournament rules
@@ -129,55 +129,111 @@ export function calculateLiveStandings(
 
     const teamAStats = teamStats[match.teamAId];
     const teamBStats = teamStats[match.teamBId];
+    const teamCStats = match.teamCId ? teamStats[match.teamCId] : null;
     
     if (!teamAStats || !teamBStats) return; // Team not in this division
+    if (match.isThreeWay && (!teamCStats || !match.teamCId)) return; // Skip incomplete 3-way matches
 
     if (match.status === 'completed') {
-      // Completed match - count full points
-      const holesData = match.holes.map(hole => ({
-        holeNumber: hole.number,
-        par: hole.par || 4,
-        teamAStrokes: hole.teamAScore ?? 0,
-        teamBStrokes: hole.teamBScore ?? 0
-      }));
+      if (match.isThreeWay && teamCStats) {
+        // 3-team stroke play match
+        const holesData = match.holes.map(hole => ({
+          holeNumber: hole.number,
+          par: hole.par || 4,
+          teamAStrokes: hole.teamAScore,
+          teamBStrokes: hole.teamBScore,
+          teamCStrokes: hole.teamCScore ?? null
+        }));
 
-      const result = calculateMatchPlayResult(holesData, 18);
-      
-      // Update match counts
-      teamAStats.matchesPlayed++;
-      teamBStats.matchesPlayed++;
+        const result = calculateThreeWayResult(holesData, 18);
+        
+        // Update match counts
+        teamAStats.matchesPlayed++;
+        teamBStats.matchesPlayed++;
+        teamCStats.matchesPlayed++;
 
-      // Update points and wins/losses using proper tournament point system
-      if (result.winner === 'teamA') {
+        // Award points based on finishing position in stroke play
+        const scores = [
+          { team: 'teamA', total: result.teamATotal, stats: teamAStats },
+          { team: 'teamB', total: result.teamBTotal, stats: teamBStats },
+          { team: 'teamC', total: result.teamCTotal, stats: teamCStats }
+        ].sort((a, b) => a.total - b.total);
+
+        // Award points: 1st place gets win points, 2nd gets tie points, 3rd gets 0
         const winPoints = getMatchPoints(match, 'win');
-        teamAStats.points += winPoints;
-        teamAStats.matchesWon++;
-        teamBStats.matchesLost++;
-        teamAStats.recentResults.unshift('W');
-        teamBStats.recentResults.unshift('L');
-      } else if (result.winner === 'teamB') {
-        const winPoints = getMatchPoints(match, 'win');
-        teamBStats.points += winPoints;
-        teamBStats.matchesWon++;
-        teamAStats.matchesLost++;
-        teamAStats.recentResults.unshift('L');
-        teamBStats.recentResults.unshift('W');
-      } else {
-        // Halved/Tied
         const tiePoints = getMatchPoints(match, 'tie');
-        teamAStats.points += tiePoints;
-        teamBStats.points += tiePoints;
-        teamAStats.matchesHalved++;
-        teamBStats.matchesHalved++;
-        teamAStats.recentResults.unshift('H');
-        teamBStats.recentResults.unshift('H');
-      }
 
-      // Count holes won/lost
-      teamAStats.holesWon += result.teamAHolesWon;
-      teamAStats.holesLost += result.teamBHolesWon;
-      teamBStats.holesWon += result.teamBHolesWon;
-      teamBStats.holesLost += result.teamAHolesWon;
+        scores[0].stats.points += winPoints; // 1st place
+        scores[0].stats.matchesWon++;
+        scores[0].stats.recentResults.unshift('W');
+
+        if (scores[0].total === scores[1].total) {
+          // Tie for 1st - both get tie points
+          scores[1].stats.points += tiePoints;
+          scores[1].stats.matchesHalved++;
+          scores[1].stats.recentResults.unshift('H');
+        } else {
+          scores[1].stats.points += tiePoints; // 2nd place
+          scores[1].stats.matchesHalved++;
+          scores[1].stats.recentResults.unshift('H');
+        }
+
+        if (scores[1].total === scores[2].total) {
+          // Tie for 2nd/3rd
+          scores[2].stats.points += tiePoints;
+          scores[2].stats.matchesHalved++;
+          scores[2].stats.recentResults.unshift('H');
+        } else {
+          scores[2].stats.matchesLost++; // 3rd place
+          scores[2].stats.recentResults.unshift('L');
+        }
+      } else {
+        // 2-team match play
+        const holesData = match.holes.map(hole => ({
+          holeNumber: hole.number,
+          par: hole.par || 4,
+          teamAStrokes: hole.teamAScore ?? 0,
+          teamBStrokes: hole.teamBScore ?? 0
+        }));
+
+        const result = calculateMatchPlayResult(holesData, 18);
+        
+        // Update match counts
+        teamAStats.matchesPlayed++;
+        teamBStats.matchesPlayed++;
+
+        // Update points and wins/losses using proper tournament point system
+        if (result.winner === 'teamA') {
+          const winPoints = getMatchPoints(match, 'win');
+          teamAStats.points += winPoints;
+          teamAStats.matchesWon++;
+          teamBStats.matchesLost++;
+          teamAStats.recentResults.unshift('W');
+          teamBStats.recentResults.unshift('L');
+        } else if (result.winner === 'teamB') {
+          const winPoints = getMatchPoints(match, 'win');
+          teamBStats.points += winPoints;
+          teamBStats.matchesWon++;
+          teamAStats.matchesLost++;
+          teamAStats.recentResults.unshift('L');
+          teamBStats.recentResults.unshift('W');
+        } else {
+          // Halved/Tied
+          const tiePoints = getMatchPoints(match, 'tie');
+          teamAStats.points += tiePoints;
+          teamBStats.points += tiePoints;
+          teamAStats.matchesHalved++;
+          teamBStats.matchesHalved++;
+          teamAStats.recentResults.unshift('H');
+          teamBStats.recentResults.unshift('H');
+        }
+
+        // Count holes won/lost
+        teamAStats.holesWon += result.teamAHolesWon;
+        teamAStats.holesLost += result.teamBHolesWon;
+        teamBStats.holesWon += result.teamBHolesWon;
+        teamBStats.holesLost += result.teamAHolesWon;
+      }
 
     } else if (match.status === 'in-progress') {
       // Live match - show current status AND award partial points for holes won
@@ -185,71 +241,135 @@ export function calculateLiveStandings(
       teamBStats.matchesInProgress++;
       teamAStats.recentResults.unshift('IP');
       teamBStats.recentResults.unshift('IP');
+      
+      if (match.isThreeWay && teamCStats) {
+        teamCStats.matchesInProgress++;
+        teamCStats.recentResults.unshift('IP');
+      }
 
       // Calculate current match status
-      const completedHoles = match.holes.filter(h => 
-        h.teamAScore !== null && h.teamBScore !== null
-      );
+      const completedHoles = match.isThreeWay 
+        ? match.holes.filter(h => h.teamAScore !== null && h.teamBScore !== null && h.teamCScore !== null)
+        : match.holes.filter(h => h.teamAScore !== null && h.teamBScore !== null);
 
       if (completedHoles.length > 0) {
-        const holesData = completedHoles.map(hole => ({
-          holeNumber: hole.number,
-          par: hole.par || 4,
-          teamAStrokes: hole.teamAScore ?? 0,
-          teamBStrokes: hole.teamBScore ?? 0
-        }));
+        if (match.isThreeWay && teamCStats) {
+          // 3-team stroke play live scoring
+          const holesData = completedHoles.map(hole => ({
+            holeNumber: hole.number,
+            par: hole.par || 4,
+            teamAStrokes: hole.teamAScore,
+            teamBStrokes: hole.teamBScore,
+            teamCStrokes: hole.teamCScore ?? null
+          }));
 
-        const liveResult = calculateMatchPlayResult(holesData, 18);
-        const teamAName = teams.find(t => t.id === match.teamAId)?.name || 'TeamA';
-        const teamBName = teams.find(t => t.id === match.teamBId)?.name || 'TeamB';
+          const liveResult = calculateThreeWayResult(holesData, 18);
+          const teamAName = teams.find(t => t.id === match.teamAId)?.name || 'TeamA';
+          const teamBName = teams.find(t => t.id === match.teamBId)?.name || 'TeamB';
+          const teamCName = teams.find(t => t.id === match.teamCId)?.name || 'TeamC';
 
-        // Create live status strings with hole progress
-        const holesPlayed = completedHoles.length;
-        if (liveResult.winner === 'teamA') {
-          teamAStats.liveMatchStatus.push(`${liveResult.result} vs ${teamBName} (${holesPlayed} holes)`);
-          teamBStats.liveMatchStatus.push(`${liveResult.result.replace('up', 'down')} vs ${teamAName} (${holesPlayed} holes)`);
-        } else if (liveResult.winner === 'teamB') {
-          teamBStats.liveMatchStatus.push(`${liveResult.result} vs ${teamAName} (${holesPlayed} holes)`);
-          teamAStats.liveMatchStatus.push(`${liveResult.result.replace('up', 'down')} vs ${teamBName} (${holesPlayed} holes)`);
+          // Create live status strings
+          const holesPlayed = completedHoles.length;
+          teamAStats.liveMatchStatus.push(`3-way: ${liveResult.result} (${holesPlayed} holes)`);
+          teamBStats.liveMatchStatus.push(`3-way: ${liveResult.result} (${holesPlayed} holes)`);
+          teamCStats.liveMatchStatus.push(`3-way: ${liveResult.result} (${holesPlayed} holes)`);
+
+          // Award live points based on current position
+          const scores = [
+            { team: 'teamA', total: liveResult.teamATotal, stats: teamAStats },
+            { team: 'teamB', total: liveResult.teamBTotal, stats: teamBStats },
+            { team: 'teamC', total: liveResult.teamCTotal, stats: teamCStats }
+          ].sort((a, b) => a.total - b.total);
+
+          const fullSessionPoints = getMatchPoints(match, 'win');
+          const halfSessionPoints = getMatchPoints(match, 'tie');
+
+          // Reset match counts for live scoring
+          scores.forEach(s => {
+            s.stats.matchesWon = 0;
+            s.stats.matchesLost = 0;
+            s.stats.matchesHalved = 0;
+          });
+
+          // Award live points: leader gets full, others get partial
+          scores[0].stats.points += fullSessionPoints; // 1st place
+          scores[0].stats.matchesWon++;
+
+          if (scores[0].total === scores[1].total) {
+            scores[1].stats.points += halfSessionPoints;
+            scores[1].stats.matchesHalved++;
+          } else {
+            scores[1].stats.points += halfSessionPoints;
+            scores[1].stats.matchesHalved++;
+          }
+
+          if (scores[1].total === scores[2].total) {
+            scores[2].stats.points += halfSessionPoints;
+            scores[2].stats.matchesHalved++;
+          } else {
+            scores[2].stats.matchesLost++;
+          }
         } else {
-          teamAStats.liveMatchStatus.push(`AS vs ${teamBName} (${holesPlayed} holes)`);
-          teamBStats.liveMatchStatus.push(`AS vs ${teamAName} (${holesPlayed} holes)`);
-        }
+          // 2-team match play live scoring
+          const holesData = completedHoles.map(hole => ({
+            holeNumber: hole.number,
+            par: hole.par || 4,
+            teamAStrokes: hole.teamAScore ?? 0,
+            teamBStrokes: hole.teamBScore ?? 0
+          }));
 
-        // Count holes won/lost so far
-        teamAStats.holesWon += liveResult.teamAHolesWon;
-        teamAStats.holesLost += liveResult.teamBHolesWon;
-        teamBStats.holesWon += liveResult.teamBHolesWon;
-        teamBStats.holesLost += liveResult.teamAHolesWon;
+          const liveResult = calculateMatchPlayResult(holesData, 18);
+          const teamAName = teams.find(t => t.id === match.teamAId)?.name || 'TeamA';
+          const teamBName = teams.find(t => t.id === match.teamBId)?.name || 'TeamB';
 
-        // CRITICAL REAL-TIME SCORING LOGIC:
-        // Team that is UP = Gets FULL session points
-        // Team that is DOWN = Gets 0 points  
-        // If ALL SQUARE = Both teams get HALF session points
-        const holeAdvantage = liveResult.teamAHolesWon - liveResult.teamBHolesWon;
-        const fullSessionPoints = getMatchPoints(match, 'win');
-        const halfSessionPoints = getMatchPoints(match, 'tie');
-        
-        if (holeAdvantage > 0) {
-          // Team A is UP (leading) = Gets FULL session points
-          teamAStats.points += fullSessionPoints;
-          // Team B is DOWN (trailing) = Gets 0 points (no points added)
-          // REAL-TIME WIN: Team A is currently winning this match
-          teamAStats.matchesWon++;
-          teamBStats.matchesLost++;
-        } else if (holeAdvantage < 0) {
-          // Team B is UP (leading) = Gets FULL session points
-          teamBStats.points += fullSessionPoints;
-          // Team A is DOWN (trailing) = Gets 0 points (no points added)
-          // REAL-TIME WIN: Team B is currently winning this match
-          teamBStats.matchesWon++;
-          teamAStats.matchesLost++;
-        } else {
-          // ALL SQUARE (tied) = Both teams get HALF session points
-          teamAStats.points += halfSessionPoints;
-          teamBStats.points += halfSessionPoints;
-          teamAStats.matchesHalved++;
-          teamBStats.matchesHalved++;
+          // Create live status strings with hole progress
+          const holesPlayed = completedHoles.length;
+          if (liveResult.winner === 'teamA') {
+            teamAStats.liveMatchStatus.push(`${liveResult.result} vs ${teamBName} (${holesPlayed} holes)`);
+            teamBStats.liveMatchStatus.push(`${liveResult.result.replace('up', 'down')} vs ${teamAName} (${holesPlayed} holes)`);
+          } else if (liveResult.winner === 'teamB') {
+            teamBStats.liveMatchStatus.push(`${liveResult.result} vs ${teamAName} (${holesPlayed} holes)`);
+            teamAStats.liveMatchStatus.push(`${liveResult.result.replace('up', 'down')} vs ${teamBName} (${holesPlayed} holes)`);
+          } else {
+            teamAStats.liveMatchStatus.push(`AS vs ${teamBName} (${holesPlayed} holes)`);
+            teamBStats.liveMatchStatus.push(`AS vs ${teamAName} (${holesPlayed} holes)`);
+          }
+
+          // Count holes won/lost so far
+          teamAStats.holesWon += liveResult.teamAHolesWon;
+          teamAStats.holesLost += liveResult.teamBHolesWon;
+          teamBStats.holesWon += liveResult.teamBHolesWon;
+          teamBStats.holesLost += liveResult.teamAHolesWon;
+
+          // CRITICAL REAL-TIME SCORING LOGIC:
+          // Team that is UP = Gets FULL session points
+          // Team that is DOWN = Gets 0 points  
+          // If ALL SQUARE = Both teams get HALF session points
+          const holeAdvantage = liveResult.teamAHolesWon - liveResult.teamBHolesWon;
+          const fullSessionPoints = getMatchPoints(match, 'win');
+          const halfSessionPoints = getMatchPoints(match, 'tie');
+          
+          if (holeAdvantage > 0) {
+            // Team A is UP (leading) = Gets FULL session points
+            teamAStats.points += fullSessionPoints;
+            // Team B is DOWN (trailing) = Gets 0 points (no points added)
+            // REAL-TIME WIN: Team A is currently winning this match
+            teamAStats.matchesWon++;
+            teamBStats.matchesLost++;
+          } else if (holeAdvantage < 0) {
+            // Team B is UP (leading) = Gets FULL session points
+            teamBStats.points += fullSessionPoints;
+            // Team A is DOWN (trailing) = Gets 0 points (no points added)
+            // REAL-TIME WIN: Team B is currently winning this match
+            teamBStats.matchesWon++;
+            teamAStats.matchesLost++;
+          } else {
+            // ALL SQUARE (tied) = Both teams get HALF session points
+            teamAStats.points += halfSessionPoints;
+            teamBStats.points += halfSessionPoints;
+            teamAStats.matchesHalved++;
+            teamBStats.matchesHalved++;
+          }
         }
       }
     }
@@ -257,6 +377,9 @@ export function calculateLiveStandings(
     // Keep only last 5 results
     teamAStats.recentResults = teamAStats.recentResults.slice(0, 5);
     teamBStats.recentResults = teamBStats.recentResults.slice(0, 5);
+    if (match.isThreeWay && teamCStats) {
+      teamCStats.recentResults = teamCStats.recentResults.slice(0, 5);
+    }
   });
 
   // Calculate sessions played for each team (not individual matches)

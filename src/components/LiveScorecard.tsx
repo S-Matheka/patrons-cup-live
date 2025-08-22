@@ -8,9 +8,10 @@ interface LiveScorecardProps {
   match: Match;
   teamA: Team;
   teamB: Team | null;
+  teamC?: Team | null; // For 3-way matches
 }
 
-const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) => {
+const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, teamC }) => {
   const getScoreIndicator = (strokes: number | null, par: number) => {
     if (strokes === null) return null;
     
@@ -35,13 +36,15 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
     }
   };
 
-  const calculateStrokeDifferential = (holes: Hole[], teamKey: 'teamA' | 'teamB') => {
+  const calculateStrokeDifferential = (holes: Hole[], teamKey: 'teamA' | 'teamB' | 'teamC') => {
     let totalStrokes = 0;
     let totalPar = 0;
     
     holes.forEach(hole => {
-      const strokes = teamKey === 'teamA' ? hole.teamAScore : hole.teamBScore;
-      if (strokes !== null) {
+      const strokes = teamKey === 'teamA' ? hole.teamAScore : 
+                     teamKey === 'teamB' ? hole.teamBScore : 
+                     hole.teamCScore;
+      if (strokes !== null && strokes !== undefined) {
         totalStrokes += strokes;
         totalPar += hole.par;
       }
@@ -192,10 +195,33 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
               <div className="text-xs text-gray-500">Score</div>
             </div>
           </div>
+          
+          {match.isThreeWay && teamC && (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div 
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+                  style={{ backgroundColor: teamC.color }}
+                >
+                  {teamC.logo}
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-bold text-gray-900 text-sm truncate">{teamC.name}</h3>
+                  <p className="text-xs text-gray-600 truncate">{teamC.description}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-lg font-bold text-green-600">
+                  {calculateStrokeDifferential(match.holes, 'teamC')}
+                </div>
+                <div className="text-xs text-gray-500">Score</div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Desktop Layout */}
-        <div className="hidden sm:grid sm:grid-cols-2 gap-6">
+        <div className={`hidden sm:grid gap-6 ${match.isThreeWay && teamC ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}>
           <div className="flex items-center space-x-4">
             <div 
               className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0"
@@ -212,21 +238,39 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
             </div>
           </div>
 
-          <div className="flex items-center space-x-4 justify-end">
-            <div className="text-right min-w-0">
-              <h3 className="font-bold text-gray-900">{teamB.name}</h3>
-              <p className="text-sm text-gray-600 truncate">{teamB.description}</p>
-              <div className="text-xl font-bold text-green-600">
-                {calculateStrokeDifferential(match.holes, 'teamB')}
-              </div>
-            </div>
+          <div className={`flex items-center space-x-4 ${!match.isThreeWay ? 'justify-end' : ''}`}>
             <div 
               className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0"
               style={{ backgroundColor: teamB.color }}
             >
               {teamB.logo}
             </div>
+            <div className="min-w-0">
+              <h3 className="font-bold text-gray-900">{teamB.name}</h3>
+              <p className="text-sm text-gray-600 truncate">{teamB.description}</p>
+              <div className="text-xl font-bold text-green-600">
+                {calculateStrokeDifferential(match.holes, 'teamB')}
+              </div>
+            </div>
           </div>
+          
+          {match.isThreeWay && teamC && (
+            <div className="flex items-center space-x-4 justify-end">
+              <div className="text-right min-w-0">
+                <h3 className="font-bold text-gray-900">{teamC.name}</h3>
+                <p className="text-sm text-gray-600 truncate">{teamC.description}</p>
+                <div className="text-xl font-bold text-green-600">
+                  {calculateStrokeDifferential(match.holes, 'teamC')}
+                </div>
+              </div>
+              <div 
+                className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0"
+                style={{ backgroundColor: teamC.color }}
+              >
+                {teamC.logo}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -239,6 +283,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
           {match.holes.map((hole, index) => {
             const teamAIndicator = getScoreIndicator(hole.teamAScore, hole.par);
             const teamBIndicator = getScoreIndicator(hole.teamBScore, hole.par);
+            const teamCIndicator = teamC ? getScoreIndicator(hole.teamCScore, hole.par) : null;
             
             return (
               <div key={hole.number} className="border rounded-lg p-3 bg-gray-50">
@@ -257,7 +302,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className={`grid gap-4 ${match.isThreeWay && teamC ? 'grid-cols-3' : 'grid-cols-2'}`}>
                   <div className="text-center">
                     <div className="text-xs text-gray-600 mb-1">{teamA.name}</div>
                     <div className="flex items-center justify-center space-x-2">
@@ -293,6 +338,26 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
                       )}
                     </div>
                   </div>
+                  
+                  {match.isThreeWay && teamC && (
+                    <div className="text-center">
+                      <div className="text-xs text-gray-600 mb-1">{teamC.name}</div>
+                      <div className="flex items-center justify-center space-x-2">
+                        {hole.teamCScore !== null && hole.teamCScore !== undefined ? (
+                          <>
+                            <span className="text-lg font-bold text-gray-900">{hole.teamCScore}</span>
+                            {teamCIndicator && (
+                              <span className={`px-1.5 py-0.5 rounded text-xs ${teamCIndicator.class}`}>
+                                {teamCIndicator.symbol}
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-gray-400 text-lg">-</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -308,6 +373,9 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
                 <th className="text-center py-3 px-2 font-semibold text-gray-700">Par</th>
                 <th className="text-center py-3 px-2 font-semibold text-gray-700">{teamA.name}</th>
                 <th className="text-center py-3 px-2 font-semibold text-gray-700">{teamB.name}</th>
+                {match.isThreeWay && teamC && (
+                  <th className="text-center py-3 px-2 font-semibold text-gray-700">{teamC.name}</th>
+                )}
                 <th className="text-center py-3 px-2 font-semibold text-gray-700">Status</th>
               </tr>
             </thead>
@@ -317,6 +385,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
                 .map((hole, index) => {
                 const teamAIndicator = getScoreIndicator(hole.teamAScore, hole.par);
                 const teamBIndicator = getScoreIndicator(hole.teamBScore, hole.par);
+                const teamCIndicator = teamC ? getScoreIndicator(hole.teamCScore, hole.par) : null;
                 
                 return (
                   <tr key={hole.number} className="border-b border-gray-100 hover:bg-blue-50 transition-colors">
@@ -350,6 +419,22 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
                         <span className="text-gray-400 text-lg">-</span>
                       )}
                     </td>
+                    {match.isThreeWay && teamC && (
+                      <td className="text-center py-4 px-2">
+                        {hole.teamCScore !== null && hole.teamCScore !== undefined ? (
+                          <div className="flex items-center justify-center space-x-2">
+                            <span className="font-bold text-lg">{hole.teamCScore}</span>
+                            {teamCIndicator && (
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${teamCIndicator.class}`}>
+                                {teamCIndicator.symbol}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-lg">-</span>
+                        )}
+                      </td>
+                    )}
                     <td className="text-center py-4 px-2">
                       {getHoleStatus(hole)}
                     </td>

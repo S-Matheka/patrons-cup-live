@@ -33,6 +33,7 @@ export default function MatchDetail() {
 
   const teamA = getTeamById(match.teamAId);
   const teamB = getTeamById(match.teamBId);
+  const teamC = match.teamCId ? getTeamById(match.teamCId) : null;
 
   // Get match players using the EXACT same logic as live scoring page
   const getMatchPlayers = (teamId: number, count: number = 2) => {
@@ -165,9 +166,9 @@ export default function MatchDetail() {
               </div>
             </div>
             
-            {/* VS Divider */}
+            {/* VS/3-WAY Divider */}
             <div className="text-center py-2">
-              <div className="text-2xl font-bold text-white">VS</div>
+              <div className="text-2xl font-bold text-white">{match.isThreeWay ? '3-WAY' : 'VS'}</div>
             </div>
             
             {/* Team B */}
@@ -191,6 +192,36 @@ export default function MatchDetail() {
                 </div>
               </div>
             </div>
+            
+            {/* Team C (for 3-way matches) */}
+            {match.isThreeWay && teamC && (
+              <>
+                <div className="text-center py-2">
+                  <div className="text-2xl font-bold text-white">VS</div>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div 
+                      className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0"
+                      style={{ backgroundColor: teamC.color }}
+                    >
+                      {teamC.logo}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-bold text-white text-lg truncate">{teamC.name}</div>
+                      <div className="text-green-100 text-sm truncate">{teamC.description}</div>
+                      <div className="text-green-100 text-xs mt-1">
+                        {getMatchPlayers(match.teamCId, match.type === 'Singles' ? 1 : 2).length > 0 
+                          ? getMatchPlayers(match.teamCId, match.type === 'Singles' ? 1 : 2).map(p => `${p.name}${p.isPro ? ' (Pro)' : ''}${p.isJunior ? ' (Jnr)' : ''}`).join(', ')
+                          : 'Players TBD'
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
             
             {/* Status */}
             <div className="text-center pt-2 border-t border-green-500">
@@ -222,11 +253,11 @@ export default function MatchDetail() {
               </div>
               
               <div className="text-center px-6">
-                <div className="text-3xl font-bold text-white">VS</div>
+                <div className="text-3xl font-bold text-white">{match.isThreeWay ? '3-WAY' : 'VS'}</div>
               </div>
               
               <div className="flex items-center space-x-4">
-                <div className="text-right min-w-0">
+                <div className={`${match.isThreeWay ? 'text-center' : 'text-right'} min-w-0`}>
                   <div className="font-bold text-white text-xl truncate">{teamB.name}</div>
                   <div className="text-green-100 text-sm truncate">{teamB.description}</div>
                   <div className="text-green-100 text-xs mt-1">
@@ -243,6 +274,34 @@ export default function MatchDetail() {
                   {teamB.logo}
                 </div>
               </div>
+              
+              {/* Team C (for 3-way matches) */}
+              {match.isThreeWay && teamC && (
+                <>
+                  <div className="text-center px-6">
+                    <div className="text-3xl font-bold text-white">VS</div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-4">
+                    <div className="text-center min-w-0">
+                      <div className="font-bold text-white text-xl truncate">{teamC.name}</div>
+                      <div className="text-green-100 text-sm truncate">{teamC.description}</div>
+                      <div className="text-green-100 text-xs mt-1">
+                        {getMatchPlayers(match.teamCId, match.type === 'Singles' ? 1 : 2).length > 0 
+                          ? getMatchPlayers(match.teamCId, match.type === 'Singles' ? 1 : 2).map(p => `${p.name}${p.isPro ? ' (Pro)' : ''}${p.isJunior ? ' (Jnr)' : ''}`).join(', ')
+                          : 'Players TBD'
+                        }
+                      </div>
+                    </div>
+                    <div 
+                      className="w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold flex-shrink-0"
+                      style={{ backgroundColor: teamC.color }}
+                    >
+                      {teamC.logo}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
             
             <div className="text-center ml-6">
@@ -258,6 +317,7 @@ export default function MatchDetail() {
         match={match}
         teamA={teamA}
         teamB={teamB}
+        teamC={teamC}
       />
     </div>
   );

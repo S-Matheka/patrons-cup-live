@@ -15,6 +15,16 @@ export interface MatchPlayResult {
   holesHalved: number;
 }
 
+export interface ThreeWayResult {
+  status: 'in-progress' | 'completed';
+  result: string; // e.g., "Team A leads by 2", "All teams tied"
+  leader: 'teamA' | 'teamB' | 'teamC' | 'tied' | null;
+  teamATotal: number;
+  teamBTotal: number;
+  teamCTotal: number;
+  holesCompleted: number;
+}
+
 /**
  * Calculate match play result based on hole-by-hole scores
  */
@@ -175,3 +185,78 @@ export function formatMatchPlayScore(result: MatchPlayResult): string {
  * 
  * And so on...
  */
+
+/**
+ * Calculate 3-team stroke play result (for Foursomes)
+ */
+export function calculateThreeWayResult(
+  holes: Array<{
+    holeNumber: number;
+    par: number;
+    teamAStrokes: number | null;
+    teamBStrokes: number | null;
+    teamCStrokes: number | null;
+  }>,
+  totalHoles: number = 18
+): ThreeWayResult {
+  let teamATotal = 0;
+  let teamBTotal = 0;
+  let teamCTotal = 0;
+  let holesCompleted = 0;
+
+  // Calculate total scores for completed holes
+  holes.forEach(hole => {
+    if (hole.teamAStrokes !== null && hole.teamBStrokes !== null && hole.teamCStrokes !== null) {
+      teamATotal += hole.teamAStrokes;
+      teamBTotal += hole.teamBStrokes;
+      teamCTotal += hole.teamCStrokes;
+      holesCompleted++;
+    }
+  });
+
+  const status: 'in-progress' | 'completed' = holesCompleted === totalHoles ? 'completed' : 'in-progress';
+  
+  // Determine leader
+  let leader: 'teamA' | 'teamB' | 'teamC' | 'tied' | null = null;
+  let result = '';
+
+  if (holesCompleted === 0) {
+    result = 'Not Started';
+    leader = null;
+  } else {
+    // Find the lowest score (leader in stroke play)
+    const scores = [
+      { team: 'teamA', total: teamATotal },
+      { team: 'teamB', total: teamBTotal },
+      { team: 'teamC', total: teamCTotal }
+    ];
+    
+    scores.sort((a, b) => a.total - b.total);
+    
+    const lowestScore = scores[0].total;
+    const leadersCount = scores.filter(s => s.total === lowestScore).length;
+    
+    if (leadersCount === 3) {
+      leader = 'tied';
+      result = 'All Teams Tied';
+    } else if (leadersCount === 2) {
+      const tiedTeams = scores.filter(s => s.total === lowestScore).map(s => s.team);
+      result = `${tiedTeams.join(' & ')} Tied for Lead`;
+      leader = 'tied';
+    } else {
+      leader = scores[0].team as 'teamA' | 'teamB' | 'teamC';
+      const leadMargin = scores[1].total - scores[0].total;
+      result = `${scores[0].team.toUpperCase()} leads by ${leadMargin}`;
+    }
+  }
+
+  return {
+    status,
+    result,
+    leader,
+    teamATotal,
+    teamBTotal,
+    teamCTotal,
+    holesCompleted
+  };
+}

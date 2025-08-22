@@ -3,7 +3,7 @@
 import { Match, Team, Hole } from '@/types';
 import { Save, Edit, CheckCircle, Circle, Clock, Play, AlertTriangle, Lock, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
-import { calculateMatchPlayResult, getMatchStatusDescription, formatMatchPlayScore } from '@/utils/matchPlayScoring';
+import { calculateMatchPlayResult, getMatchStatusDescription, formatMatchPlayScore, calculateThreeWayResult, ThreeWayResult } from '@/utils/matchPlayScoring';
 import { canScoreMatch, MatchTimingInfo } from '@/utils/matchTiming';
 import { useAuth } from '@/context/AuthContext';
 import { useTournament } from '@/context/TournamentContext';
@@ -42,33 +42,59 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
   );
 
   const calculateMatchStatus = () => {
-    // Convert holes to the format expected by the match play calculator
-    const holesData = match.holes.map(hole => ({
-      holeNumber: hole.number,
-      par: hole.par || 4, // Default to par 4 if not specified
-      teamAStrokes: hole.teamAScore ?? 0, // Use teamAScore (null coalescing for proper null check)
-      teamBStrokes: hole.teamBScore ?? 0  // Use teamBScore (null coalescing for proper null check)
-    }));
+    if (match.isThreeWay && teamC) {
+      // 3-team stroke play scoring
+      const holesData = match.holes.map(hole => ({
+        holeNumber: hole.number,
+        par: hole.par || 4,
+        teamAStrokes: hole.teamAScore,
+        teamBStrokes: hole.teamBScore,
+        teamCStrokes: hole.teamCScore
+      }));
 
-    const result = calculateMatchPlayResult(holesData, 18);
-    
-    // Format the match play result for display with actual team names
-    const score = formatMatchPlayScore(result);
-    
-    if (result.status === 'completed') {
-      if (result.winner === 'halved') {
-        return 'Match Halved (AS)';
+      const result = calculateThreeWayResult(holesData, 18);
+      
+      if (result.status === 'completed') {
+        if (result.leader === 'tied') {
+          return result.result; // "All Teams Tied" or "Team A & Team B Tied for Lead"
+        } else {
+          const winnerName = result.leader === 'teamA' ? teamA.name : 
+                           result.leader === 'teamB' ? teamB.name : 
+                           teamC.name;
+          return `${winnerName} wins (${result.result})`;
+        }
       } else {
-        const winnerName = result.winner === 'teamA' ? teamA.name : teamB.name;
-        return `${winnerName} wins ${score}`;
+        return result.result; // "Team A leads by 2" etc.
       }
     } else {
-      // Match in progress
-      if (result.result === 'AS') {
-        return 'All Square';
+      // 2-team match play scoring
+      const holesData = match.holes.map(hole => ({
+        holeNumber: hole.number,
+        par: hole.par || 4,
+        teamAStrokes: hole.teamAScore ?? 0,
+        teamBStrokes: hole.teamBScore ?? 0
+      }));
+
+      const result = calculateMatchPlayResult(holesData, 18);
+      
+      // Format the match play result for display with actual team names
+      const score = formatMatchPlayScore(result);
+      
+      if (result.status === 'completed') {
+        if (result.winner === 'halved') {
+          return 'Match Halved (AS)';
+        } else {
+          const winnerName = result.winner === 'teamA' ? teamA.name : teamB.name;
+          return `${winnerName} wins ${score}`;
+        }
       } else {
-        const leaderName = result.teamAHolesWon > result.teamBHolesWon ? teamA.name : teamB.name;
-        return `${leaderName} ${score}`;
+        // Match in progress
+        if (result.result === 'AS') {
+          return 'All Square';
+        } else {
+          const leaderName = result.teamAHolesWon > result.teamBHolesWon ? teamA.name : teamB.name;
+          return `${leaderName} ${score}`;
+        }
       }
     }
   };

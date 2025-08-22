@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Clock, CheckCircle, Circle, ExternalLink, Filter, Calendar, Users, Trophy, Medal } from 'lucide-react';
 import Leaderboard from '@/components/Leaderboard';
 import TournamentCountdown from '@/components/TournamentCountdown';
+import { calculateThreeWayResult } from '@/utils/matchPlayScoring';
 import Link from 'next/link';
 
 export default function LiveScoring() {
@@ -66,38 +67,73 @@ export default function LiveScoring() {
   };
 
   const calculateMatchResult = (match: Match) => {
-    let teamAWins = 0;
-    let teamBWins = 0;
-    let holesPlayed = 0;
+    if (match.isThreeWay) {
+      // 3-team stroke play scoring
+      const holesData = match.holes.map(hole => ({
+        holeNumber: hole.number,
+        par: hole.par || 4,
+        teamAStrokes: hole.teamAScore,
+        teamBStrokes: hole.teamBScore,
+        teamCStrokes: hole.teamCScore
+      }));
 
-    match.holes.forEach((hole: Hole) => {
-      if (hole.teamAScore !== null && hole.teamBScore !== null) {
-        holesPlayed++;
-        if (hole.teamAScore < hole.teamBScore) {
-          teamAWins++;
-        } else if (hole.teamBScore < hole.teamAScore) {
-          teamBWins++;
-        }
+      const result = calculateThreeWayResult(holesData, 18);
+      
+      if (result.holesCompleted === 0) return 'Not Started';
+      
+      const teamA = teams.find(t => t.id === match.teamAId);
+      const teamB = teams.find(t => t.id === match.teamBId);
+      const teamC = teams.find(t => t.id === match.teamCId);
+      
+      if (result.leader === 'tied') {
+        return result.result; // "All Teams Tied" or specific tie message
+      } else {
+        const leaderName = result.leader === 'teamA' ? teamA?.name : 
+                          result.leader === 'teamB' ? teamB?.name : 
+                          teamC?.name;
+        const leadMargin = result.leader === 'teamA' ? 
+          Math.min(result.teamBTotal - result.teamATotal, result.teamCTotal - result.teamATotal) :
+          result.leader === 'teamB' ?
+          Math.min(result.teamATotal - result.teamBTotal, result.teamCTotal - result.teamBTotal) :
+          Math.min(result.teamATotal - result.teamCTotal, result.teamBTotal - result.teamCTotal);
+        
+        return `${leaderName} leads by ${leadMargin}`;
       }
-    });
+    } else {
+      // 2-team match play scoring
+      let teamAWins = 0;
+      let teamBWins = 0;
+      let holesPlayed = 0;
 
-    if (holesPlayed === 0) return 'Not Started';
-    
-    const teamA = teams.find(t => t.id === match.teamAId);
-    const teamB = teams.find(t => t.id === match.teamBId);
-    
-    if (holesPlayed === 9 || holesPlayed === 18) {
-      if (teamAWins > teamBWins) return `${teamA?.name || 'Team A'} ${teamAWins - teamBWins} UP`;
-      if (teamBWins > teamAWins) return `${teamB?.name || 'Team B'} ${teamBWins - teamAWins} UP`;
+      match.holes.forEach((hole: Hole) => {
+        if (hole.teamAScore !== null && hole.teamBScore !== null) {
+          holesPlayed++;
+          if (hole.teamAScore < hole.teamBScore) {
+            teamAWins++;
+          } else if (hole.teamBScore < hole.teamAScore) {
+            teamBWins++;
+          }
+        }
+      });
+
+      if (holesPlayed === 0) return 'Not Started';
+      
+      const teamA = teams.find(t => t.id === match.teamAId);
+      const teamB = teams.find(t => t.id === match.teamBId);
+      
+      if (holesPlayed === 9 || holesPlayed === 18) {
+        if (teamAWins > teamBWins) return `${teamA?.name || 'Team A'} ${teamAWins - teamBWins} UP`;
+        if (teamBWins > teamAWins) return `${teamB?.name || 'Team B'} ${teamBWins - teamAWins} UP`;
+        return 'ALL SQUARE';
+      }
+      
+      if (teamAWins > teamBWins) {
+        return `${teamA?.name || 'Team A'} ${teamAWins - teamBWins} UP`;
+      } else if (teamBWins > teamAWins) {
+        return `${teamB?.name || 'Team B'} ${teamBWins - teamAWins} UP`;
+      }
       return 'ALL SQUARE';
     }
-    
-    if (teamAWins > teamBWins) {
-      return `${teamA?.name || 'Team A'} ${teamAWins - teamBWins} UP`;
-    } else if (teamBWins > teamAWins) {
-      return `${teamB?.name || 'Team B'} ${teamBWins - teamAWins} UP`;
-    }
-    return 'ALL SQUARE';
   };
 
   // Helper function to get actual assigned players or sample players for a match

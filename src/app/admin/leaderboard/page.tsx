@@ -311,9 +311,9 @@ export default function AdminLeaderboardPage() {
                     <th className="text-left py-3 px-4 font-medium text-gray-600">Team</th>
                     <th className="text-center py-3 px-4 font-medium text-gray-600">Points</th>
                     <th className="text-center py-3 px-4 font-medium text-gray-600">Played</th>
-                    <th className="text-center py-3 px-4 font-medium text-gray-600">Won</th>
-                    <th className="text-center py-3 px-4 font-medium text-gray-600">Lost</th>
-                    <th className="text-center py-3 px-4 font-medium text-gray-600">Halved</th>
+                    <th className="text-center py-3 px-4 font-medium text-gray-600">Wins</th>
+                    <th className="text-center py-3 px-4 font-medium text-gray-600">Loss</th>
+                    <th className="text-center py-3 px-4 font-medium text-gray-600">Tied</th>
                     <th className="text-center py-3 px-4 font-medium text-gray-600">Holes +/-</th>
                     <th className="text-center py-3 px-4 font-medium text-gray-600">Actions</th>
                   </tr>

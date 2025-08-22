@@ -42,9 +42,7 @@ export interface Player {
   id: number;
   name: string;
   teamId: number;
-  handicap: number;
-  email: string;
-  phone: string;
+  position?: string;
   isPro?: boolean;
   isExOfficio?: boolean;
   isJunior?: boolean;

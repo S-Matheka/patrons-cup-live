@@ -40,8 +40,8 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
     const holesData = match.holes.map(hole => ({
       holeNumber: hole.number,
       par: hole.par || 4, // Default to par 4 if not specified
-      teamAStrokes: hole.teamAScore || 0, // Use teamAScore instead of teamAStrokes
-      teamBStrokes: hole.teamBScore || 0  // Use teamBScore instead of teamBStrokes
+      teamAStrokes: hole.teamAScore ?? 0, // Use teamAScore (null coalescing for proper null check)
+      teamBStrokes: hole.teamBScore ?? 0  // Use teamBScore (null coalescing for proper null check)
     }));
 
     const result = calculateMatchPlayResult(holesData, 18);
@@ -123,8 +123,8 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, onSave }) =>
       const holesData = updatedHoles.map(hole => ({
         holeNumber: hole.number,
         par: hole.par || 4,
-        teamAStrokes: hole.teamAScore || 0, // Use teamAScore
-        teamBStrokes: hole.teamBScore || 0  // Use teamBScore
+        teamAStrokes: hole.teamAScore ?? 0, // Use teamAScore (null coalescing for proper null check)
+        teamBStrokes: hole.teamBScore ?? 0  // Use teamBScore (null coalescing for proper null check)
       }));
 
       const matchPlayResult = calculateMatchPlayResult(holesData, 18);

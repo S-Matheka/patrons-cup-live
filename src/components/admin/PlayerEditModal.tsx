@@ -28,14 +28,10 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
       setFormData({
         name: '',
         teamId: teamId || 0,
-        handicap: 0,
         isPro: false,
         isExOfficio: false,
         isJunior: false,
-        email: '',
-        phone: '',
-        position: '',
-        medicalInfo: ''
+        position: ''
       });
     }
     setErrors({});
@@ -50,36 +46,35 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
     if (!formData.teamId || formData.teamId <= 0) {
       newErrors.teamId = 'Team is required';
     }
-    if (formData.handicap === undefined || formData.handicap < 0) {
-      newErrors.handicap = 'Handicap must be 0 or greater';
-    }
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSave = async () => {
-    if (!validateForm()) return;
+    console.log('🔄 Starting save process...', { formData });
+    
+    if (!validateForm()) {
+      console.log('❌ Validation failed', errors);
+      return;
+    }
 
     setIsLoading(true);
     try {
       // Prepare player data - exclude ID for new records
       const playerData = {
-        name: formData.name,
+        name: formData.name?.trim(),
         team_id: formData.teamId,
-        handicap: formData.handicap,
-        is_pro: formData.isPro,
-        is_ex_officio: formData.isExOfficio,
-        is_junior: formData.isJunior,
-        email: formData.email || null,
-        phone: formData.phone || null,
+        is_pro: formData.isPro || false,
+        is_ex_officio: formData.isExOfficio || false,
+        is_junior: formData.isJunior || false,
+        position: formData.position || null,
         updated_at: new Date().toISOString()
         // Note: ID is intentionally excluded - it should be auto-generated for new records
       };
 
+      console.log('📊 Player data to save:', playerData);
+      
       const adminClient = getAdminClient();
       if (!adminClient) {
         throw new Error('Admin client not available');
@@ -88,6 +83,7 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
       let result;
       if (player?.id) {
         // Update existing player
+        console.log('🔄 Updating existing player:', player.id);
         result = await adminClient
           .from('players')
           .update(playerData)
@@ -96,12 +92,15 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
           .single();
       } else {
         // Create new player
+        console.log('🔄 Creating new player');
         result = await adminClient
           .from('players')
           .insert(playerData)
           .select()
           .single();
       }
+      
+      console.log('📊 Database result:', result);
 
       if (result.error) throw result.error;
 
@@ -110,19 +109,27 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
         id: result.data.id,
         name: result.data.name,
         teamId: result.data.team_id,
-        handicap: result.data.handicap,
-        isPro: result.data.is_pro,
-        isExOfficio: result.data.is_ex_officio,
-        isJunior: result.data.is_junior,
-        email: result.data.email,
-        phone: result.data.phone
+        isPro: result.data.is_pro || false,
+        isExOfficio: result.data.is_ex_officio || false,
+        isJunior: result.data.is_junior || false,
+        position: result.data.position
       };
 
+      console.log('✅ Player saved successfully:', savedPlayer);
       onSave(savedPlayer);
       onClose();
+      
     } catch (error) {
-      console.error('Error saving player:', error);
-      setErrors({ general: 'Failed to save player. Please try again.' });
+      console.error('❌ Error saving player:', error);
+      let errorMessage = 'Failed to save player. Please try again.';
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'object' && error !== null && 'message' in error) {
+        errorMessage = (error as any).message;
+      }
+      
+      setErrors({ general: errorMessage });
     } finally {
       setIsLoading(false);
     }
@@ -218,49 +225,7 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
             {errors.teamId && <p className="text-red-500 text-sm mt-1">{errors.teamId}</p>}
           </div>
 
-          {/* Handicap */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Handicap *</label>
-            <input
-              type="number"
-              min="0"
-              max="54"
-              step="0.1"
-              className={`mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                errors.handicap ? 'border-red-300' : 'border-gray-300'
-              }`}
-              value={formData.handicap || ''}
-              onChange={(e) => setFormData({ ...formData, handicap: parseFloat(e.target.value) || 0 })}
-            />
-            {errors.handicap && <p className="text-red-500 text-sm mt-1">{errors.handicap}</p>}
-          </div>
 
-          {/* Contact Information */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Email</label>
-              <input
-                type="email"
-                className={`mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                  errors.email ? 'border-red-300' : 'border-gray-300'
-                }`}
-                value={formData.email || ''}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="player@email.com"
-              />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Phone</label>
-              <input
-                type="tel"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                value={formData.phone || ''}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="+254 xxx xxx xxx"
-              />
-            </div>
-          </div>
 
           {/* Position/Role */}
           <div>
@@ -313,18 +278,7 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
             </div>
           </div>
 
-          {/* Medical Information */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Medical Information</label>
-            <textarea
-              rows={3}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-              value={formData.medicalInfo || ''}
-              onChange={(e) => setFormData({ ...formData, medicalInfo: e.target.value })}
-              placeholder="Any medical conditions, allergies, or special requirements..."
-            />
-            <p className="text-xs text-gray-500 mt-1">This information is confidential and used for emergency purposes only.</p>
-          </div>
+
         </div>
 
         {/* Action Buttons */}

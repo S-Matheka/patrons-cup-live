@@ -54,6 +54,7 @@ export function calculateMatchPlayResult(
   const holesDifference = Math.abs(teamAHolesWon - teamBHolesWon);
 
   // Determine if match is completed
+  // Match ends when: 1) All 18 holes played, OR 2) Team is up by more holes than remain
   const isMatchComplete = holesPlayed === totalHoles || holesDifference > holesRemaining;
 
   let result: string;
@@ -70,7 +71,7 @@ export function calculateMatchPlayResult(
       result = `${holesDifference}up`;
       winner = leadingTeam!;
     } else {
-      // Match ended early (dormie situation)
+      // Match ended early - team is up by more holes than remain
       // Format: holes_up/holes_remaining (e.g., 3/2, 4/3, etc.)
       result = `${holesDifference}/${holesRemaining}`;
       winner = leadingTeam!;
@@ -139,10 +140,10 @@ export function calculateMatchPoints(result: MatchPlayResult): { teamAPoints: nu
 }
 
 /**
- * Determine if a match is in a "dormie" situation
- * (leading by the same number of holes as remain)
+ * Determine if a match is one hole away from ending early
+ * (leading by the same number of holes as remain - next hole wins the match)
  */
-export function isDormie(result: MatchPlayResult): boolean {
+export function isOneHoleFromWinning(result: MatchPlayResult): boolean {
   if (result.status === 'completed') return false;
   
   const holesDifference = Math.abs(result.teamAHolesWon - result.teamBHolesWon);

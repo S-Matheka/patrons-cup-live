@@ -178,9 +178,9 @@ export default function Dashboard() {
                     <th className="text-left py-3 px-2 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Team</th>
                     <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Points</th>
                     <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm hidden xs:table-cell">Played</th>
-                    <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Won</th>
-                    <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Lost</th>
-                    <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">AS</th>
+                    <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Wins</th>
+                    <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Loss</th>
+                    <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm">Tied</th>
                     <th className="text-center py-3 px-1 sm:px-4 font-medium text-gray-600 text-xs sm:text-sm hidden sm:table-cell">Recent</th>
                   </tr>
                 </thead>

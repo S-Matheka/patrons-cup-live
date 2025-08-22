@@ -130,7 +130,18 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB }) =>
           <div className="text-center sm:text-right text-white">
             <div className="text-base sm:text-lg font-bold">{getMatchStatus()}</div>
             <div className="text-sm text-blue-100">
-              Playing Hole {match.holes.filter(h => h.status === 'completed').length + 1}
+              {(() => {
+                const completedHoles = match.holes.filter(h => h.status === 'completed').length;
+                const nextHole = completedHoles + 1;
+                
+                if (match.status === 'completed') {
+                  return `Match completed after ${completedHoles} holes`;
+                } else if (nextHole > 18) {
+                  return 'All holes completed';
+                } else {
+                  return `Playing Hole ${nextHole}`;
+                }
+              })()}
             </div>
           </div>
         </div>

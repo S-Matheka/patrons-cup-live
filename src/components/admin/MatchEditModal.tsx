@@ -210,11 +210,11 @@ export default function MatchEditModal({ match, isOpen, onClose, onSave }: Match
 
     setIsLoading(true);
     try {
-      // Prepare player data - use selected real players if available, otherwise keep original
+      // Prepare player data - use selected players (can be empty arrays to show blank)
       const updatedPlayers = {
-        teamA: selectedPlayers.teamA.length > 0 ? selectedPlayers.teamA : (formData.players?.teamA || []),
-        teamB: selectedPlayers.teamB.length > 0 ? selectedPlayers.teamB : (formData.players?.teamB || []),
-        teamC: selectedPlayers.teamC.length > 0 ? selectedPlayers.teamC : (formData.players?.teamC || [])
+        teamA: selectedPlayers.teamA || [],
+        teamB: selectedPlayers.teamB || [],
+        teamC: selectedPlayers.teamC || []
       };
 
       // Prepare match data - exclude ID for new records

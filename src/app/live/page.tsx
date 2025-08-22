@@ -110,21 +110,35 @@ export default function LiveScoring() {
       }
     }
     
-    // If we have assigned players, try to resolve them
-    if (assignedPlayerIds && assignedPlayerIds.length > 0) {
-      const resolvedPlayers = assignedPlayerIds
-        .map(playerId => {
-          // Try to find player by ID first, then by name (for legacy data)
-          return teamPlayers.find(p => 
-            p.id.toString() === playerId || 
-            p.name === playerId
-          );
-        })
-        .filter(player => player !== undefined);
-      
-      // If we successfully resolved some players, use them
-      if (resolvedPlayers.length > 0) {
+    // Check if players were explicitly assigned (even if empty)
+    let hasExplicitAssignment = false;
+    if (match.players) {
+      if (teamId === match.teamAId && match.players.teamA !== undefined) {
+        hasExplicitAssignment = true;
+      } else if (teamId === match.teamBId && match.players.teamB !== undefined) {
+        hasExplicitAssignment = true;
+      } else if (teamId === match.teamCId && match.players.teamC !== undefined) {
+        hasExplicitAssignment = true;
+      }
+    }
+    
+    // If we have explicit assignment (even empty), use it
+    if (hasExplicitAssignment) {
+      if (assignedPlayerIds && assignedPlayerIds.length > 0) {
+        const resolvedPlayers = assignedPlayerIds
+          .map(playerId => {
+            // Try to find player by ID first, then by name (for legacy data)
+            return teamPlayers.find(p => 
+              p.id.toString() === playerId || 
+              p.name === playerId
+            );
+          })
+          .filter(player => player !== undefined);
+        
         return resolvedPlayers.slice(0, count);
+      } else {
+        // Explicitly assigned empty array - show no players
+        return [];
       }
     }
     

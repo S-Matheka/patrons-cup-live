@@ -184,9 +184,9 @@ export default function LeaderboardPage() {
                     <th className="text-left py-3 px-4 font-medium text-gray-600">Team</th>
                     <th className="text-center py-3 px-4 font-medium text-gray-600">Points</th>
                     <th className="text-center py-3 px-4 font-medium text-gray-600">Played</th>
-                    <th className="text-center py-3 px-4 font-medium text-gray-600">Won</th>
-                    <th className="text-center py-3 px-4 font-medium text-gray-600">Lost</th>
-                    <th className="text-center py-3 px-4 font-medium text-gray-600">AS</th>
+                    <th className="text-center py-3 px-4 font-medium text-gray-600">Wins</th>
+                    <th className="text-center py-3 px-4 font-medium text-gray-600">Loss</th>
+                    <th className="text-center py-3 px-4 font-medium text-gray-600">Tied</th>
                     <th className="text-center py-3 px-4 font-medium text-gray-600">Recent</th>
                   </tr>
                 </thead>

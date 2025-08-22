@@ -91,11 +91,14 @@ export default function PlayerEditModal({ player, teamId, isOpen, onClose, onSav
           .select()
           .single();
       } else {
-        // Create new player
+        // Create new player - ensure no ID is included
         console.log('🔄 Creating new player');
+        const newPlayerData = { ...playerData };
+        delete newPlayerData.id; // Ensure no ID field is sent
+        
         result = await adminClient
           .from('players')
-          .insert(playerData)
+          .insert(newPlayerData)
           .select()
           .single();
       }

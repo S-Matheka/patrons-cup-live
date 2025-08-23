@@ -199,7 +199,7 @@ export default function Dashboard() {
                 <tbody>
                   {divisionStandings.map((standing) => {
                     return (
-                      <tr key={standing.teamId} className="border-b border-gray-100 hover:bg-gray-50">
+                      <tr key={standing.team.id} className="border-b border-gray-100 hover:bg-gray-50">
                         <td className="py-3 sm:py-4 px-2 sm:px-4">
                           <div className="flex items-center space-x-1 sm:space-x-2">
                             <span className="text-sm sm:text-lg font-bold text-gray-900">#{standing.position}</span>
@@ -243,7 +243,7 @@ export default function Dashboard() {
                         </td>
                         <td className="py-3 sm:py-4 px-1 sm:px-4 text-center hidden sm:table-cell">
                           <div className="flex items-center justify-center space-x-1">
-                            {standing.trend.split('-').map((result, idx) => (
+                            {standing.trend && standing.trend !== '-' ? standing.trend.split('').slice(0, 5).map((result, idx) => (
                               <span
                                 key={idx}
                                 className={`inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 text-xs font-bold rounded-full ${
@@ -254,8 +254,7 @@ export default function Dashboard() {
                               >
                                 {result}
                               </span>
-                            ))}
-                            {standing.trend === '-' && (
+                            )) : (
                               <span className="text-xs text-gray-400">-</span>
                             )}
                           </div>

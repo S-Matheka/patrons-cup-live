@@ -19,8 +19,8 @@ export const TournamentContextSwitcher: React.FC<TournamentContextSwitcherProps>
     setIsClient(true);
   }, []);
 
-  // Check if Supabase is configured (only on client side)
-  const supabaseConfigured = isClient && 
+  // Check if Supabase is configured
+  const supabaseConfigured = typeof window !== 'undefined' && 
     process.env.NEXT_PUBLIC_SUPABASE_URL && 
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
     process.env.NEXT_PUBLIC_SUPABASE_URL !== 'your_supabase_url_here';
@@ -28,8 +28,8 @@ export const TournamentContextSwitcher: React.FC<TournamentContextSwitcherProps>
   // Use Supabase if configured and requested, otherwise fallback to localStorage
   const shouldUseSupabase = useSupabase && supabaseConfigured;
 
-  // Always provide a context, but switch the implementation
-  if (shouldUseSupabase && isClient) {
+  // Always provide a context, but switch the implementation consistently
+  if (shouldUseSupabase) {
     return <SupabaseProvider>{children}</SupabaseProvider>;
   }
 

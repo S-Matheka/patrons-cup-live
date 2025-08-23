@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { TournamentContextType, Team, Player, Match, Score, Hole } from '@/types';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { matchStatusManager } from '@/utils/matchStatusManager';
 
@@ -31,24 +31,32 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
 
   // Load initial data from Supabase
   useEffect(() => {
-    loadInitialData();
-    setupRealtimeSubscriptions();
-    
-    // Start automatic match status monitoring
-    matchStatusManager.startMonitoring();
-
-    // Cleanup subscriptions on unmount
-    return () => {
-      channels.forEach(channel => {
-        supabase.removeChannel(channel);
-      });
+    // Only load data if Supabase is configured and we're on the client
+    if (typeof window !== 'undefined' && isSupabaseConfigured() && supabase) {
+      loadInitialData();
+      setupRealtimeSubscriptions();
       
-      // Stop match status monitoring
-      matchStatusManager.stopMonitoring();
-    };
+      // Start automatic match status monitoring
+      matchStatusManager.startMonitoring();
+
+      // Cleanup subscriptions on unmount
+      return () => {
+        channels.forEach(channel => {
+          supabase.removeChannel(channel);
+        });
+        
+        // Stop match status monitoring
+        matchStatusManager.stopMonitoring();
+      };
+    }
   }, []);
 
   const loadInitialData = async () => {
+    if (!supabase || typeof window === 'undefined') {
+      console.log('Supabase not available or running on server');
+      return;
+    }
+    
     try {
 
       // Load all data in parallel

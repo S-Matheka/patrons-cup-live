@@ -8,6 +8,7 @@ import { canScoreMatch, MatchTimingInfo } from '@/utils/matchTiming';
 import { useAuth } from '@/context/AuthContext';
 import { useTournament } from '@/context/TournamentContextSwitcher';
 import { supabase } from '@/lib/supabase';
+import { getAdminClient } from '@/lib/supabase-admin';
 
 interface ScoreCardProps {
   match: Match;
@@ -176,25 +177,52 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
         status: isMatchComplete ? 'completed' : 'in-progress'
       };
 
-      // Save the match to database first
-      console.log('🔄 Updating match in database...');
+      // Save the hole score to database using admin client
+      console.log('🔄 Saving hole score to database...');
       try {
-        await updateMatch(updatedMatch.id, updatedMatch);
-        console.log('✅ Match updated in database successfully');
-        onSave(updatedMatch); // This updates local state
+        const adminClient = getAdminClient();
+        if (!adminClient) {
+          throw new Error('Admin client not available');
+        }
+
+        // Get the current hole to preserve the par value
+        const currentHole = match.holes.find(h => h.number === editingHole);
+        const parValue = currentHole?.par || 4; // Default to par 4 if not found
+
+        // Update the specific hole
+        const { data, error } = await adminClient
+          .from('holes')
+          .upsert({
+            match_id: match.id,
+            hole_number: editingHole,
+            par: parValue, // Include the par value
+            team_a_score: tempScores.teamA,
+            team_b_score: tempScores.teamB,
+            team_c_score: match.isThreeWay ? tempScores.teamC : null,
+            status: 'completed',
+            last_updated: new Date().toISOString()
+          }, {
+            onConflict: 'match_id,hole_number'
+          })
+          .select()
+          .single();
+
+        if (error) {
+          throw new Error(`Database error: ${error.message}`);
+        }
+
+        console.log('✅ Hole score saved successfully:', data);
+        
+        // Update local state
+        onSave(updatedMatch);
       } catch (error) {
-        console.error('❌ Failed to save match to database:', error);
+        console.error('❌ Failed to save hole score to database:', error);
         // Still update local state to provide immediate feedback
         onSave(updatedMatch);
         
-        // Provide specific error message for Team C database issues
+        // Provide user-friendly error message
         const errorMessage = error instanceof Error ? error.message : String(error);
-        if (errorMessage.includes('team_c_score') || errorMessage.includes('team_c_strokes') || 
-            errorMessage.includes('column') && errorMessage.includes('does not exist')) {
-          alert('Database schema needs to be updated for 3-team matches. Please run the database migration script in Supabase SQL Editor.');
-        } else {
-          alert('Warning: Failed to save to database. Your changes may not be visible to other users.');
-        }
+        alert(`Warning: Failed to save to database. Your changes may not be visible to other users.\n\nError: ${errorMessage}`);
       }
 
       // If match is complete, update tournament standings

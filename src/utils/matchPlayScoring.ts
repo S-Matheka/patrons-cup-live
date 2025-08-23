@@ -45,12 +45,12 @@ export function calculateMatchPlayResult(
   // Count holes won by each team
   for (const hole of holes) {
     // Only count holes where both teams have valid scores (not null/undefined/0)
-    if (hole.teamAStrokes && hole.teamBStrokes && hole.teamAStrokes > 0 && hole.teamBStrokes > 0) {
+    if (hole.teamAScore && hole.teamBScore && hole.teamAScore > 0 && hole.teamBScore > 0) {
       holesPlayed++;
       
-      if (hole.teamAStrokes < hole.teamBStrokes) {
+      if (hole.teamAScore < hole.teamBScore) {
         teamAHolesWon++;
-      } else if (hole.teamBStrokes < hole.teamAStrokes) {
+      } else if (hole.teamBScore < hole.teamAScore) {
         teamBHolesWon++;
       } else {
         holesHalved++;
@@ -193,9 +193,9 @@ export function calculateThreeWayResult(
   holes: Array<{
     holeNumber: number;
     par: number;
-    teamAStrokes: number | null;
-    teamBStrokes: number | null;
-    teamCStrokes: number | null;
+    teamAScore: number | null;
+    teamBScore: number | null;
+    teamCScore: number | null;
   }>,
   totalHoles: number = 18
 ): ThreeWayResult {
@@ -206,10 +206,10 @@ export function calculateThreeWayResult(
 
   // Calculate total scores for completed holes
   holes.forEach(hole => {
-    if (hole.teamAStrokes !== null && hole.teamBStrokes !== null && hole.teamCStrokes !== null) {
-      teamATotal += hole.teamAStrokes;
-      teamBTotal += hole.teamBStrokes;
-      teamCTotal += hole.teamCStrokes;
+    if (hole.teamAScore !== null && hole.teamBScore !== null && hole.teamCScore !== null) {
+      teamATotal += hole.teamAScore;
+      teamBTotal += hole.teamBScore;
+      teamCTotal += hole.teamCScore;
       holesCompleted++;
     }
   });

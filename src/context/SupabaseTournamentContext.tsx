@@ -379,8 +379,10 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
           par: hole.par,
           team_a_score: hole.teamAScore,
           team_b_score: hole.teamBScore,
+          team_c_score: hole.teamCScore,
           team_a_strokes: hole.teamAStrokes,
           team_b_strokes: hole.teamBStrokes,
+          team_c_strokes: hole.teamCStrokes,
           status: hole.status,
           last_updated: new Date().toISOString()
         }));

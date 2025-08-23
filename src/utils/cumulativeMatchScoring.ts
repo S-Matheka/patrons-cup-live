@@ -116,9 +116,9 @@ function processCompletedMatch(
     const holesData = match.holes.map(hole => ({
       holeNumber: hole.number,
       par: hole.par || 4,
-      teamAStrokes: hole.teamAScore,
-      teamBStrokes: hole.teamBScore,
-      teamCStrokes: hole.teamCScore
+      teamAScore: hole.teamAScore,
+      teamBScore: hole.teamBScore,
+      teamCScore: hole.teamCScore
     }));
 
     const result = calculateThreeWayResult(holesData, 18);
@@ -163,8 +163,8 @@ function processCompletedMatch(
     const holesData = match.holes.map(hole => ({
       holeNumber: hole.number,
       par: hole.par || 4,
-      teamAStrokes: hole.teamAScore,
-      teamBStrokes: hole.teamBScore
+      teamAScore: hole.teamAScore,
+      teamBScore: hole.teamBScore
     }));
 
     const result = calculateMatchPlayResult(holesData, 18);

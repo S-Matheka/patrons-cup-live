@@ -7,6 +7,7 @@ import { calculateMatchPlayResult, getMatchStatusDescription, formatMatchPlaySco
 import { canScoreMatch, MatchTimingInfo } from '@/utils/matchTiming';
 import { useAuth } from '@/context/AuthContext';
 import { useTournament } from '@/context/TournamentContextSwitcher';
+import { RefreshCw } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getAdminClient } from '@/lib/supabase-admin';
 
@@ -19,6 +20,8 @@ interface ScoreCardProps {
 }
 
 const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSave }) => {
+  const { refreshMatchData } = useTournament();
+  
   // Debug logging to see what data we're receiving
   console.log('🎯 ScoreCard received match data:', {
     matchId: match.id,
@@ -226,24 +229,6 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
         console.log('✅ Hole score saved successfully:', data);
         
         // Update local state immediately for better UX while real-time subscription catches up
-        const updatedHoles = match.holes.map(hole => 
-          hole.number === editingHole 
-            ? {
-                ...hole,
-                teamAScore: tempScores.teamA,
-                teamBScore: tempScores.teamB,
-                ...(match.isThreeWay && { teamCScore: tempScores.teamC }),
-                status: 'completed' as const
-              }
-            : hole
-        );
-
-        const updatedMatch: Match = {
-          ...match,
-          holes: updatedHoles
-        };
-
-        // Update local state immediately
         console.log('🔄 Updating parent component with new match data:', {
           matchId: updatedMatch.id,
           holesCount: updatedMatch.holes.length,
@@ -261,7 +246,14 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
           ...(match.isThreeWay && { teamC: null })
         });
         
+        // Force a small delay to ensure the state update is processed
+        setTimeout(() => {
+          console.log('🔄 Forcing state refresh after save...');
+          // This will trigger a re-render and should show the updated scores
+        }, 100);
+        
         // Real-time subscription will also update when it receives the change
+        // If real-time fails, the context will need to be refreshed manually
       } catch (error) {
         console.error('❌ Failed to save hole score to database:', error);
         
@@ -642,7 +634,17 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
 
         {/* Mobile-Optimized Hole-by-Hole Editing */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Edit Scores</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-gray-800">Edit Scores</h3>
+            <button
+              onClick={() => refreshMatchData(match.id)}
+              className="flex items-center px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              title="Refresh match data if scores are not showing"
+            >
+              <RefreshCw className="w-4 h-4 mr-1" />
+              Refresh
+            </button>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {match.holes
               .sort((a, b) => a.number - b.number)

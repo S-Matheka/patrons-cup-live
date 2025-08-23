@@ -111,6 +111,7 @@ export interface TournamentContextType {
   loading?: boolean;
   updateMatch: (matchId: number, updatedMatch: Match) => void;
   updateScore: (teamId: number, updatedScore: Score) => void;
+  refreshMatchData: (matchId: number) => Promise<void>;
   getTeamById: (id: number) => Team | undefined;
   getPlayersByTeamId: (teamId: number) => Player[];
   getMatchById: (id: number) => Match | undefined;

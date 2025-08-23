@@ -417,6 +417,12 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
     return scores.find(score => score.teamId === teamId);
   };
 
+  // Manual refresh function for when real-time fails
+  const refreshMatchData = async (matchId: number) => {
+    // This is a no-op for the local context since it doesn't have real-time
+    console.log('🔄 Manual refresh requested for match:', matchId, '(local context - no-op)');
+  };
+
   const value: TournamentContextType = {
     teams,
     players,
@@ -425,6 +431,7 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
     loading: false, // localStorage context is always ready
     updateMatch,
     updateScore,
+    refreshMatchData,
     getTeamById,
     getPlayersByTeamId,
     getMatchById,

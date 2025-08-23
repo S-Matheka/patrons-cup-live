@@ -221,7 +221,14 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'holes' },
         (payload) => {
-          console.log('🔄 Real-time hole update received:', payload);
+          console.log('🔄 Real-time hole update received:', {
+            eventType: payload.eventType,
+            matchId: payload.new?.match_id || payload.old?.match_id,
+            holeNumber: payload.new?.hole_number || payload.old?.hole_number,
+            teamAScore: payload.new?.team_a_score,
+            teamBScore: payload.new?.team_b_score,
+            status: payload.new?.status
+          });
           handleHoleUpdate(payload);
         }
       )
@@ -269,8 +276,9 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
       eventType,
       matchId: newRecord?.match_id || oldRecord?.match_id,
       holeNumber: newRecord?.hole_number || oldRecord?.hole_number,
-      newRecord,
-      oldRecord
+      teamAScore: newRecord?.team_a_score,
+      teamBScore: newRecord?.team_b_score,
+      status: newRecord?.status
     });
 
     setMatches(currentMatches => {
@@ -507,6 +515,65 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
     return scores.find(score => score.teamId === teamId);
   };
 
+  // Manual refresh function for when real-time fails
+  const refreshMatchData = async (matchId: number) => {
+    try {
+      console.log('🔄 Manually refreshing match data for match:', matchId);
+      
+      const { data: match, error } = await supabase
+        .from('matches')
+        .select(`
+          *,
+          holes (
+            hole_number,
+            par,
+            team_a_score,
+            team_b_score,
+            team_c_score,
+            team_a_strokes,
+            team_b_strokes,
+            team_c_strokes,
+            status,
+            last_updated
+          )
+        `)
+        .eq('id', matchId)
+        .single();
+
+      if (error) throw error;
+
+      const transformedMatch: Match = {
+        ...transformSupabaseMatch(match),
+        holes: (match.holes || []).map((hole: any) => ({
+          number: hole.hole_number,
+          par: hole.par,
+          teamAScore: hole.team_a_score,
+          teamBScore: hole.team_b_score,
+          teamCScore: hole.team_c_score,
+          teamAStrokes: hole.team_a_strokes,
+          teamBStrokes: hole.team_b_strokes,
+          teamCStrokes: hole.team_c_strokes,
+          status: hole.status,
+          lastUpdated: hole.last_updated
+        })).sort((a, b) => a.number - b.number)
+      };
+
+      setMatches(currentMatches => 
+        currentMatches.map(m => 
+          m.id === matchId ? transformedMatch : m
+        )
+      );
+
+      console.log('✅ Match data refreshed successfully:', {
+        matchId: transformedMatch.id,
+        holesCount: transformedMatch.holes.length,
+        holesWithScores: transformedMatch.holes.filter(h => h.teamAScore !== null || h.teamBScore !== null).length
+      });
+    } catch (error) {
+      console.error('❌ Error refreshing match data:', error);
+    }
+  };
+
   const value: TournamentContextType = {
     teams,
     players,
@@ -515,6 +582,7 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
     loading,
     updateMatch,
     updateScore,
+    refreshMatchData,
     getTeamById,
     getPlayersByTeamId,
     getMatchById,

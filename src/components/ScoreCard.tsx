@@ -76,10 +76,20 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
           const winnerName = result.leader === 'teamA' ? teamA.name : 
                            result.leader === 'teamB' ? teamB.name : 
                            teamC.name;
-          return `${winnerName} wins (${result.result})`;
+          const opponents = [teamA.name, teamB.name, teamC.name]
+            .filter(name => name !== winnerName)
+            .join(' & ');
+          return `${winnerName} wins against ${opponents} (${result.result})`;
         }
       } else {
-        return result.result; // "Team A leads by 2" etc.
+        // For 3-way matches in progress, show who the leader is leading against
+        const leaderName = result.leader === 'teamA' ? teamA.name : 
+                          result.leader === 'teamB' ? teamB.name : 
+                          teamC.name;
+        const opponents = [teamA.name, teamB.name, teamC.name]
+          .filter(name => name !== leaderName)
+          .join(' & ');
+        return `${leaderName} leads against ${opponents} (${result.result})`;
       }
     } else {
       // 2-team match play scoring
@@ -97,18 +107,20 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
       
       if (result.status === 'completed') {
         if (result.winner === 'halved') {
-          return 'Match Halved (AS)';
+          return `${teamA.name} & ${teamB.name} Match Halved (AS)`;
         } else {
           const winnerName = result.winner === 'teamA' ? teamA.name : teamB.name;
-          return `${winnerName} wins ${score}`;
+          const loserName = result.winner === 'teamA' ? teamB.name : teamA.name;
+          return `${winnerName} wins against ${loserName} ${score}`;
         }
       } else {
         // Match in progress
         if (result.result === 'AS') {
-          return 'All Square';
+          return `${teamA.name} & ${teamB.name} All Square`;
         } else {
           const leaderName = result.teamAHolesWon > result.teamBHolesWon ? teamA.name : teamB.name;
-          return `${leaderName} ${score}`;
+          const trailingName = result.teamAHolesWon > result.teamBHolesWon ? teamB.name : teamA.name;
+          return `${leaderName} leads against ${trailingName} ${score}`;
         }
       }
     }
@@ -174,16 +186,33 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
           : hole
       );
 
-      // Check if match is automatically completed due to match play rules
-      const holesData = updatedHoles.map(hole => ({
-        holeNumber: hole.number,
-        par: hole.par || 4,
-        teamAStrokes: hole.teamAScore ?? 0, // Use teamAScore (null coalescing for proper null check)
-        teamBStrokes: hole.teamBScore ?? 0  // Use teamBScore (null coalescing for proper null check)
-      }));
-
-      const matchPlayResult = calculateMatchPlayResult(holesData, 18);
-      const isMatchComplete = matchPlayResult.status === 'completed';
+      // Check if match is automatically completed based on match type
+      let isMatchComplete = false;
+      
+      if (match.isThreeWay) {
+        // 3-team stroke play (Foursomes)
+        const holesData = updatedHoles.map(hole => ({
+          holeNumber: hole.number,
+          par: hole.par || 4,
+          teamAScore: hole.teamAScore,
+          teamBScore: hole.teamBScore,
+          teamCScore: hole.teamCScore
+        }));
+        
+        const threeWayResult = calculateThreeWayResult(holesData, 18);
+        isMatchComplete = threeWayResult.status === 'completed';
+      } else {
+        // 2-team match play (4BBB, Singles)
+        const holesData = updatedHoles.map(hole => ({
+          holeNumber: hole.number,
+          par: hole.par || 4,
+          teamAStrokes: hole.teamAScore ?? 0,
+          teamBStrokes: hole.teamBScore ?? 0
+        }));
+        
+        const matchPlayResult = calculateMatchPlayResult(holesData, 18);
+        isMatchComplete = matchPlayResult.status === 'completed';
+      }
 
       const updatedMatch: Match = {
         ...match,
@@ -225,6 +254,25 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
           throw new Error(`Database error: ${error.message}`);
         }
 
+        // If match is complete, update the match status in database
+        if (isMatchComplete) {
+          console.log(`🏆 Match ${match.id} completed! Updating match status to 'completed'`);
+          
+          const { error: matchStatusError } = await adminClient
+            .from('matches')
+            .update({ 
+              status: 'completed',
+              last_updated: new Date().toISOString()
+            })
+            .eq('id', match.id);
+
+          if (matchStatusError) {
+            console.error('❌ Failed to update match status:', matchStatusError);
+          } else {
+            console.log('✅ Match status updated to completed');
+          }
+        }
+
         console.log('✅ Hole score saved successfully:', data);
         
         // Update local state immediately for better UX while real-time subscription catches up
@@ -264,10 +312,37 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
       // If match is complete, update tournament standings
       if (isMatchComplete) {
         console.log(`🏆 Match ${match.id} completed automatically!`);
-        console.log(`Result: ${matchPlayResult.result}, Winner: ${matchPlayResult.winner}`);
         
-        // Update tournament standings
-        await updateTournamentStandings(updatedMatch, matchPlayResult);
+        if (match.isThreeWay) {
+          // 3-team stroke play result
+          const holesData = updatedHoles.map(hole => ({
+            holeNumber: hole.number,
+            par: hole.par || 4,
+            teamAScore: hole.teamAScore,
+            teamBScore: hole.teamBScore,
+            teamCScore: hole.teamCScore
+          }));
+          
+          const threeWayResult = calculateThreeWayResult(holesData, 18);
+          console.log(`3-team result: ${threeWayResult.result}, Leader: ${threeWayResult.leader}`);
+          
+          // Update tournament standings for 3-team match
+          await updateTournamentStandings(updatedMatch, threeWayResult);
+        } else {
+          // 2-team match play result
+          const holesData = updatedHoles.map(hole => ({
+            holeNumber: hole.number,
+            par: hole.par || 4,
+            teamAStrokes: hole.teamAScore ?? 0,
+            teamBStrokes: hole.teamBScore ?? 0
+          }));
+          
+          const matchPlayResult = calculateMatchPlayResult(holesData, 18);
+          console.log(`2-team result: ${matchPlayResult.result}, Winner: ${matchPlayResult.winner}`);
+          
+          // Update tournament standings for 2-team match
+          await updateTournamentStandings(updatedMatch, matchPlayResult);
+        }
       }
     }
   };
@@ -278,56 +353,104 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
     try {
       console.log('📊 Updating tournament standings...');
       
-      const teamAId = completedMatch.teamAId;
-      const teamBId = completedMatch.teamBId;
-      
-      if (!teamAId || !teamBId) return;
+      if (completedMatch.isThreeWay) {
+        // Handle 3-team stroke play (Foursomes)
+        const teamAId = completedMatch.teamAId;
+        const teamBId = completedMatch.teamBId;
+        const teamCId = completedMatch.teamCId;
+        
+        if (!teamAId || !teamBId || !teamCId) return;
 
-      // Determine points based on result
-      let teamAPoints = 0;
-      let teamBPoints = 0;
-      let teamAWon = 0;
-      let teamBWon = 0;
-      let teamALost = 0;
-      let teamBLost = 0;
-      let teamAHalved = 0;
-      let teamBHalved = 0;
+        // For 3-team stroke play, determine positions based on total scores
+        const scores = [
+          { teamId: teamAId, total: result.teamATotal },
+          { teamId: teamBId, total: result.teamBTotal },
+          { teamId: teamCId, total: result.teamCTotal }
+        ].sort((a, b) => a.total - b.total);
 
-      if (result.winner === 'teamA') {
-        teamAPoints = 1;
-        teamAWon = 1;
-        teamBLost = 1;
-      } else if (result.winner === 'teamB') {
-        teamBPoints = 1;
-        teamBWon = 1;
-        teamALost = 1;
-      } else if (result.winner === 'halved') {
-        teamAPoints = 0.5;
-        teamBPoints = 0.5;
-        teamAHalved = 1;
-        teamBHalved = 1;
+        // 1st place (winner) gets win points, 2nd place gets tie points, 3rd place gets 0
+        const winnerId = scores[0].teamId;
+        const secondPlaceId = scores[1].teamId;
+        const thirdPlaceId = scores[2].teamId;
+
+        // Update standings for all three teams
+        await updateTeamStandings(winnerId, {
+          points: 1, // Win
+          matchesPlayed: 1,
+          matchesWon: 1,
+          matchesLost: 0,
+          matchesHalved: 0
+        });
+
+        await updateTeamStandings(secondPlaceId, {
+          points: 0.5, // Tie for second
+          matchesPlayed: 1,
+          matchesWon: 0,
+          matchesLost: 0,
+          matchesHalved: 1
+        });
+
+        await updateTeamStandings(thirdPlaceId, {
+          points: 0, // Loss
+          matchesPlayed: 1,
+          matchesWon: 0,
+          matchesLost: 1,
+          matchesHalved: 0
+        });
+
+      } else {
+        // Handle 2-team match play (4BBB, Singles)
+        const teamAId = completedMatch.teamAId;
+        const teamBId = completedMatch.teamBId;
+        
+        if (!teamAId || !teamBId) return;
+
+        // Determine points based on result
+        let teamAPoints = 0;
+        let teamBPoints = 0;
+        let teamAWon = 0;
+        let teamBWon = 0;
+        let teamALost = 0;
+        let teamBLost = 0;
+        let teamAHalved = 0;
+        let teamBHalved = 0;
+
+        if (result.winner === 'teamA') {
+          teamAPoints = 1;
+          teamAWon = 1;
+          teamBLost = 1;
+        } else if (result.winner === 'teamB') {
+          teamBPoints = 1;
+          teamBWon = 1;
+          teamALost = 1;
+        } else if (result.winner === 'halved') {
+          teamAPoints = 0.5;
+          teamBPoints = 0.5;
+          teamAHalved = 1;
+          teamBHalved = 1;
+        }
+
+        // Update both teams' standings
+        await updateTeamStandings(teamAId, {
+          points: teamAPoints,
+          matchesPlayed: 1,
+          matchesWon: teamAWon,
+          matchesLost: teamALost,
+          matchesHalved: teamAHalved,
+          holesWon: result.teamAHolesWon,
+          holesLost: result.teamBHolesWon
+        });
+
+        await updateTeamStandings(teamBId, {
+          points: teamBPoints,
+          matchesPlayed: 1,
+          matchesWon: teamBWon,
+          matchesLost: teamBLost,
+          matchesHalved: teamBHalved,
+          holesWon: result.teamBHolesWon,
+          holesLost: result.teamAHolesWon
+        });
       }
-
-      // Update both teams' standings
-      await updateTeamStandings(teamAId, {
-        points: teamAPoints,
-        matchesPlayed: 1,
-        matchesWon: teamAWon,
-        matchesLost: teamALost,
-        matchesHalved: teamAHalved,
-        holesWon: result.teamAHolesWon,
-        holesLost: result.teamBHolesWon
-      });
-
-      await updateTeamStandings(teamBId, {
-        points: teamBPoints,
-        matchesPlayed: 1,
-        matchesWon: teamBWon,
-        matchesLost: teamBLost,
-        matchesHalved: teamBHalved,
-        holesWon: result.teamBHolesWon,
-        holesLost: result.teamAHolesWon
-      });
 
       console.log('✅ Tournament standings updated successfully');
       

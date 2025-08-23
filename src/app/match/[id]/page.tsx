@@ -31,8 +31,8 @@ export default function MatchDetail() {
     );
   }
 
-  const teamA = getTeamById(match.teamAId);
-  const teamB = getTeamById(match.teamBId);
+  const teamA = match.teamAId ? getTeamById(match.teamAId) : null;
+  const teamB = match.teamBId ? getTeamById(match.teamBId) : null;
   const teamC = match.teamCId ? getTeamById(match.teamCId) : null;
 
   // Get match players using the EXACT same logic as live scoring page
@@ -87,13 +87,19 @@ export default function MatchDetail() {
     }
     
     // Fallback: Generate consistent sample players based on match ID
-    const seed = match.id + teamId;
-    const shuffled = [...teamPlayers].sort(() => 0.5 - Math.sin(seed * 9999));
-    return shuffled.slice(0, count);
+    const startIndex = (match.id * teamId) % teamPlayers.length;
+    const selectedPlayers = [];
+    
+    for (let i = 0; i < count && i < teamPlayers.length; i++) {
+      const playerIndex = (startIndex + i) % teamPlayers.length;
+      selectedPlayers.push(teamPlayers[playerIndex]);
+    }
+    
+    return selectedPlayers;
   };
 
-  const teamAPlayers = getMatchPlayers(match.teamAId, match.type === 'Singles' ? 1 : 2);
-  const teamBPlayers = getMatchPlayers(match.teamBId, match.type === 'Singles' ? 1 : 2);
+  const teamAPlayers = getMatchPlayers(match.teamAId || 0, match.type === 'Singles' ? 1 : 2);
+  const teamBPlayers = getMatchPlayers(match.teamBId || 0, match.type === 'Singles' ? 1 : 2);
 
   if (!teamA || !teamB) {
     return (
@@ -212,7 +218,7 @@ export default function MatchDetail() {
                       <div className="font-bold text-white text-lg truncate">{teamC.name}</div>
                       <div className="text-green-100 text-sm truncate">{teamC.description}</div>
                       <div className="text-green-100 text-xs mt-1">
-                        {getMatchPlayers(match.teamCId, match.type === 'Singles' ? 1 : 2).length > 0 
+                        {match.teamCId && getMatchPlayers(match.teamCId, match.type === 'Singles' ? 1 : 2).length > 0 
                           ? getMatchPlayers(match.teamCId, match.type === 'Singles' ? 1 : 2).map(p => `${p.name}${p.isPro ? ' (Pro)' : ''}${p.isJunior ? ' (Jnr)' : ''}`).join(', ')
                           : 'Players TBD'
                         }
@@ -287,7 +293,7 @@ export default function MatchDetail() {
                       <div className="font-bold text-white text-xl truncate">{teamC.name}</div>
                       <div className="text-green-100 text-sm truncate">{teamC.description}</div>
                       <div className="text-green-100 text-xs mt-1">
-                        {getMatchPlayers(match.teamCId, match.type === 'Singles' ? 1 : 2).length > 0 
+                        {match.teamCId && getMatchPlayers(match.teamCId, match.type === 'Singles' ? 1 : 2).length > 0 
                           ? getMatchPlayers(match.teamCId, match.type === 'Singles' ? 1 : 2).map(p => `${p.name}${p.isPro ? ' (Pro)' : ''}${p.isJunior ? ' (Jnr)' : ''}`).join(', ')
                           : 'Players TBD'
                         }

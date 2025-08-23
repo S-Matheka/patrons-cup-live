@@ -67,6 +67,11 @@ export default function LiveScoring() {
   };
 
   const calculateMatchResult = (match: Match) => {
+    // Check match status first - scheduled matches should show "Scheduled"
+    if (match.status === 'scheduled') {
+      return 'Scheduled';
+    }
+    
     if (match.isThreeWay) {
       // 3-team stroke play scoring
       const holesData = match.holes.map(hole => ({
@@ -91,13 +96,47 @@ export default function LiveScoring() {
         const leaderName = result.leader === 'teamA' ? teamA?.name : 
                           result.leader === 'teamB' ? teamB?.name : 
                           teamC?.name;
-        const leadMargin = result.leader === 'teamA' ? 
-          Math.min(result.teamBTotal - result.teamATotal, result.teamCTotal - result.teamATotal) :
-          result.leader === 'teamB' ?
-          Math.min(result.teamATotal - result.teamBTotal, result.teamCTotal - result.teamBTotal) :
-          Math.min(result.teamATotal - result.teamCTotal, result.teamBTotal - result.teamCTotal);
         
-        return `${leaderName} leads by ${leadMargin}`;
+        // For 3-way matches, show who the leader is leading against
+        const opponents = [teamA?.name, teamB?.name, teamC?.name]
+          .filter(name => name && name !== leaderName)
+          .join(' & ');
+        
+        if (result.status === 'completed') {
+          // For completed matches, show final result
+          const scores = [
+            { team: 'teamA', total: result.teamATotal, name: teamA?.name },
+            { team: 'teamB', total: result.teamBTotal, name: teamB?.name },
+            { team: 'teamC', total: result.teamCTotal, name: teamC?.name }
+          ].sort((a, b) => a.total - b.total);
+          
+          if (scores[0].total === scores[1].total && scores[1].total === scores[2].total) {
+            return `${scores[0].name}, ${scores[1].name} & ${scores[2].name} tied`;
+          } else if (scores[0].total === scores[1].total) {
+            return `${scores[0].name} & ${scores[1].name} tied for 1st`;
+          } else {
+            return `${leaderName} wins against ${opponents}`;
+          }
+        } else {
+          // For in-progress matches, show current lead
+          let leadMargin = 0;
+          if (result.leader === 'teamA') {
+            const margin1 = (result.teamBTotal || 0) - (result.teamATotal || 0);
+            const margin2 = (result.teamCTotal || 0) - (result.teamATotal || 0);
+            leadMargin = Math.min(margin1, margin2);
+          } else if (result.leader === 'teamB') {
+            const margin1 = (result.teamATotal || 0) - (result.teamBTotal || 0);
+            const margin2 = (result.teamCTotal || 0) - (result.teamBTotal || 0);
+            leadMargin = Math.min(margin1, margin2);
+          } else if (result.leader === 'teamC') {
+            const margin1 = (result.teamATotal || 0) - (result.teamCTotal || 0);
+            const margin2 = (result.teamBTotal || 0) - (result.teamCTotal || 0);
+            leadMargin = Math.min(margin1, margin2);
+          }
+          
+          const validLeadMargin = isNaN(leadMargin) ? 0 : leadMargin;
+          return `${leaderName} leads against ${opponents} by ${validLeadMargin}`;
+        }
       }
     } else {
       // 2-team match play scoring
@@ -121,18 +160,32 @@ export default function LiveScoring() {
       const teamA = teams.find(t => t.id === match.teamAId);
       const teamB = teams.find(t => t.id === match.teamBId);
       
-      if (holesPlayed === 9 || holesPlayed === 18) {
-        if (teamAWins > teamBWins) return `${teamA?.name || 'Team A'} ${teamAWins - teamBWins} UP`;
-        if (teamBWins > teamAWins) return `${teamB?.name || 'Team B'} ${teamBWins - teamAWins} UP`;
-        return 'ALL SQUARE';
-      }
+      // Check if match is completed (18 holes played or match ended early)
+      const isCompleted = holesPlayed === 18 || Math.abs(teamAWins - teamBWins) > (18 - holesPlayed);
       
-      if (teamAWins > teamBWins) {
-        return `${teamA?.name || 'Team A'} ${teamAWins - teamBWins} UP`;
-      } else if (teamBWins > teamAWins) {
-        return `${teamB?.name || 'Team B'} ${teamBWins - teamAWins} UP`;
+      if (isCompleted) {
+        // For completed matches, show final result with proper format
+        const holesRemaining = 18 - holesPlayed;
+        const holesDifference = Math.abs(teamAWins - teamBWins);
+        const resultFormat = holesPlayed === 18 ? `${holesDifference}up` : `${holesDifference}/${holesRemaining}`;
+        
+        if (teamAWins > teamBWins) {
+          return `${teamA?.name || 'Team A'} wins by ${resultFormat}`;
+        } else if (teamBWins > teamAWins) {
+          return `${teamB?.name || 'Team B'} wins by ${resultFormat}`;
+        } else {
+          return `${teamA?.name || 'Team A'} & ${teamB?.name || 'Team B'} halved`;
+        }
+      } else {
+        // For in-progress matches, show current lead
+        if (teamAWins > teamBWins) {
+          return `${teamA?.name || 'Team A'} leads against ${teamB?.name || 'Team B'} by ${teamAWins - teamBWins}`;
+        } else if (teamBWins > teamAWins) {
+          return `${teamB?.name || 'Team B'} leads against ${teamA?.name || 'Team A'} by ${teamBWins - teamAWins}`;
+        } else {
+          return `${teamA?.name || 'Team A'} & ${teamB?.name || 'Team B'} are ALL SQUARE`;
+        }
       }
-      return 'ALL SQUARE';
     }
   };
 

@@ -70,8 +70,96 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
     return calculateMatchPlayResult(holesData, 18);
   };
 
+  const getThreeWayHeadToHeadResults = () => {
+    if (!match.isThreeWay || !teamC) return null;
+    
+    const holesWithScores = match.holes.filter(h => 
+      h.teamAScore !== null && h.teamBScore !== null && h.teamCScore !== null
+    );
+    
+    if (holesWithScores.length === 0) return null;
+    
+    // Calculate head-to-head results for each pair
+    const results = [];
+    
+    // Team A vs Team B
+    let teamAWins = 0;
+    let teamBWins = 0;
+    holesWithScores.forEach(hole => {
+      if (hole.teamAScore! < hole.teamBScore!) {
+        teamAWins++;
+      } else if (hole.teamBScore! < hole.teamAScore!) {
+        teamBWins++;
+      }
+    });
+    
+    const holesPlayed = holesWithScores.length;
+    const holesRemaining = 18 - holesPlayed;
+    const holesDifference = Math.abs(teamAWins - teamBWins);
+    const resultFormat = holesPlayed === 18 ? `${holesDifference}up` : `${holesDifference}/${holesRemaining}`;
+    
+    if (teamAWins === teamBWins) {
+      results.push(`${teamA.name} vs ${teamB?.name}: AS`);
+    } else {
+      const winnerName = teamAWins > teamBWins ? teamA.name : teamB?.name;
+      results.push(`${teamA.name} vs ${teamB?.name}: ${winnerName} wins ${resultFormat}`);
+    }
+    
+    // Team A vs Team C
+    let teamAWinsC = 0;
+    let teamCWins = 0;
+    holesWithScores.forEach(hole => {
+      if (hole.teamAScore! < hole.teamCScore!) {
+        teamAWinsC++;
+      } else if (hole.teamCScore! < hole.teamAScore!) {
+        teamCWins++;
+      }
+    });
+    
+    const holesDifferenceAC = Math.abs(teamAWinsC - teamCWins);
+    const resultFormatAC = holesPlayed === 18 ? `${holesDifferenceAC}up` : `${holesDifferenceAC}/${holesRemaining}`;
+    
+    if (teamAWinsC === teamCWins) {
+      results.push(`${teamA.name} vs ${teamC.name}: AS`);
+    } else {
+      const winnerName = teamAWinsC > teamCWins ? teamA.name : teamC.name;
+      results.push(`${teamA.name} vs ${teamC.name}: ${winnerName} wins ${resultFormatAC}`);
+    }
+    
+    // Team B vs Team C
+    let teamBWinsC = 0;
+    let teamCWinsB = 0;
+    holesWithScores.forEach(hole => {
+      if (hole.teamBScore! < hole.teamCScore!) {
+        teamBWinsC++;
+      } else if (hole.teamCScore! < hole.teamBScore!) {
+        teamCWinsB++;
+      }
+    });
+    
+    const holesDifferenceBC = Math.abs(teamBWinsC - teamCWinsB);
+    const resultFormatBC = holesPlayed === 18 ? `${holesDifferenceBC}up` : `${holesDifferenceBC}/${holesRemaining}`;
+    
+    if (teamBWinsC === teamCWinsB) {
+      results.push(`${teamB?.name} vs ${teamC.name}: AS`);
+    } else {
+      const winnerName = teamBWinsC > teamCWinsB ? teamB?.name : teamC.name;
+      results.push(`${teamB?.name} vs ${teamC.name}: ${winnerName} wins ${resultFormatBC}`);
+    }
+    
+    return results;
+  };
+
   const getMatchStatus = () => {
     if (match.status === 'scheduled') return 'Match Not Started';
+    
+    // For 3-way matches, show head-to-head results
+    if (match.isThreeWay && teamC) {
+      const headToHeadResults = getThreeWayHeadToHeadResults();
+      if (headToHeadResults) {
+        return headToHeadResults.join(' • ');
+      }
+    }
     
     const result = getMatchPlayResult();
     if (!result) return 'Starting Soon';
@@ -81,18 +169,45 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
     
     if (result.status === 'completed') {
       if (result.winner === 'halved') {
-        return 'Match Halved (AS)';
+        return `${teamA.name} & ${teamB?.name} Match Halved (AS)`;
       } else {
         const winnerName = result.winner === 'teamA' ? teamA.name : teamB?.name;
-        return `${winnerName} wins ${score}`;
+        const loserName = result.winner === 'teamA' ? teamB?.name : teamA.name;
+        return `${winnerName} wins by ${score}`;
+      }
+    } else if (match.status === 'completed') {
+      // Fallback for completed matches when getMatchPlayResult fails
+      const holesWithScores = match.holes.filter(h => h.teamAScore !== null && h.teamBScore !== null);
+      let teamAWins = 0;
+      let teamBWins = 0;
+      
+      holesWithScores.forEach(hole => {
+        if (hole.teamAScore! < hole.teamBScore!) {
+          teamAWins++;
+        } else if (hole.teamBScore! < hole.teamAScore!) {
+          teamBWins++;
+        }
+      });
+      
+      const holesPlayed = holesWithScores.length;
+      const holesRemaining = 18 - holesPlayed;
+      const holesDifference = Math.abs(teamAWins - teamBWins);
+      const resultFormat = holesPlayed === 18 ? `${holesDifference}up` : `${holesDifference}/${holesRemaining}`;
+      
+      if (teamAWins === teamBWins) {
+        return `${teamA.name} & ${teamB?.name} Match Halved (AS)`;
+      } else {
+        const winnerName = teamAWins > teamBWins ? teamA.name : teamB?.name;
+        return `${winnerName} wins by ${resultFormat}`;
       }
     } else {
       // Match in progress
       if (result.result === 'AS') {
-        return 'All Square';
+        return `${teamA.name} & ${teamB?.name} All Square`;
       } else {
         const leaderName = result.teamAHolesWon > result.teamBHolesWon ? teamA.name : teamB?.name;
-        return `${leaderName} ${score}`;
+        const trailingName = result.teamAHolesWon > result.teamBHolesWon ? teamB?.name : teamA.name;
+        return `${leaderName} leads against ${trailingName} ${score}`;
       }
     }
   };
@@ -138,7 +253,39 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
                 const nextHole = completedHoles + 1;
                 
                 if (match.status === 'completed') {
-                  return `Match completed after ${completedHoles} holes`;
+                  // For 3-way matches, show head-to-head results
+                  if (match.isThreeWay && teamC) {
+                    const headToHeadResults = getThreeWayHeadToHeadResults();
+                    if (headToHeadResults) {
+                      return `Head-to-Head: ${headToHeadResults.join(' • ')}`;
+                    }
+                  }
+                  
+                  // For completed matches, show the result format (e.g., "4/3", "2/1", etc.)
+                  const result = getMatchPlayResult();
+                  if (result && result.status === 'completed') {
+                    return `Final Result: ${formatMatchPlayScore(result)}`;
+                  } else {
+                    // Fallback: calculate the result manually for completed matches
+                    const holesWithScores = match.holes.filter(h => h.teamAScore !== null && h.teamBScore !== null);
+                    let teamAWins = 0;
+                    let teamBWins = 0;
+                    
+                    holesWithScores.forEach(hole => {
+                      if (hole.teamAScore! < hole.teamBScore!) {
+                        teamAWins++;
+                      } else if (hole.teamBScore! < hole.teamAScore!) {
+                        teamBWins++;
+                      }
+                    });
+                    
+                    const holesPlayed = holesWithScores.length;
+                    const holesRemaining = 18 - holesPlayed;
+                    const holesDifference = Math.abs(teamAWins - teamBWins);
+                    const resultFormat = holesPlayed === 18 ? `${holesDifference}up` : `${holesDifference}/${holesRemaining}`;
+                    
+                    return `Final Result: ${resultFormat}`;
+                  }
                 } else if (nextHole > 18) {
                   return 'All holes completed';
                 } else {

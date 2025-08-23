@@ -246,7 +246,9 @@ export function calculateThreeWayResult(
     } else {
       leader = scores[0].team as 'teamA' | 'teamB' | 'teamC';
       const leadMargin = scores[1].total - scores[0].total;
-      result = `${scores[0].team.toUpperCase()} leads by ${leadMargin}`;
+      // Ensure leadMargin is a valid number
+      const validLeadMargin = isNaN(leadMargin) ? 0 : leadMargin;
+      result = `${scores[0].team.toUpperCase()} leads by ${validLeadMargin}`;
     }
   }
 
@@ -254,9 +256,9 @@ export function calculateThreeWayResult(
     status,
     result,
     leader,
-    teamATotal,
-    teamBTotal,
-    teamCTotal,
+    teamATotal: teamATotal || 0,
+    teamBTotal: teamBTotal || 0,
+    teamCTotal: teamCTotal || 0,
     holesCompleted
   };
 }

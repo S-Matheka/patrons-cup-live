@@ -244,9 +244,16 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
         };
 
         // Update local state immediately
+        console.log('🔄 Updating parent component with new match data:', {
+          matchId: updatedMatch.id,
+          holesCount: updatedMatch.holes.length,
+          holesWithScores: updatedMatch.holes.filter(h => h.teamAScore !== null || h.teamBScore !== null).length,
+          updatedHole: editingHole,
+          updatedHoleData: updatedMatch.holes.find(h => h.number === editingHole)
+        });
         onSave(updatedMatch);
         
-        // Force a re-render by updating the component state
+        // Close the editing mode and reset temp scores
         setEditingHole(null);
         setTempScores({ 
           teamA: null, 

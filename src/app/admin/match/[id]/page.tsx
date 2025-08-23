@@ -141,6 +141,16 @@ export default function AdminMatchDetail() {
   }
 
   const handleSaveMatch = (updatedMatch: Match) => {
+    console.log('🔄 handleSaveMatch called with updated match:', {
+      matchId: updatedMatch.id,
+      holesCount: updatedMatch.holes.length,
+      holesWithScores: updatedMatch.holes.filter(h => h.teamAScore !== null || h.teamBScore !== null).length
+    });
+    
+    // Update the local state immediately for better UX
+    setMatch(updatedMatch);
+    
+    // Also update the context
     updateMatch(matchId, updatedMatch);
   };
 

@@ -278,18 +278,28 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
         if (match.id === (newRecord?.match_id || oldRecord?.match_id)) {
           console.log('📋 Updating match:', match.id, 'Current holes:', match.holes.length);
           
-          const updatedHoles = [...match.holes];
-          const holeIndex = updatedHoles.findIndex(h => h.number === (newRecord?.hole_number || oldRecord?.hole_number));
+          // Create a new array to avoid mutation
+          let updatedHoles = [...match.holes];
+          const holeNumber = newRecord?.hole_number || oldRecord?.hole_number;
+          const holeIndex = updatedHoles.findIndex(h => h.number === holeNumber);
 
-          console.log('🔍 Hole index found:', holeIndex, 'for hole number:', newRecord?.hole_number || oldRecord?.hole_number);
+          console.log('🔍 Hole index found:', holeIndex, 'for hole number:', holeNumber);
 
           switch (eventType) {
             case 'INSERT':
             case 'UPDATE':
               if (holeIndex >= 0) {
+                // Update existing hole while preserving other properties
+                const existingHole = updatedHoles[holeIndex];
                 const transformedHole = transformSupabaseHole(newRecord);
-                console.log('🔄 Updating existing hole:', transformedHole);
-                updatedHoles[holeIndex] = transformedHole;
+                console.log('🔄 Updating existing hole:', {
+                  existing: existingHole,
+                  new: transformedHole
+                });
+                updatedHoles[holeIndex] = {
+                  ...existingHole,
+                  ...transformedHole
+                };
               } else {
                 const transformedHole = transformSupabaseHole(newRecord);
                 console.log('➕ Adding new hole:', transformedHole);
@@ -304,8 +314,20 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
               break;
           }
 
-          console.log('✅ Updated holes count:', updatedHoles.length);
-          return { ...match, holes: updatedHoles };
+          // Sort holes by number to maintain consistent order
+          updatedHoles.sort((a, b) => a.number - b.number);
+
+          console.log('✅ Updated holes count:', updatedHoles.length, 'Holes with scores:', updatedHoles.filter(h => h.teamAScore !== null || h.teamBScore !== null).length);
+          
+          const updatedMatch = { ...match, holes: updatedHoles };
+          console.log('🎯 Final match state:', {
+            matchId: updatedMatch.id,
+            holesCount: updatedMatch.holes.length,
+            holesWithScores: updatedHoles.filter(h => h.teamAScore !== null || h.teamBScore !== null).length,
+            sampleHoles: updatedHoles.slice(0, 3).map(h => ({ hole: h.number, teamA: h.teamAScore, teamB: h.teamBScore }))
+          });
+          
+          return updatedMatch;
         }
         return match;
       });

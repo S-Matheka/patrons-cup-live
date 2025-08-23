@@ -10,33 +10,49 @@ export default function Dashboard() {
   const { teams, matches, getTeamById } = useTournament();
   const [activeDivision, setActiveDivision] = useState<'Trophy' | 'Shield' | 'Plaque' | 'Bowl' | 'Mug'>('Trophy');
 
+  // Safety check for data availability
+  if (!teams || !matches) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading tournament data...</p>
+        </div>
+      </div>
+    );
+  }
+
   // Get recent match results for a team (last 5 matches)
   const getTeamForm = (teamId: number) => {
+    if (!matches || !Array.isArray(matches)) return [];
     const teamMatches = matches
       .filter(match => 
-        (match.teamAId === teamId || match.teamBId === teamId) && 
+        match && (match.teamAId === teamId || match.teamBId === teamId) && 
         match.status === 'completed' && 
         !match.isBye
       )
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // Most recent first
+      .sort((a, b) => new Date(b.date || b.match_date || 0).getTime() - new Date(a.date || a.match_date || 0).getTime()) // Most recent first
       .slice(0, 5); // Last 5 matches
 
     return teamMatches.map(match => {
+      if (!match) return 'H';
       const isTeamA = match.teamAId === teamId;
       
       // Calculate match result based on holes won
       let teamHolesWon = 0;
       let opponentHolesWon = 0;
       
-      match.holes?.forEach(hole => {
-        if (hole.teamAStrokes && hole.teamBStrokes) {
-          if (hole.teamAStrokes < hole.teamBStrokes) {
-            if (isTeamA) teamHolesWon++; else opponentHolesWon++;
-          } else if (hole.teamBStrokes < hole.teamAStrokes) {
-            if (isTeamA) opponentHolesWon++; else teamHolesWon++;
+      if (match.holes && Array.isArray(match.holes)) {
+        match.holes.forEach(hole => {
+          if (hole && hole.teamAStrokes && hole.teamBStrokes) {
+            if (hole.teamAStrokes < hole.teamBStrokes) {
+              if (isTeamA) teamHolesWon++; else opponentHolesWon++;
+            } else if (hole.teamBStrokes < hole.teamAStrokes) {
+              if (isTeamA) opponentHolesWon++; else teamHolesWon++;
+            }
           }
-        }
-      });
+        });
+      }
 
       // Determine result
       if (teamHolesWon > opponentHolesWon) return 'W';
@@ -47,11 +63,13 @@ export default function Dashboard() {
 
   // Get live standings for the selected division using the new calculation
   const divisionStandings = useMemo(() => {
+    if (!matches || !teams) return [];
     return calculateLiveStandings(matches, teams, activeDivision);
   }, [matches, teams, activeDivision]);
 
   // Get tournament statistics
   const tournamentStats = useMemo(() => {
+    if (!matches) return { totalMatches: 0, completedMatches: 0, inProgressMatches: 0, completionRate: 0 };
     const totalMatches = matches.length;
     const completedMatches = matches.filter(m => m.status === 'completed').length;
     const inProgressMatches = matches.filter(m => m.status === 'in-progress').length;

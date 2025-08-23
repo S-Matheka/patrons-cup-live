@@ -7,7 +7,10 @@
 
 import { Match, Team, Score } from '@/types';
 import { calculateMatchPlayResult, calculateThreeWayResult } from './matchPlayScoring';
-import { calculateSessionBasedStandings, LiveStandingEntry } from './sessionBasedScoring';
+import { calculateCumulativeStandings, CumulativeStandingEntry } from './cumulativeMatchScoring';
+
+// Export the interface for backward compatibility
+export type LiveStandingEntry = CumulativeStandingEntry;
 
 /**
  * Get points for match based on tournament rules
@@ -66,16 +69,16 @@ function getMatchPoints(match: Match, result: 'win' | 'tie' | 'loss'): number {
 /**
  * Calculate live standings from current match data
  * This runs in real-time as holes are scored
- * Uses SESSION-BASED scoring to prevent over-awarding points
+ * Uses CUMULATIVE MATCH-BASED scoring to show total points earned
  */
 export function calculateLiveStandings(
   matches: Match[], 
   teams: Team[], 
   division?: string
 ): LiveStandingEntry[] {
-  // Use session-based scoring to prevent teams getting multiple points per session
+  // Use cumulative match-based scoring to show total points across all matches
   if (division) {
-    return calculateSessionBasedStandings(matches, teams, division);
+    return calculateCumulativeStandings(matches, teams, division);
   }
 
   // If no division specified, calculate for all divisions
@@ -83,7 +86,7 @@ export function calculateLiveStandings(
   const allStandings: LiveStandingEntry[] = [];
   
   allDivisions.forEach(div => {
-    const divisionStandings = calculateSessionBasedStandings(matches, teams, div);
+    const divisionStandings = calculateCumulativeStandings(matches, teams, div);
     allStandings.push(...divisionStandings);
   });
   

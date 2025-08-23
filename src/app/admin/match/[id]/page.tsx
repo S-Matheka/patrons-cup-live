@@ -147,10 +147,7 @@ export default function AdminMatchDetail() {
       holesWithScores: updatedMatch.holes.filter(h => h.teamAScore !== null || h.teamBScore !== null).length
     });
     
-    // Update the local state immediately for better UX
-    setMatch(updatedMatch);
-    
-    // Also update the context
+    // Update the context - this will trigger a re-render with the updated data
     updateMatch(matchId, updatedMatch);
   };
 

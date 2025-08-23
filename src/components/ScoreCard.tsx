@@ -165,46 +165,44 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
   };
 
   const handleSaveHole = async () => {
-    // Allow saving even with empty/zero values for holes that weren't played
-    const hasAnyInput = tempScores.teamA !== null || tempScores.teamB !== null || 
-                       (match.isThreeWay && tempScores.teamC !== null);
-    
-    if (editingHole !== null) {
-      console.log('💾 Saving hole scores:', {
-        holeNumber: editingHole,
-        teamAScore: tempScores.teamA,
-        teamBScore: tempScores.teamB,
-        ...(match.isThreeWay && { teamCScore: tempScores.teamC }),
-        matchId: match.id
-      });
-      
-      const updatedHoles = match.holes.map(hole => 
-        hole.number === editingHole 
-          ? {
-              ...hole,
-              teamAScore: tempScores.teamA,
-              teamBScore: tempScores.teamB,
-              ...(match.isThreeWay && { teamCScore: tempScores.teamC }),
-              status: 'completed' as const // Allow saving with null values for holes not played
-            }
-          : hole
-      );
+    if (!editingHole || !timingInfo.canScore) return;
 
-      // Check if match is automatically completed based on match type
+    try {
+      console.log('💾 Saving hole score:', {
+        hole: editingHole,
+        teamA: tempScores.teamA,
+        teamB: tempScores.teamB,
+        teamC: tempScores.teamC
+      });
+
+              // Update local holes array immediately for better UX
+        const updatedHoles = match.holes.map(hole => 
+          hole.number === editingHole 
+            ? { 
+                ...hole, 
+                teamAScore: tempScores.teamA,
+                teamBScore: tempScores.teamB,
+                teamCScore: match.isThreeWay ? tempScores.teamC : hole.teamCScore,
+                status: 'completed' as const
+              }
+            : hole
+        );
+
+      // Check if match should be completed
       let isMatchComplete = false;
       
-      if (match.isThreeWay) {
-        // 3-team stroke play (Foursomes)
+      if (match.isThreeWay && teamC) {
+        // 3-team match play scoring (hole-by-hole wins)
         const holesData = updatedHoles.map(hole => ({
           holeNumber: hole.number,
           par: hole.par || 4,
           teamAScore: hole.teamAScore,
           teamBScore: hole.teamBScore,
-          teamCScore: hole.teamCScore
+          teamCScore: hole.teamCScore || null
         }));
-        
-        const threeWayResult = calculateThreeWayResult(holesData, 18);
-        isMatchComplete = threeWayResult.status === 'completed';
+
+        const result = calculateThreeWayResult(holesData, 18);
+        isMatchComplete = result.status === 'completed';
       } else {
         // 2-team match play (4BBB, Singles)
         const holesData = updatedHoles.map(hole => ({
@@ -218,11 +216,11 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
         isMatchComplete = matchPlayResult.status === 'completed';
       }
 
-      const updatedMatch: Match = {
-        ...match,
-        holes: updatedHoles,
-        status: isMatchComplete ? 'completed' : 'in-progress'
-      };
+              const updatedMatch: Match = {
+          ...match,
+          holes: updatedHoles,
+          status: isMatchComplete ? 'completed' as const : 'in-progress' as const
+        };
 
       // Save the hole score to database using admin client
       console.log('🔄 Saving hole score to database...');
@@ -278,7 +276,7 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
 
         console.log('✅ Hole score saved successfully:', data);
         
-        // Update local state immediately for better UX while real-time subscription catches up
+        // Update parent component immediately with new match data
         console.log('🔄 Updating parent component with new match data:', {
           matchId: updatedMatch.id,
           holesCount: updatedMatch.holes.length,
@@ -286,7 +284,18 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
           updatedHole: editingHole,
           updatedHoleData: updatedMatch.holes.find(h => h.number === editingHole)
         });
+        
+        // Call onSave to update parent component immediately
         onSave(updatedMatch);
+        
+        // Force refresh match data to ensure real-time updates
+        await refreshMatchData(match.id);
+        
+        // Force a re-render to show updated scores immediately
+        setTimeout(() => {
+          console.log('🔄 Forcing re-render to show updated scores...');
+          // This ensures the UI updates immediately with the new scores
+        }, 100);
         
         // Close the editing mode and reset temp scores
         setEditingHole(null);
@@ -296,57 +305,17 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
           ...(match.isThreeWay && { teamC: null })
         });
         
-        // Force a small delay to ensure the state update is processed
-        setTimeout(() => {
-          console.log('🔄 Forcing state refresh after save...');
-          // This will trigger a re-render and should show the updated scores
-        }, 100);
+        // Show success message
+        console.log('✅ Hole score saved and displayed successfully!');
         
-        // Real-time subscription will also update when it receives the change
-        // If real-time fails, the context will need to be refreshed manually
       } catch (error) {
-        console.error('❌ Failed to save hole score to database:', error);
-        
-        // Provide user-friendly error message
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        alert(`Warning: Failed to save to database. Your changes may not be visible to other users.\n\nError: ${errorMessage}`);
+        console.error('❌ Error saving hole score:', error);
+        alert(`Failed to save hole score: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
-
-      // If match is complete, update tournament standings
-      if (isMatchComplete) {
-        console.log(`🏆 Match ${match.id} completed automatically!`);
-        
-        if (match.isThreeWay) {
-          // 3-team stroke play result
-          const holesData = updatedHoles.map(hole => ({
-            holeNumber: hole.number,
-            par: hole.par || 4,
-            teamAScore: hole.teamAScore,
-            teamBScore: hole.teamBScore,
-            teamCScore: hole.teamCScore
-          }));
-          
-          const threeWayResult = calculateThreeWayResult(holesData, 18);
-          console.log(`3-team result: ${threeWayResult.result}, Leader: ${threeWayResult.leader}`);
-          
-          // Update tournament standings for 3-team match
-          await updateTournamentStandings(updatedMatch, threeWayResult);
-        } else {
-          // 2-team match play result
-          const holesData = updatedHoles.map(hole => ({
-            holeNumber: hole.number,
-            par: hole.par || 4,
-            teamAStrokes: hole.teamAScore ?? 0,
-            teamBStrokes: hole.teamBScore ?? 0
-          }));
-          
-          const matchPlayResult = calculateMatchPlayResult(holesData, 18);
-          console.log(`2-team result: ${matchPlayResult.result}, Winner: ${matchPlayResult.winner}`);
-          
-          // Update tournament standings for 2-team match
-          await updateTournamentStandings(updatedMatch, matchPlayResult);
-        }
-      }
+      
+    } catch (error) {
+      console.error('❌ Error in handleSaveHole:', error);
+      alert(`Error saving hole score: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 

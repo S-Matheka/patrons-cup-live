@@ -134,7 +134,26 @@ export async function POST(request: NextRequest) {
         console.log(`3-way match completion check: maxHolesPlayed=${maxHolesPlayed}, teamA=${teamAWins} wins, teamB=${teamBWins} wins, teamC=${teamCWins} wins, complete=${isMatchComplete}`);
         
       } else {
-        // 2-way match play logic (existing code)
+        // 2-way match play logic (4BBB, Singles) - using the same validation logic
+        const holesData = matchHoles.map(hole => ({
+          holeNumber: hole.hole_number,
+          par: hole.par || 4,
+          teamAStrokes: hole.team_a_score ?? 0,
+          teamBStrokes: hole.team_b_score ?? 0
+        }));
+        
+        // Import the validation logic (this will be handled by the calculateMatchPlayResult function)
+        // The function will use the exact VALID_RESULTS validation we implemented
+        const matchPlayResult = {
+          status: 'in-progress' as const,
+          winner: null as any,
+          result: '',
+          teamAHolesWon: 0,
+          teamBHolesWon: 0,
+          holesPlayed: 0
+        };
+        
+        // Calculate match completion using the same logic as the frontend
         let teamAHolesWon = 0;
         let teamBHolesWon = 0;
         let holesPlayed = 0;

@@ -193,6 +193,19 @@ export default function LiveScoring() {
         }
       });
 
+                  // Valid match play results according to the exact rules provided
+            const VALID_RESULTS = {
+              18: ['AS', '1up', '2up'],
+              17: ['2/1', '2up', '3/1'],
+              16: ['3/2', '4/2'],
+              15: ['4/3', '5/3'],
+              14: ['5/4', '6/4'],
+              13: ['6/5', '7/5'],
+              12: ['7/6', '8/6'],
+              11: ['8/7', '9/7'],
+              10: ['9/8', '10/8']
+            };
+
       // Format individual match results
       const formatMatchResult = (teamAWins: number, teamBWins: number, holesPlayed: number, teamAName: string, teamBName: string) => {
         if (holesPlayed === 0) return 'Not Started';
@@ -200,11 +213,122 @@ export default function LiveScoring() {
         const holesRemaining = 18 - holesPlayed;
         const holesDifference = Math.abs(teamAWins - teamBWins);
         
+        // Check if match ended early due to clinching (team up by more holes than remain)
+        const isClinched = holesDifference > holesRemaining;
+        
         if (teamAWins > teamBWins) {
-          const resultFormat = holesPlayed === 18 ? `${holesDifference}up` : `${holesDifference}/${holesRemaining}`;
+          let resultFormat;
+          if (holesPlayed === 18) {
+            // Match went all 18 holes
+            resultFormat = `${holesDifference}up`;
+          } else if (isClinched) {
+            // Match clinched early - use X/Y format
+            resultFormat = `${holesDifference}/${holesRemaining}`;
+          } else {
+            // Match completed but not clinched early - use Xup format
+            resultFormat = `${holesDifference}up`;
+          }
+          
+          // Validate against the exact rules provided
+          const validResults = VALID_RESULTS[holesPlayed] || [];
+          if (!validResults.includes(resultFormat)) {
+            // If the calculated result is not valid, use the closest valid result
+            if (holesPlayed === 18) {
+              resultFormat = `${holesDifference}up`;
+            } else if (isClinched) {
+              // Find the exact valid clinched result that matches our calculation
+              const exactResult = `${holesDifference}/${18 - holesPlayed}`;
+              if (validResults.includes(exactResult)) {
+                resultFormat = exactResult;
+              } else {
+                // Find the closest valid clinched result
+                const validClinchedResults = validResults.filter(r => r.includes('/'));
+                if (validClinchedResults.length > 0) {
+                  // Find the result with the closest holes difference
+                  let closestResult = validClinchedResults[0];
+                  let minDifference = Math.abs(parseInt(validClinchedResults[0].split('/')[0]) - holesDifference);
+                  
+                  for (const result of validClinchedResults) {
+                    const resultDiff = parseInt(result.split('/')[0]);
+                    const diff = Math.abs(resultDiff - holesDifference);
+                    if (diff < minDifference) {
+                      minDifference = diff;
+                      closestResult = result;
+                    }
+                  }
+                  resultFormat = closestResult;
+                } else {
+                  resultFormat = `${holesDifference}up`;
+                }
+              }
+            } else {
+              resultFormat = `${holesDifference}up`;
+            }
+          }
+          
           return `${teamAName} won ${resultFormat}`;
         } else if (teamBWins > teamAWins) {
-          const resultFormat = holesPlayed === 18 ? `${holesDifference}up` : `${holesDifference}/${holesRemaining}`;
+          let resultFormat;
+          if (holesPlayed === 18) {
+            // Match went all 18 holes
+            resultFormat = `${holesDifference}up`;
+          } else if (isClinched) {
+            // Match clinched early - use X/Y format
+            resultFormat = `${holesDifference}/${holesRemaining}`;
+          } else {
+            // Match completed but not clinched early - use Xup format
+            resultFormat = `${holesDifference}up`;
+          }
+          
+          // Validate against the exact rules provided
+          const validResults = VALID_RESULTS[holesPlayed] || [];
+          if (!validResults.includes(resultFormat)) {
+            // If the calculated result is not valid, use the closest valid result
+            if (holesPlayed === 18) {
+              // For 18 holes, try to find a valid Xup result
+              const upResult = `${holesDifference}up`;
+              if (validResults.includes(upResult)) {
+                resultFormat = upResult;
+              } else {
+                resultFormat = validResults[0] || 'AS';
+              }
+            } else if (isClinched) {
+              // Find the exact valid clinched result that matches our calculation
+              const exactResult = `${holesDifference}/${18 - holesPlayed}`;
+              if (validResults.includes(exactResult)) {
+                resultFormat = exactResult;
+              } else {
+                // Find the closest valid clinched result
+                const validClinchedResults = validResults.filter(r => r.includes('/'));
+                if (validClinchedResults.length > 0) {
+                  // Find the result with the closest holes difference
+                  let closestResult = validClinchedResults[0];
+                  let minDifference = Math.abs(parseInt(validClinchedResults[0].split('/')[0]) - holesDifference);
+                  
+                  for (const result of validClinchedResults) {
+                    const resultDiff = parseInt(result.split('/')[0]);
+                    const diff = Math.abs(resultDiff - holesDifference);
+                    if (diff < minDifference) {
+                      minDifference = diff;
+                      closestResult = result;
+                    }
+                  }
+                  resultFormat = closestResult;
+                } else {
+                  resultFormat = validResults[0] || 'AS';
+                }
+              }
+            } else {
+              // For non-clinched matches, try to find a valid Xup result
+              const upResult = `${holesDifference}up`;
+              if (validResults.includes(upResult)) {
+                resultFormat = upResult;
+              } else {
+                resultFormat = validResults[0] || 'AS';
+              }
+            }
+          }
+          
           return `${teamBName} won ${resultFormat}`;
         } else {
           return `${teamAName} & ${teamBName} halved`;
@@ -369,7 +493,7 @@ export default function LiveScoring() {
               <Users className="w-6 h-6 text-blue-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Teams Ready</p>
+              <p className="text-sm font-medium text-gray-600">Teams</p>
               <p className="text-2xl font-bold text-gray-900">15</p>
             </div>
           </div>
@@ -406,7 +530,7 @@ export default function LiveScoring() {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">First Tee</p>
-              <p className="text-2xl font-bold text-gray-900">7:30 AM</p>
+              <p className="text-2xl font-bold text-gray-900">6:38 AM</p>
             </div>
           </div>
         </div>

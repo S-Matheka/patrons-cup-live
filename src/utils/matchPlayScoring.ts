@@ -71,6 +71,67 @@ export function calculateMatchPlayResult(
   let winner: 'teamA' | 'teamB' | 'halved' | null = null;
   let status: 'in-progress' | 'completed' = isMatchComplete ? 'completed' : 'in-progress';
 
+  // Valid match play results according to the exact rules provided
+  const VALID_RESULTS: Record<number, string[]> = {
+    18: ['AS', '1up', '2up'],
+    17: ['2/1', '2up', '3/1'],
+    16: ['3/2', '4/2'],
+    15: ['4/3', '5/3'],
+    14: ['5/4', '6/4'],
+    13: ['6/5', '7/5'],
+    12: ['7/6', '8/6'],
+    11: ['8/7', '9/7'],
+    10: ['9/8', '10/8']
+  };
+
+  // Helper function to get valid result
+  function getValidResult(holesPlayed: number, holesDifference: number, isClinched: boolean): string {
+    const validResults = VALID_RESULTS[holesPlayed] || [];
+    
+    if (holesPlayed === 18) {
+      // 18 holes - should be Xup format, but only if it's in the valid list
+      const upResult = `${holesDifference}up`;
+      if (validResults.includes(upResult)) {
+        return upResult;
+      }
+      // If not valid, return the first valid result
+      return validResults[0] || 'AS';
+    } else if (isClinched) {
+      // Find the exact valid clinched result that matches our calculation
+      const exactResult = `${holesDifference}/${18 - holesPlayed}`;
+      if (validResults.includes(exactResult)) {
+        return exactResult;
+      }
+      
+      // If exact result not found, find the closest valid clinched result
+      const validClinchedResults = validResults.filter((r: string) => r.includes('/'));
+      if (validClinchedResults.length > 0) {
+        // Find the result with the closest holes difference
+        let closestResult = validClinchedResults[0];
+        let minDifference = Math.abs(parseInt(validClinchedResults[0].split('/')[0]) - holesDifference);
+        
+        for (const result of validClinchedResults) {
+          const resultDiff = parseInt(result.split('/')[0]);
+          const diff = Math.abs(resultDiff - holesDifference);
+          if (diff < minDifference) {
+            minDifference = diff;
+            closestResult = result;
+          }
+        }
+        return closestResult;
+      }
+    }
+    
+    // For non-clinched matches, try to find a valid Xup result
+    const upResult = `${holesDifference}up`;
+    if (validResults.includes(upResult)) {
+      return upResult;
+    }
+    
+    // If no valid result found, return the first valid result or default
+    return validResults[0] || 'AS';
+  }
+
   if (isMatchComplete) {
     if (teamAHolesWon === teamBHolesWon) {
       // Match is tied after all holes - only possible if played to hole 18
@@ -82,8 +143,8 @@ export function calculateMatchPlayResult(
       winner = leadingTeam!;
     } else {
       // Match ended early - team is up by more holes than remain
-      // Format: holes_up/holes_remaining (e.g., 3/2, 4/3, etc.)
-      result = `${holesDifference}/${holesRemaining}`;
+      // Use valid result format
+      result = getValidResult(holesPlayed, holesDifference, true);
       winner = leadingTeam!;
     }
   } else {
@@ -205,7 +266,7 @@ export function calculateThreeWayResult(
   let teamAvsC = { teamAWins: 0, teamCWins: 0, holesPlayed: 0 };
   let teamBvsC = { teamBWins: 0, teamCWins: 0, holesPlayed: 0 };
 
-  holes.forEach(hole => {
+  holes.forEach((hole: any) => {
     // Handle both camelCase and snake_case property names for compatibility
     const teamAScore = hole.teamAScore !== undefined ? hole.teamAScore : (hole.team_a_score !== undefined ? hole.team_a_score : null);
     const teamBScore = hole.teamBScore !== undefined ? hole.teamBScore : (hole.team_b_score !== undefined ? hole.team_b_score : null);

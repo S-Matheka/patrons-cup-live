@@ -7,7 +7,6 @@ import { calculateMatchPlayResult, getMatchStatusDescription, formatMatchPlaySco
 import { canScoreMatch, MatchTimingInfo } from '@/utils/matchTiming';
 import { useAuth } from '@/context/AuthContext';
 import { useTournament } from '@/context/TournamentContextSwitcher';
-import { RefreshCw } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getAdminClient } from '@/lib/supabase-admin';
 

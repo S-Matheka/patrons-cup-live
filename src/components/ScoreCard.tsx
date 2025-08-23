@@ -213,12 +213,30 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
 
         console.log('✅ Hole score saved successfully:', data);
         
-        // Update local state
+        // Update local state immediately for better UX while real-time subscription catches up
+        const updatedHoles = match.holes.map(hole => 
+          hole.number === editingHole 
+            ? {
+                ...hole,
+                teamAScore: tempScores.teamA,
+                teamBScore: tempScores.teamB,
+                ...(match.isThreeWay && { teamCScore: tempScores.teamC }),
+                status: 'completed' as const
+              }
+            : hole
+        );
+
+        const updatedMatch: Match = {
+          ...match,
+          holes: updatedHoles
+        };
+
+        // Update local state immediately
         onSave(updatedMatch);
+        
+        // Real-time subscription will also update when it receives the change
       } catch (error) {
         console.error('❌ Failed to save hole score to database:', error);
-        // Still update local state to provide immediate feedback
-        onSave(updatedMatch);
         
         // Provide user-friendly error message
         const errorMessage = error instanceof Error ? error.message : String(error);

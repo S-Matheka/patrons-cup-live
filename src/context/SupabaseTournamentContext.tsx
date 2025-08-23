@@ -244,28 +244,46 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
   const handleHoleUpdate = (payload: any) => {
     const { eventType, new: newRecord, old: oldRecord } = payload;
 
+    console.log('🔄 Real-time hole update received:', {
+      eventType,
+      matchId: newRecord?.match_id || oldRecord?.match_id,
+      holeNumber: newRecord?.hole_number || oldRecord?.hole_number,
+      newRecord,
+      oldRecord
+    });
+
     setMatches(currentMatches => {
       return currentMatches.map(match => {
         if (match.id === (newRecord?.match_id || oldRecord?.match_id)) {
+          console.log('📋 Updating match:', match.id, 'Current holes:', match.holes.length);
+          
           const updatedHoles = [...match.holes];
           const holeIndex = updatedHoles.findIndex(h => h.number === (newRecord?.hole_number || oldRecord?.hole_number));
+
+          console.log('🔍 Hole index found:', holeIndex, 'for hole number:', newRecord?.hole_number || oldRecord?.hole_number);
 
           switch (eventType) {
             case 'INSERT':
             case 'UPDATE':
               if (holeIndex >= 0) {
-                updatedHoles[holeIndex] = transformSupabaseHole(newRecord);
+                const transformedHole = transformSupabaseHole(newRecord);
+                console.log('🔄 Updating existing hole:', transformedHole);
+                updatedHoles[holeIndex] = transformedHole;
               } else {
-                updatedHoles.push(transformSupabaseHole(newRecord));
+                const transformedHole = transformSupabaseHole(newRecord);
+                console.log('➕ Adding new hole:', transformedHole);
+                updatedHoles.push(transformedHole);
               }
               break;
             case 'DELETE':
               if (holeIndex >= 0) {
+                console.log('🗑️ Deleting hole at index:', holeIndex);
                 updatedHoles.splice(holeIndex, 1);
               }
               break;
           }
 
+          console.log('✅ Updated holes count:', updatedHoles.length);
           return { ...match, holes: updatedHoles };
         }
         return match;
@@ -319,8 +337,10 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
     par: supabaseHole.par,
     teamAScore: supabaseHole.team_a_score,
     teamBScore: supabaseHole.team_b_score,
+    teamCScore: supabaseHole.team_c_score,
     teamAStrokes: supabaseHole.team_a_strokes,
     teamBStrokes: supabaseHole.team_b_strokes,
+    teamCStrokes: supabaseHole.team_c_strokes,
     status: supabaseHole.status,
     lastUpdated: supabaseHole.last_updated
   });

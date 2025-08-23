@@ -296,11 +296,11 @@ export default function LiveScoring() {
 
       {/* Header */}
       <div className="text-center px-4 sm:px-0">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Tournament Scoring</h1>
-        <p className="text-sm sm:text-base text-gray-600 mt-2">4th Edition Patron's Cup 2025 - Live Tournament</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">🏆 FINAL DAY - SINGLES CHAMPIONSHIP 🏆</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-2">4th Edition Patron's Cup 2025 - The Ultimate Challenge</p>
         <div className="flex items-center justify-center space-x-2 mt-4">
-          <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-          <span className="text-xs sm:text-sm font-medium text-blue-600">AUG 22-24, 2025</span>
+          <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
+          <span className="text-xs sm:text-sm font-medium text-yellow-600 font-semibold">SUNDAY AUG 24, 2025 - SINGLES</span>
         </div>
       </div>
 
@@ -332,12 +332,12 @@ export default function LiveScoring() {
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Calendar className="w-6 h-6 text-green-600" />
+            <div className="p-2 bg-yellow-100 rounded-lg">
+              <Calendar className="w-6 h-6 text-yellow-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Days to Play</p>
-              <p className="text-2xl font-bold text-gray-900">3</p>
+              <p className="text-sm font-medium text-gray-600">Final Day</p>
+              <p className="text-2xl font-bold text-gray-900">SINGLES</p>
             </div>
           </div>
         </div>

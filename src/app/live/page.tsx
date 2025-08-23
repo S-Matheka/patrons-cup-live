@@ -156,15 +156,6 @@ export default function LiveScoring() {
       }
       
       // For 3-way Foursomes, show individual match results with proper match play scores
-      // Calculate individual head-to-head results
-      const holesData = match.holes.map(hole => ({
-        holeNumber: hole.number,
-        par: hole.par || 4,
-        teamAScore: hole.teamAScore,
-        teamBScore: hole.teamBScore,
-        teamCScore: hole.teamCScore
-      }));
-
       // Calculate individual matches
       let teamAvsB = { teamAWins: 0, teamBWins: 0, holesPlayed: 0 };
       let teamAvsC = { teamAWins: 0, teamCWins: 0, holesPlayed: 0 };

@@ -66,11 +66,13 @@ export interface Match {
   teamBId: number | null; // null for BYE matches
   teamCId?: number; // For 3-way matches (Foursomes and Singles)
   division: 'Trophy' | 'Shield' | 'Plaque' | 'Bowl' | 'Mug';
-  date: string;
+  date?: string;
+  match_date?: string;
   teeTime: string;
   tee: string; // Tee assignment (1st, 2nd, 10th, etc.)
   course: string;
-  type: '4BBB' | 'Foursomes' | 'Singles';
+  type?: '4BBB' | 'Foursomes' | 'Singles';
+  match_type?: '4BBB' | 'Foursomes' | 'Singles';
   session: 'AM' | 'PM';
   status: 'scheduled' | 'in-progress' | 'completed';
   players: {

@@ -187,7 +187,8 @@ export function formatMatchPlayScore(result: MatchPlayResult): string {
  */
 
 /**
- * Calculate 3-team stroke play result (for Foursomes)
+ * Calculate 3-team match play result (for Foursomes)
+ * This follows the same match play rules as 4BBB: hole-by-hole wins
  */
 export function calculateThreeWayResult(
   holes: Array<{
@@ -199,63 +200,116 @@ export function calculateThreeWayResult(
   }>,
   totalHoles: number = 18
 ): ThreeWayResult {
-  let teamATotal = 0;
-  let teamBTotal = 0;
-  let teamCTotal = 0;
-  let holesCompleted = 0;
+  let teamAHolesWon = 0;
+  let teamBHolesWon = 0;
+  let teamCHolesWon = 0;
+  let holesPlayed = 0;
 
-  // Calculate total scores for completed holes
+
+
+  // Calculate hole-by-hole wins (match play)
   holes.forEach(hole => {
-    if (hole.teamAScore !== null && hole.teamBScore !== null && hole.teamCScore !== null) {
-      teamATotal += hole.teamAScore;
-      teamBTotal += hole.teamBScore;
-      teamCTotal += hole.teamCScore;
-      holesCompleted++;
+    // Handle both camelCase and snake_case property names for compatibility
+    const teamAScore = hole.teamAScore !== undefined ? hole.teamAScore : (hole.team_a_score !== undefined ? hole.team_a_score : null);
+    const teamBScore = hole.teamBScore !== undefined ? hole.teamBScore : (hole.team_b_score !== undefined ? hole.team_b_score : null);
+    const teamCScore = hole.teamCScore !== undefined ? hole.teamCScore : (hole.team_c_score !== undefined ? hole.team_c_score : null);
+    
+    // Only count holes where at least 2 teams have valid scores
+    const validScores = [teamAScore, teamBScore, teamCScore].filter(score => score !== null && score > 0);
+    
+    if (validScores.length >= 2) {
+      holesPlayed++;
+      
+      // Find the lowest score (winner of the hole)
+      const scores = [
+        { team: 'teamA', score: teamAScore },
+        { team: 'teamB', score: teamBScore },
+        { team: 'teamC', score: teamCScore }
+      ].filter(s => s.score !== null && s.score > 0);
+      
+      scores.sort((a, b) => (a.score || 0) - (b.score || 0));
+      
+      const lowestScore = scores[0].score;
+      const winners = scores.filter(s => s.score === lowestScore);
+      
+      if (winners.length === 1) {
+        // Single winner
+        if (winners[0].team === 'teamA') teamAHolesWon++;
+        else if (winners[0].team === 'teamB') teamBHolesWon++;
+        else if (winners[0].team === 'teamC') teamCHolesWon++;
+      }
+      // If multiple teams tie for lowest score, no one wins the hole (halved)
     }
   });
-
-  // For 3-way stroke play, match is completed when all holes are played
-  // or when there's a clear winner with enough holes played to be statistically significant
-  const status: 'in-progress' | 'completed' = holesCompleted === totalHoles ? 'completed' : 'in-progress';
   
-  // Determine leader
+
+
+  // Determine match completion using match play rules
+  const holesRemaining = totalHoles - holesPlayed;
+  
+  // Find the leading team and margin
+  const scores = [
+    { team: 'teamA', holesWon: teamAHolesWon },
+    { team: 'teamB', holesWon: teamBHolesWon },
+    { team: 'teamC', holesWon: teamCHolesWon }
+  ];
+  
+  scores.sort((a, b) => b.holesWon - a.holesWon);
+  
+  const leaderHolesWon = scores[0].holesWon;
+  const secondPlaceHolesWon = scores[1].holesWon;
+  const thirdPlaceHolesWon = scores[2].holesWon;
+  
+  // Check if match is completed
+  // Match ends when: 1) All 18 holes played, OR 2) Team is up by more holes than remain
+  const holesDifference = leaderHolesWon - secondPlaceHolesWon;
+  const isMatchComplete = holesPlayed === totalHoles || holesDifference > holesRemaining;
+  
+  const status: 'in-progress' | 'completed' = isMatchComplete ? 'completed' : 'in-progress';
+  
+  // Determine result string
   let leader: 'teamA' | 'teamB' | 'teamC' | 'tied' | null = null;
   let result = '';
 
-  if (holesCompleted === 0) {
+  if (holesPlayed === 0) {
     result = 'Not Started';
     leader = null;
-  } else {
-    // Find the lowest score (leader in stroke play)
-    const scores = [
-      { team: 'teamA', total: teamATotal },
-      { team: 'teamB', total: teamBTotal },
-      { team: 'teamC', total: teamCTotal }
-    ];
-    
-    scores.sort((a, b) => a.total - b.total);
-    
-    const lowestScore = scores[0].total;
-    const leadersCount = scores.filter(s => s.total === lowestScore).length;
-    
-    if (leadersCount === 3) {
-      leader = 'tied';
+  } else if (leaderHolesWon === secondPlaceHolesWon && secondPlaceHolesWon === thirdPlaceHolesWon) {
+    // All teams tied
+    leader = 'tied';
+    if (status === 'completed') {
       result = 'All Teams Tied';
-    } else if (leadersCount === 2) {
-      const tiedTeams = scores.filter(s => s.total === lowestScore).map(s => s.team);
-      result = `${tiedTeams.join(' & ')} Tied for Lead`;
-      leader = 'tied';
     } else {
-      leader = scores[0].team as 'teamA' | 'teamB' | 'teamC';
-      const leadMargin = scores[1].total - scores[0].total;
-      // Ensure leadMargin is a valid number
-      const validLeadMargin = isNaN(leadMargin) ? 0 : leadMargin;
-      
-      // Different wording based on match status
-      if (status === 'completed') {
-        result = `${scores[0].team.toUpperCase()} wins by ${validLeadMargin}`;
+      result = 'All Square';
+    }
+  } else if (leaderHolesWon === secondPlaceHolesWon) {
+    // Two teams tied for lead
+    leader = 'tied';
+    const tiedTeams = scores.filter(s => s.holesWon === leaderHolesWon).map(s => s.team);
+    result = `${tiedTeams.join(' & ')} Tied for Lead`;
+  } else {
+    // Single leader
+    leader = scores[0].team as 'teamA' | 'teamB' | 'teamC';
+    const leadMargin = leaderHolesWon - secondPlaceHolesWon;
+    
+    if (status === 'completed') {
+      if (holesPlayed === totalHoles) {
+        // Match went all 18 holes
+        if (leadMargin === 0) {
+          result = 'All Square';
+        } else {
+          result = `${leadMargin}up`;
+        }
       } else {
-        result = `${scores[0].team.toUpperCase()} leads by ${validLeadMargin}`;
+        // Match ended early
+        result = `${leadMargin}/${holesRemaining}`;
+      }
+    } else {
+      // Match in progress
+      if (leadMargin === 0) {
+        result = 'All Square';
+      } else {
+        result = `${leadMargin}up`;
       }
     }
   }
@@ -264,9 +318,9 @@ export function calculateThreeWayResult(
     status,
     result,
     leader,
-    teamATotal: teamATotal || 0,
-    teamBTotal: teamBTotal || 0,
-    teamCTotal: teamCTotal || 0,
-    holesCompleted
+    teamATotal: teamAHolesWon,
+    teamBTotal: teamBHolesWon,
+    teamCTotal: teamCHolesWon,
+    holesCompleted: holesPlayed
   };
 }

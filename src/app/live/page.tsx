@@ -10,12 +10,57 @@ import { calculateThreeWayResult } from '@/utils/matchPlayScoring';
 import Link from 'next/link';
 
 export default function LiveScoring() {
-  const { teams, scores, matches, players } = useTournament();
+  const { teams, scores, matches, players, loading, refreshMatchData } = useTournament();
   const [selectedDivision, setSelectedDivision] = useState<'Trophy' | 'Shield' | 'Plaque' | 'Bowl' | 'Mug' | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'in-progress' | 'scheduled' | 'completed'>('all');
   const [activeDivision, setActiveDivision] = useState<'Trophy' | 'Shield' | 'Plaque' | 'Bowl' | 'Mug'>('Trophy');
 
 
+
+  // Filter 3-way Foursomes matches for debugging
+  const threeWayFoursomesMatches = matches.filter(match => 
+    match.isThreeWay && (match.type === 'Foursomes' || match.match_type === 'Foursomes')
+  );
+
+  // Show loading state while data is being fetched (only on client)
+  if (typeof window !== 'undefined' && loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white rounded-lg shadow-md p-8 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <div className="text-lg font-medium text-gray-900 mb-2">Loading tournament data...</div>
+            <div className="text-sm text-gray-500">Please wait while we fetch the latest scores and standings.</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if no data is loaded (only on client)
+  if (typeof window !== 'undefined' && (teams.length === 0 || matches.length === 0)) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white rounded-lg shadow-md p-8 text-center">
+            <div className="text-red-600 mb-4">
+              <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <div className="text-lg font-medium text-gray-900 mb-2">Unable to load tournament data</div>
+            <div className="text-sm text-gray-500 mb-4">Please check your connection and refresh the page.</div>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const filteredMatches = matches.filter(match => {
     const divisionMatch = selectedDivision === 'all' || match.division === selectedDivision;
@@ -67,62 +112,63 @@ export default function LiveScoring() {
   };
 
   const calculateMatchResult = (match: Match) => {
+
+    
     // Check match status first - scheduled matches should show "Scheduled"
     if (match.status === 'scheduled') {
       return 'Scheduled';
     }
     
     if (match.isThreeWay) {
-      // 3-team stroke play scoring
-      const holesData = match.holes.map(hole => ({
-        holeNumber: hole.number,
-        par: hole.par || 4,
-        teamAStrokes: hole.teamAScore,
-        teamBStrokes: hole.teamBScore,
-        teamCStrokes: hole.teamCScore
-      }));
+      // 3-team match play scoring (hole-by-hole wins)
+      const holesData = match.holes.map(hole => {
+        // Handle both camelCase and snake_case property names for compatibility
+        const teamAScore = hole.teamAScore !== undefined ? hole.teamAScore : (hole.team_a_score !== undefined ? hole.team_a_score : null);
+        const teamBScore = hole.teamBScore !== undefined ? hole.teamBScore : (hole.team_b_score !== undefined ? hole.team_b_score : null);
+        const teamCScore = hole.teamCScore !== undefined ? hole.teamCScore : (hole.team_c_score !== undefined ? hole.team_c_score : null);
+        
+        return {
+          holeNumber: hole.number,
+          par: hole.par || 4,
+          teamAScore: teamAScore,
+          teamBScore: teamBScore,
+          teamCScore: teamCScore
+        };
+      });
 
       const result = calculateThreeWayResult(holesData, 18);
       
-      if (result.holesCompleted === 0) return 'Not Started';
-      
+      // Get team names for display
       const teamA = teams.find(t => t.id === match.teamAId);
       const teamB = teams.find(t => t.id === match.teamBId);
       const teamC = teams.find(t => t.id === match.teamCId);
       
-      // Don't use the result.result from calculateThreeWayResult directly
-      // Instead, format our own result string with team names
+      // Check if there are any scores at all
+      const hasAnyScores = match.holes.some(hole => {
+        const teamAScore = hole.teamAScore !== undefined ? hole.teamAScore : (hole.team_a_score !== undefined ? hole.team_a_score : null);
+        const teamBScore = hole.teamBScore !== undefined ? hole.teamBScore : (hole.team_b_score !== undefined ? hole.team_b_score : null);
+        const teamCScore = hole.teamCScore !== undefined ? hole.teamCScore : (hole.team_c_score !== undefined ? hole.team_c_score : null);
+        return teamAScore !== null || teamBScore !== null || teamCScore !== null;
+      });
       
-      // First, sort teams by their scores (lowest is better in golf)
-      const scores = [
-        { team: 'teamA', total: result.teamATotal, name: teamA?.name },
-        { team: 'teamB', total: result.teamBTotal, name: teamB?.name },
-        { team: 'teamC', total: result.teamCTotal, name: teamC?.name }
-      ].sort((a, b) => a.total - b.total);
-      
-      // Check if all teams are tied
-      if (scores[0].total === scores[1].total && scores[1].total === scores[2].total) {
-        return `${scores[0].name}, ${scores[1].name} & ${scores[2].name} tied`;
-      } 
-      // Check if top two teams are tied
-      else if (scores[0].total === scores[1].total) {
-        return `${scores[0].name} & ${scores[1].name} tied for 1st`;
+      if (!hasAnyScores) {
+        return 'Not Started';
       }
-      // Not tied - we have a clear leader
-      else {
-        const leaderName = scores[0].name;
-        const opponents = [scores[1].name, scores[2].name].join(' & ');
-        const leadMargin = Math.min(
-          scores[1].total - scores[0].total,
-          scores[2].total - scores[0].total
-        );
+      
+      // Use the result from calculateThreeWayResult which now returns match play results
+      if (result.leader === 'tied') {
+        // All teams tied or two teams tied for lead
+        return result.result;
+      } else {
+        // Single leader
+        const leaderName = result.leader === 'teamA' ? teamA?.name : 
+                          result.leader === 'teamB' ? teamB?.name : 
+                          teamC?.name;
         
-        // Different wording based on match status
         if (match.status === 'completed') {
-          return `${leaderName} wins against ${opponents}`;
+          return `${leaderName} won ${result.result}`;
         } else {
-          // For in-progress matches, show current leader with "leads"
-          return `${leaderName} leads against ${opponents}`;
+          return `${leaderName} leads ${result.result}`;
         }
       }
     } else {
@@ -341,6 +387,22 @@ export default function LiveScoring() {
               <option value="scheduled">Scheduled</option>
               <option value="completed">Completed</option>
             </select>
+
+            <button
+              onClick={() => {
+                // Force refresh all 3-way Foursomes matches
+                const threeWayFoursomesMatches = matches.filter(match => 
+                  match.isThreeWay && (match.type === 'Foursomes' || match.match_type === 'Foursomes')
+                );
+                console.log('Refreshing matches:', threeWayFoursomesMatches.map(m => m.id));
+                threeWayFoursomesMatches.forEach(match => {
+                  refreshMatchData(match.id);
+                });
+              }}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Refresh Data
+            </button>
           </div>
         </div>
       </div>

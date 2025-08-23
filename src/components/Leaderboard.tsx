@@ -8,7 +8,7 @@ interface LeaderboardProps {
 }
 
 export default function Leaderboard({ activeDivision }: LeaderboardProps) {
-  const { teams, scores } = useTournament();
+  const { teams, scores, loading } = useTournament();
   
   // Filter scores by active division
   const divisionScores = scores.filter(score => score.division === activeDivision);
@@ -18,10 +18,40 @@ export default function Leaderboard({ activeDivision }: LeaderboardProps) {
     .filter(team => team.division === activeDivision)
     .sort((a, b) => a.seed - b.seed);
 
-  // Debug: Check if we have any teams at all
-  if (teams.length === 0) {
-    console.error('No teams loaded in Leaderboard component');
-    return <div className="p-4 text-red-600">Error: No teams data loaded</div>;
+  // Show loading state while data is being fetched (only on client)
+  if (typeof window !== 'undefined' && loading) {
+    return (
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="px-6 py-4 bg-gradient-to-r from-green-600 to-green-700">
+          <h2 className="text-xl font-bold text-white flex items-center">
+            <Medal className="w-5 h-5 mr-2" />
+            Tournament Seedings - {activeDivision} Division
+          </h2>
+        </div>
+        <div className="p-8 text-center text-gray-500">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
+          Loading tournament data...
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if no teams are loaded (only on client)
+  if (typeof window !== 'undefined' && teams.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="px-6 py-4 bg-gradient-to-r from-green-600 to-green-700">
+          <h2 className="text-xl font-bold text-white flex items-center">
+            <Medal className="w-5 h-5 mr-2" />
+            Tournament Seedings - {activeDivision} Division
+          </h2>
+        </div>
+        <div className="p-8 text-center text-red-600">
+          <div className="text-lg font-medium mb-2">No teams data loaded</div>
+          <div className="text-sm">Please check your connection and refresh the page.</div>
+        </div>
+      </div>
+    );
   }
 
 

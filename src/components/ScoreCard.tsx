@@ -58,13 +58,13 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
 
   const calculateMatchStatus = () => {
     if (match.isThreeWay && teamC) {
-      // 3-team stroke play scoring
+      // 3-team match play scoring (hole-by-hole wins)
       const holesData = match.holes.map(hole => ({
         holeNumber: hole.number,
         par: hole.par || 4,
-        teamAStrokes: hole.teamAScore,
-        teamBStrokes: hole.teamBScore,
-        teamCStrokes: hole.teamCScore
+        teamAScore: hole.teamAScore,
+        teamBScore: hole.teamBScore,
+        teamCScore: hole.teamCScore
       }));
 
       const result = calculateThreeWayResult(holesData, 18);
@@ -83,13 +83,17 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
         }
       } else {
         // For 3-way matches in progress, show who the leader is leading against
-        const leaderName = result.leader === 'teamA' ? teamA.name : 
-                          result.leader === 'teamB' ? teamB.name : 
-                          teamC.name;
-        const opponents = [teamA.name, teamB.name, teamC.name]
-          .filter(name => name !== leaderName)
-          .join(' & ');
-        return `${leaderName} leads against ${opponents} (${result.result})`;
+        if (result.leader === 'tied') {
+          return result.result; // "All Square" or "Team A & Team B Tied for Lead"
+        } else {
+          const leaderName = result.leader === 'teamA' ? teamA.name : 
+                            result.leader === 'teamB' ? teamB.name : 
+                            teamC.name;
+          const opponents = [teamA.name, teamB.name, teamC.name]
+            .filter(name => name !== leaderName)
+            .join(' & ');
+          return `${leaderName} leads against ${opponents} (${result.result})`;
+        }
       }
     } else {
       // 2-team match play scoring

@@ -250,7 +250,13 @@ export function calculateThreeWayResult(
       const leadMargin = scores[1].total - scores[0].total;
       // Ensure leadMargin is a valid number
       const validLeadMargin = isNaN(leadMargin) ? 0 : leadMargin;
-      result = `${scores[0].team.toUpperCase()} leads by ${validLeadMargin}`;
+      
+      // Different wording based on match status
+      if (status === 'completed') {
+        result = `${scores[0].team.toUpperCase()} wins by ${validLeadMargin}`;
+      } else {
+        result = `${scores[0].team.toUpperCase()} leads by ${validLeadMargin}`;
+      }
     }
   }
 

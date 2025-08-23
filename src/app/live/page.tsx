@@ -90,52 +90,39 @@ export default function LiveScoring() {
       const teamB = teams.find(t => t.id === match.teamBId);
       const teamC = teams.find(t => t.id === match.teamCId);
       
-      if (result.leader === 'tied') {
-        return result.result; // "All Teams Tied" or specific tie message
-      } else {
-        const leaderName = result.leader === 'teamA' ? teamA?.name : 
-                          result.leader === 'teamB' ? teamB?.name : 
-                          teamC?.name;
+      // Don't use the result.result from calculateThreeWayResult directly
+      // Instead, format our own result string with team names
+      
+      // First, sort teams by their scores (lowest is better in golf)
+      const scores = [
+        { team: 'teamA', total: result.teamATotal, name: teamA?.name },
+        { team: 'teamB', total: result.teamBTotal, name: teamB?.name },
+        { team: 'teamC', total: result.teamCTotal, name: teamC?.name }
+      ].sort((a, b) => a.total - b.total);
+      
+      // Check if all teams are tied
+      if (scores[0].total === scores[1].total && scores[1].total === scores[2].total) {
+        return `${scores[0].name}, ${scores[1].name} & ${scores[2].name} tied`;
+      } 
+      // Check if top two teams are tied
+      else if (scores[0].total === scores[1].total) {
+        return `${scores[0].name} & ${scores[1].name} tied for 1st`;
+      }
+      // Not tied - we have a clear leader
+      else {
+        const leaderName = scores[0].name;
+        const opponents = [scores[1].name, scores[2].name].join(' & ');
+        const leadMargin = Math.min(
+          scores[1].total - scores[0].total,
+          scores[2].total - scores[0].total
+        );
         
-        // For 3-way matches, show who the leader is leading against
-        const opponents = [teamA?.name, teamB?.name, teamC?.name]
-          .filter(name => name && name !== leaderName)
-          .join(' & ');
-        
-        if (result.status === 'completed') {
-          // For completed matches, show final result
-          const scores = [
-            { team: 'teamA', total: result.teamATotal, name: teamA?.name },
-            { team: 'teamB', total: result.teamBTotal, name: teamB?.name },
-            { team: 'teamC', total: result.teamCTotal, name: teamC?.name }
-          ].sort((a, b) => a.total - b.total);
-          
-          if (scores[0].total === scores[1].total && scores[1].total === scores[2].total) {
-            return `${scores[0].name}, ${scores[1].name} & ${scores[2].name} tied`;
-          } else if (scores[0].total === scores[1].total) {
-            return `${scores[0].name} & ${scores[1].name} tied for 1st`;
-          } else {
-            return `${leaderName} wins against ${opponents}`;
-          }
+        // Different wording based on match status
+        if (match.status === 'completed') {
+          return `${leaderName} wins against ${opponents}`;
         } else {
-          // For in-progress matches, show current lead
-          let leadMargin = 0;
-          if (result.leader === 'teamA') {
-            const margin1 = (result.teamBTotal || 0) - (result.teamATotal || 0);
-            const margin2 = (result.teamCTotal || 0) - (result.teamATotal || 0);
-            leadMargin = Math.min(margin1, margin2);
-          } else if (result.leader === 'teamB') {
-            const margin1 = (result.teamATotal || 0) - (result.teamBTotal || 0);
-            const margin2 = (result.teamCTotal || 0) - (result.teamBTotal || 0);
-            leadMargin = Math.min(margin1, margin2);
-          } else if (result.leader === 'teamC') {
-            const margin1 = (result.teamATotal || 0) - (result.teamCTotal || 0);
-            const margin2 = (result.teamBTotal || 0) - (result.teamCTotal || 0);
-            leadMargin = Math.min(margin1, margin2);
-          }
-          
-          const validLeadMargin = isNaN(leadMargin) ? 0 : leadMargin;
-          return `${leaderName} leads against ${opponents} by ${validLeadMargin}`;
+          // For in-progress matches, show current leader with "leads"
+          return `${leaderName} leads against ${opponents}`;
         }
       }
     } else {

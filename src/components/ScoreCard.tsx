@@ -246,6 +246,14 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
         // Update local state immediately
         onSave(updatedMatch);
         
+        // Force a re-render by updating the component state
+        setEditingHole(null);
+        setTempScores({ 
+          teamA: null, 
+          teamB: null,
+          ...(match.isThreeWay && { teamC: null })
+        });
+        
         // Real-time subscription will also update when it receives the change
       } catch (error) {
         console.error('❌ Failed to save hole score to database:', error);
@@ -263,13 +271,6 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
         // Update tournament standings
         await updateTournamentStandings(updatedMatch, matchPlayResult);
       }
-
-      setEditingHole(null);
-      setTempScores({ 
-        teamA: null, 
-        teamB: null,
-        ...(match.isThreeWay && { teamC: null })
-      });
     }
   };
 

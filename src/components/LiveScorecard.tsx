@@ -18,11 +18,11 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
     const diff = strokes - par;
     if (diff === -3) return { symbol: '🦅', label: 'Albatross', class: 'bg-purple-100 text-purple-800' };
     if (diff === -2) return { symbol: '🦅', label: 'Eagle', class: 'bg-blue-100 text-blue-800' };
-    if (diff === -1) return { symbol: '🐦', label: 'Birdie', class: 'bg-green-100 text-green-800' };
-    if (diff === 0) return { symbol: '⚪', label: 'Par', class: 'bg-gray-100 text-gray-800' };
-    if (diff === 1) return { symbol: '🔴', label: 'Bogey', class: 'bg-yellow-100 text-yellow-800' };
-    if (diff === 2) return { symbol: '🔴🔴', label: 'Double Bogey', class: 'bg-orange-100 text-orange-800' };
-    return { symbol: '❌', label: `+${diff}`, class: 'bg-red-100 text-red-800' };
+    if (diff === -1) return { symbol: '🔴', label: 'Birdie', class: 'bg-red-100 text-red-800' }; // RED for birdie
+    if (diff === 0) return { symbol: '⚪', label: 'Par', class: 'bg-gray-100 text-gray-800' }; // Grey for par
+    if (diff === 1) return { symbol: '🔵', label: 'Bogey', class: 'bg-blue-100 text-blue-800' }; // BLUE for bogey
+    if (diff >= 2) return { symbol: '⚫', label: `+${diff}`, class: 'bg-black text-white' }; // BLACK for double bogey+
+    return { symbol: '⚫', label: `+${diff}`, class: 'bg-black text-white' };
   };
 
   const getHoleStatus = (hole: Hole) => {

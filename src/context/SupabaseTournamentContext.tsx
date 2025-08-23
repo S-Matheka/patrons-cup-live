@@ -85,10 +85,32 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
         supabase.from('scores').select('*').order('points', { ascending: false })
       ]);
 
-      if (teamsRes.error) throw teamsRes.error;
-      if (playersRes.error) throw playersRes.error;
-      if (matchesRes.error) throw matchesRes.error;
-      if (scoresRes.error) throw scoresRes.error;
+      if (teamsRes.error) {
+        console.error('Error fetching teams:', teamsRes.error);
+        throw teamsRes.error;
+      }
+      
+      if (playersRes.error) {
+        console.error('Error fetching players:', playersRes.error);
+        throw playersRes.error;
+      }
+      
+      if (matchesRes.error) {
+        console.error('Error fetching matches:', matchesRes.error);
+        throw matchesRes.error;
+      }
+      
+      if (scoresRes.error) {
+        console.error('Error fetching scores:', scoresRes.error);
+        throw scoresRes.error;
+      }
+      
+      // Log teams data for debugging
+      console.log('📊 Teams data loaded:', {
+        count: teamsRes.data.length,
+        divisions: [...new Set(teamsRes.data.map(team => team.division))],
+        teamNames: teamsRes.data.map(team => team.name)
+      });
 
       // Transform Supabase data to match our types
       const transformedTeams: Team[] = teamsRes.data.map(team => ({

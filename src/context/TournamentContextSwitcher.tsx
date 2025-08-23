@@ -27,7 +27,7 @@ export const useTournament = (): TournamentContextType => {
 
 export const TournamentContextSwitcher: React.FC<TournamentContextSwitcherProps> = ({ 
   children, 
-  useSupabase = false 
+  useSupabase = true  // Default to true to always use Supabase
 }) => {
   const [isClient, setIsClient] = useState(false);
 
@@ -46,9 +46,11 @@ export const TournamentContextSwitcher: React.FC<TournamentContextSwitcherProps>
 
   // Always provide a context, but switch the implementation consistently
   if (shouldUseSupabase) {
+    console.log('Using Supabase provider for tournament data');
     return <SupabaseProvider>{children}</SupabaseProvider>;
   }
 
   // Default to localStorage provider (works for SSR and fallback)
+  console.log('Using localStorage provider for tournament data (fallback)');
   return <LocalStorageProvider>{children}</LocalStorageProvider>;
 };

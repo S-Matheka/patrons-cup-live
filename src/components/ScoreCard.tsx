@@ -19,6 +19,18 @@ interface ScoreCardProps {
 }
 
 const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSave }) => {
+  // Debug logging to see what data we're receiving
+  console.log('🎯 ScoreCard received match data:', {
+    matchId: match.id,
+    holesCount: match.holes?.length || 0,
+    holesWithScores: match.holes?.filter(h => h.teamAScore !== null || h.teamBScore !== null).length || 0,
+    firstFewHoles: match.holes?.slice(0, 3).map(h => ({
+      hole: h.number,
+      teamA: h.teamAScore,
+      teamB: h.teamBScore,
+      status: h.status
+    }))
+  });
   const [editingHole, setEditingHole] = useState<number | null>(null);
   const [tempScores, setTempScores] = useState<{ 
     teamA: number | null; 

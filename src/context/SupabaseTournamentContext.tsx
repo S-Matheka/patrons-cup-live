@@ -67,7 +67,7 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
           .from('matches')
           .select(`
             *,
-            holes!inner (
+            holes (
               hole_number,
               par,
               team_a_score,
@@ -119,6 +119,11 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
         isJunior: player.is_junior
       }));
 
+      console.log('📊 Loading matches data:', {
+        totalMatches: matchesRes.data.length,
+        matchesWithHoles: matchesRes.data.filter(m => m.holes && m.holes.length > 0).length
+      });
+
       const transformedMatches: Match[] = matchesRes.data.map(match => ({
         id: match.id,
         teamAId: match.team_a_id,
@@ -148,8 +153,24 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
           teamCStrokes: hole.team_c_strokes,
           status: hole.status,
           lastUpdated: hole.last_updated
-        }))
+        })).sort((a, b) => a.number - b.number) // Sort holes by number
       }));
+
+      // Debug: Log a sample match to see the transformed data
+      if (transformedMatches.length > 0) {
+        const sampleMatch = transformedMatches[0];
+        console.log('🎯 Sample match data:', {
+          id: sampleMatch.id,
+          holesCount: sampleMatch.holes?.length || 0,
+          holesWithScores: sampleMatch.holes?.filter(h => h.teamAScore !== null || h.teamBScore !== null).length || 0,
+          firstFewHoles: sampleMatch.holes?.slice(0, 3).map(h => ({
+            hole: h.number,
+            teamA: h.teamAScore,
+            teamB: h.teamBScore,
+            status: h.status
+          }))
+        });
+      }
 
       const transformedScores: Score[] = scoresRes.data.map(score => ({
         teamId: score.team_id,
@@ -200,7 +221,7 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'holes' },
         (payload) => {
-          console.log('Hole updated:', payload);
+          console.log('🔄 Real-time hole update received:', payload);
           handleHoleUpdate(payload);
         }
       )

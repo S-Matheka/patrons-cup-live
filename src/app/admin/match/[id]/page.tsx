@@ -25,6 +25,7 @@ export default function AdminMatchDetail() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isStartingMatch, setIsStartingMatch] = useState(false);
+  const [localMatch, setLocalMatch] = useState<Match | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated || !isOfficial) {
@@ -33,6 +34,15 @@ export default function AdminMatchDetail() {
     }
     setIsLoading(false);
   }, [isAuthenticated, isOfficial, router]);
+
+  // Sync local state with context when context updates
+  useEffect(() => {
+    const contextMatch = getMatchById(matchId);
+    if (contextMatch && (!localMatch || contextMatch.id !== localMatch.id)) {
+      console.log('🔄 Syncing local state with context update');
+      setLocalMatch(contextMatch);
+    }
+  }, [getMatchById, matchId, localMatch]);
 
   if (isLoading) {
     return (
@@ -64,7 +74,8 @@ export default function AdminMatchDetail() {
     );
   }
 
-  const match = getMatchById(matchId);
+  const contextMatch = getMatchById(matchId);
+  const match = localMatch || contextMatch;
   
   if (!match) {
     return (
@@ -147,7 +158,10 @@ export default function AdminMatchDetail() {
       holesWithScores: updatedMatch.holes.filter(h => h.teamAScore !== null || h.teamBScore !== null).length
     });
     
-    // Update the context - this will trigger a re-render with the updated data
+    // Update local state immediately for instant UI feedback
+    setLocalMatch(updatedMatch);
+    
+    // Also update the context for persistence
     updateMatch(matchId, updatedMatch);
   };
 

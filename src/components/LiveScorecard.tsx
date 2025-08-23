@@ -101,8 +101,12 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
     if (teamAWins === teamBWins) {
       results.push(`${teamA.name} vs ${teamB?.name}: AS`);
     } else {
-      const winnerName = teamAWins > teamBWins ? teamA.name : teamB?.name;
-      results.push(`${teamA.name} vs ${teamB?.name}: ${winnerName} wins ${resultFormat}`);
+      const leaderName = teamAWins > teamBWins ? teamA.name : teamB?.name;
+      if (match.status === 'completed') {
+        results.push(`${teamA.name} vs ${teamB?.name}: ${leaderName} wins ${resultFormat}`);
+      } else {
+        results.push(`${teamA.name} vs ${teamB?.name}: ${leaderName} leads ${resultFormat}`);
+      }
     }
     
     // Team A vs Team C
@@ -122,8 +126,12 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
     if (teamAWinsC === teamCWins) {
       results.push(`${teamA.name} vs ${teamC.name}: AS`);
     } else {
-      const winnerName = teamAWinsC > teamCWins ? teamA.name : teamC.name;
-      results.push(`${teamA.name} vs ${teamC.name}: ${winnerName} wins ${resultFormatAC}`);
+      const leaderName = teamAWinsC > teamCWins ? teamA.name : teamC.name;
+      if (match.status === 'completed') {
+        results.push(`${teamA.name} vs ${teamC.name}: ${leaderName} wins ${resultFormatAC}`);
+      } else {
+        results.push(`${teamA.name} vs ${teamC.name}: ${leaderName} leads ${resultFormatAC}`);
+      }
     }
     
     // Team B vs Team C
@@ -143,8 +151,12 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
     if (teamBWinsC === teamCWinsB) {
       results.push(`${teamB?.name} vs ${teamC.name}: AS`);
     } else {
-      const winnerName = teamBWinsC > teamCWinsB ? teamB?.name : teamC.name;
-      results.push(`${teamB?.name} vs ${teamC.name}: ${winnerName} wins ${resultFormatBC}`);
+      const leaderName = teamBWinsC > teamCWinsB ? teamB?.name : teamC.name;
+      if (match.status === 'completed') {
+        results.push(`${teamB?.name} vs ${teamC.name}: ${leaderName} wins ${resultFormatBC}`);
+      } else {
+        results.push(`${teamB?.name} vs ${teamC.name}: ${leaderName} leads ${resultFormatBC}`);
+      }
     }
     
     return results;

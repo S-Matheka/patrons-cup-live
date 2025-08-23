@@ -38,7 +38,7 @@ export default function TournamentCountdown({
     // Tournament dates and times (all in EAT)
     const fridayStart = new Date('2025-08-22T07:30:00+03:00'); // Friday first match
     const saturdayStart = new Date('2025-08-23T07:30:00+03:00'); // Saturday first match
-    const sundayStart = new Date('2025-08-24T07:30:00+03:00'); // Sunday first match (Singles)
+    const sundayStart = new Date('2025-08-24T06:38:00+03:00'); // Sunday first match (Singles)
     
     // If before Friday start, count down to Friday
     if (now < fridayStart) {
@@ -63,9 +63,9 @@ export default function TournamentCountdown({
     // If Saturday has started but before Sunday, count down to Sunday (Final Day)
     if (now >= saturdayStart && now < sundayStart) {
       return {
-        date: '2025-08-24T07:30:00+03:00',
+        date: '2025-08-24T06:38:00+03:00',
         label: '🏆 FINAL DAY 🏆',
-        description: 'Sunday Singles matches at 7:30 AM',
+        description: 'Sunday Singles matches at 6:38 AM',
         icon: <Sun className="w-5 h-5 text-yellow-500" />
       };
     }

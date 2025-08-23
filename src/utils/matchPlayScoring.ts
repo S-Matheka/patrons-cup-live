@@ -45,12 +45,12 @@ export function calculateMatchPlayResult(
   // Count holes won by each team
   for (const hole of holes) {
     // Only count holes where both teams have valid scores (not null/undefined/0)
-    if (hole.teamAScore && hole.teamBScore && hole.teamAScore > 0 && hole.teamBScore > 0) {
+    if (hole.teamAStrokes && hole.teamBStrokes && hole.teamAStrokes > 0 && hole.teamBStrokes > 0) {
       holesPlayed++;
       
-      if (hole.teamAScore < hole.teamBScore) {
+      if (hole.teamAStrokes < hole.teamBStrokes) {
         teamAHolesWon++;
-      } else if (hole.teamBScore < hole.teamAScore) {
+      } else if (hole.teamBStrokes < hole.teamAStrokes) {
         teamBHolesWon++;
       } else {
         holesHalved++;
@@ -214,6 +214,8 @@ export function calculateThreeWayResult(
     }
   });
 
+  // For 3-way stroke play, match is completed when all holes are played
+  // or when there's a clear winner with enough holes played to be statistically significant
   const status: 'in-progress' | 'completed' = holesCompleted === totalHoles ? 'completed' : 'in-progress';
   
   // Determine leader

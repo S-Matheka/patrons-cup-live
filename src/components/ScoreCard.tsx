@@ -261,8 +261,7 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
           const { error: matchStatusError } = await adminClient
             .from('matches')
             .update({ 
-              status: 'completed',
-              last_updated: new Date().toISOString()
+              status: 'completed'
             })
             .eq('id', match.id);
 

@@ -20,7 +20,7 @@ import Link from 'next/link';
 
 export default function AdminDashboard() {
   const { user, isAuthenticated, isOfficial, isAdmin, isScorer, logout } = useAuth();
-  const { teams, matches } = useTournament();
+  const { teams, matches, loading } = useTournament();
   const router = useRouter();
   const [officialRole, setOfficialRole] = useState('');
 
@@ -54,6 +54,18 @@ export default function AdminDashboard() {
           >
             Go to Login
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading state to prevent hydration mismatch
+  if (loading || !teams || !matches) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading tournament data...</p>
         </div>
       </div>
     );

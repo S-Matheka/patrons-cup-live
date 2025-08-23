@@ -447,6 +447,7 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
     players,
     matches,
     scores,
+    loading,
     updateMatch,
     updateScore,
     getTeamById,

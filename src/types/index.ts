@@ -108,6 +108,7 @@ export interface TournamentContextType {
   players: Player[];
   matches: Match[];
   scores: Score[];
+  loading?: boolean;
   updateMatch: (matchId: number, updatedMatch: Match) => void;
   updateScore: (teamId: number, updatedScore: Score) => void;
   getTeamById: (id: number) => Team | undefined;

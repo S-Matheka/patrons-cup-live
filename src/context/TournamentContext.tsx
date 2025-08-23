@@ -422,6 +422,7 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
     players,
     matches,
     scores,
+    loading: false, // localStorage context is always ready
     updateMatch,
     updateScore,
     getTeamById,

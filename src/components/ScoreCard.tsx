@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { calculateMatchPlayResult, getMatchStatusDescription, formatMatchPlayScore, calculateThreeWayResult, ThreeWayResult } from '@/utils/matchPlayScoring';
 import { canScoreMatch, MatchTimingInfo } from '@/utils/matchTiming';
 import { useAuth } from '@/context/AuthContext';
-import { useTournament } from '@/context/TournamentContext';
+import { useTournament } from '@/context/TournamentContextSwitcher';
 import { supabase } from '@/lib/supabase';
 
 interface ScoreCardProps {

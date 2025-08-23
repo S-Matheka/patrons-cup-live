@@ -1,6 +1,6 @@
 'use client';
 
-import { useTournament } from '@/context/TournamentContext';
+import { useTournament } from '@/context/TournamentContextSwitcher';
 import { Clock, TrendingUp, TrendingDown, Zap, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 

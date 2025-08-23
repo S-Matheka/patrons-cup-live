@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { useTournament } from '@/context/TournamentContext';
+import { useTournament } from '@/context/TournamentContextSwitcher';
 import { Shield, ArrowLeft, Search, Filter, Edit3, Clock, Play, CheckCircle, Lock, AlertTriangle } from 'lucide-react';
 import { canScoreMatch } from '@/utils/matchTiming';
 import Link from 'next/link';

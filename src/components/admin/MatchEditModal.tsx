@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 
 import { Match, Team, Player } from '@/types';
-import { useTournament } from '@/context/TournamentContext';
+import { useTournament } from '@/context/TournamentContextSwitcher';
 import { X, Save, Calendar, Clock, Users, MapPin, UserPlus, UserMinus, AlertCircle } from 'lucide-react';
 
 interface MatchEditModalProps {

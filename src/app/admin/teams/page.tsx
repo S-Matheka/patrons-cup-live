@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { useTournament } from '@/context/TournamentContext';
+import { useTournament } from '@/context/TournamentContextSwitcher';
 import { supabase } from '@/lib/supabase';
 import { Team, Player } from '@/types';
 import TeamEditModal from '@/components/admin/TeamEditModal';

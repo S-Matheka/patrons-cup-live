@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { matchStatusManager } from '@/utils/matchStatusManager';
-import { useTournament } from '@/context/TournamentContext';
+import { useTournament } from '@/context/TournamentContextSwitcher';
 import { supabase } from '@/lib/supabase';
 import { Play, Pause, RotateCcw, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { getCurrentEAT, parseTeeTimeEAT } from '@/utils/timezone';

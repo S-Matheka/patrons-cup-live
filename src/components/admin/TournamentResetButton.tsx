@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { RefreshCw, AlertTriangle, CheckCircle } from 'lucide-react';
 import { getAdminClient } from '@/lib/supabase-admin';
-import { useTournament } from '@/context/TournamentContext';
+import { useTournament } from '@/context/TournamentContextSwitcher';
 
 interface TournamentResetButtonProps {
   onComplete?: () => void;

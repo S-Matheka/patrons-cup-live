@@ -1,6 +1,6 @@
 'use client';
 
-import { useTournament } from '@/context/TournamentContext';
+import { useTournament } from '@/context/TournamentContextSwitcher';
 import { Score, Team } from '@/types';
 import { useState, useMemo } from 'react';
 import { Trophy, Medal, TrendingUp, TrendingDown, Minus, Clock } from 'lucide-react';

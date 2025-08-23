@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { getAdminClient } from '@/lib/supabase-admin';
 import { Player, Team } from '@/types';
-import { useTournament } from '@/context/TournamentContext';
+import { useTournament } from '@/context/TournamentContextSwitcher';
 import { X, Save, User, UserPlus } from 'lucide-react';
 
 interface PlayerEditModalProps {

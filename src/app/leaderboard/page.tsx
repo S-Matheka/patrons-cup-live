@@ -1,6 +1,6 @@
 'use client';
 
-import { useTournament } from '@/context/TournamentContext';
+import { useTournament } from '@/context/TournamentContextSwitcher';
 import { useState, useMemo } from 'react';
 import { Trophy, Medal, TrendingUp, TrendingDown, Minus, Clock, CheckCircle } from 'lucide-react';
 import TournamentCountdown from '@/components/TournamentCountdown';

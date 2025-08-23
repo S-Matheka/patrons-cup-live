@@ -1,6 +1,6 @@
 'use client';
 
-import { useTournament } from '@/context/TournamentContext';
+import { useTournament } from '@/context/TournamentContextSwitcher';
 import { Trophy, Users, Target, TrendingUp } from 'lucide-react';
 
 export default function StatsPage() {

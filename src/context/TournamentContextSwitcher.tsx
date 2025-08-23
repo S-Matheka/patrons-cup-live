@@ -1,13 +1,29 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { TournamentProvider as LocalStorageProvider } from './TournamentContext';
-import { TournamentProvider as SupabaseProvider } from './SupabaseTournamentContext';
+import React, { useState, useEffect, useContext } from 'react';
+import { TournamentProvider as LocalStorageProvider, useTournament as useLocalStorageTournament } from './TournamentContext';
+import { TournamentProvider as SupabaseProvider, useTournament as useSupabaseTournament } from './SupabaseTournamentContext';
+import { TournamentContextType } from '@/types';
 
 interface TournamentContextSwitcherProps {
   children: React.ReactNode;
   useSupabase?: boolean;
 }
+
+// Create a unified useTournament hook that works with both contexts
+export const useTournament = (): TournamentContextType => {
+  // Try Supabase context first
+  try {
+    return useSupabaseTournament();
+  } catch (error) {
+    // If Supabase context is not available, try localStorage context
+    try {
+      return useLocalStorageTournament();
+    } catch (error) {
+      throw new Error('useTournament must be used within a TournamentProvider');
+    }
+  }
+};
 
 export const TournamentContextSwitcher: React.FC<TournamentContextSwitcherProps> = ({ 
   children, 

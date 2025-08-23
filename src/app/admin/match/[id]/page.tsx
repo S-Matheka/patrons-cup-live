@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { useTournament } from '@/context/TournamentContext';
+import { useTournament } from '@/context/TournamentContextSwitcher';
 import { Match } from '@/types';
 import { ArrowLeft, AlertCircle, Shield, Lock, Clock, Play, CheckCircle } from 'lucide-react';
 import ScoreCard from '@/components/ScoreCard';

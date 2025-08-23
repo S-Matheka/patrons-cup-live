@@ -1,6 +1,6 @@
 'use client';
 
-import { useTournament } from '@/context/TournamentContext';
+import { useTournament } from '@/context/TournamentContextSwitcher';
 import { Match, Hole } from '@/types';
 import { useState } from 'react';
 import { Clock, CheckCircle, Circle, ExternalLink, Filter, Calendar, Users, Trophy, Medal } from 'lucide-react';

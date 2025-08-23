@@ -1,6 +1,6 @@
 'use client';
 
-import { useTournament } from '@/context/TournamentContext';
+import { useTournament } from '@/context/TournamentContextSwitcher';
 import { Medal, TrendingUp } from 'lucide-react';
 
 interface LeaderboardProps {

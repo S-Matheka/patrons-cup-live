@@ -1,6 +1,6 @@
 'use client';
 
-import { useTournament } from '@/context/TournamentContext';
+import { useTournament } from '@/context/TournamentContextSwitcher';
 import { useState } from 'react';
 import { Users, Mail, Phone, Trophy, Medal } from 'lucide-react';
 

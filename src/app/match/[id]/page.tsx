@@ -1,6 +1,6 @@
 'use client';
 
-import { useTournament } from '@/context/TournamentContext';
+import { useTournament } from '@/context/TournamentContextSwitcher';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
 import LiveScorecard from '@/components/LiveScorecard';

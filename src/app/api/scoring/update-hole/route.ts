@@ -82,65 +82,56 @@ export async function POST(request: NextRequest) {
       let isMatchComplete = false;
 
       if (isThreeWay) {
-        // 3-way match play logic
-        let teamAHolesWon = 0;
-        let teamBHolesWon = 0;
-        let teamCHolesWon = 0;
-        let holesPlayed = 0;
+        // 3-way match play logic - treat as individual head-to-head matches
+        let teamAvsB = { teamAWins: 0, teamBWins: 0, holesPlayed: 0 };
+        let teamAvsC = { teamAWins: 0, teamCWins: 0, holesPlayed: 0 };
+        let teamBvsC = { teamBWins: 0, teamCWins: 0, holesPlayed: 0 };
 
         matchHoles.forEach(hole => {
-          // Only count holes where at least 2 teams have valid scores
-          const validScores = [
-            hole.team_a_score, 
-            hole.team_b_score, 
-            hole.team_c_score
-          ].filter(score => score !== null && score > 0);
-          
-          if (validScores.length >= 2) {
-            holesPlayed++;
-            
-            // Find the lowest score (winner of the hole)
-            const scores = [
-              { team: 'teamA', score: hole.team_a_score },
-              { team: 'teamB', score: hole.team_b_score },
-              { team: 'teamC', score: hole.team_c_score }
-            ].filter(s => s.score !== null && s.score > 0);
-            
-            scores.sort((a, b) => (a.score || 0) - (b.score || 0));
-            
-            const lowestScore = scores[0].score;
-            const winners = scores.filter(s => s.score === lowestScore);
-            
-            if (winners.length === 1) {
-              // Single winner
-              if (winners[0].team === 'teamA') teamAHolesWon++;
-              else if (winners[0].team === 'teamB') teamBHolesWon++;
-              else if (winners[0].team === 'teamC') teamCHolesWon++;
+          // Team A vs Team B
+          if (hole.team_a_score && hole.team_b_score && hole.team_a_score > 0 && hole.team_b_score > 0) {
+            teamAvsB.holesPlayed++;
+            if (hole.team_a_score < hole.team_b_score) {
+              teamAvsB.teamAWins++;
+            } else if (hole.team_b_score < hole.team_a_score) {
+              teamAvsB.teamBWins++;
             }
-            // If multiple teams tie for lowest score, no one wins the hole (halved)
+          }
+
+          // Team A vs Team C
+          if (hole.team_a_score && hole.team_c_score && hole.team_a_score > 0 && hole.team_c_score > 0) {
+            teamAvsC.holesPlayed++;
+            if (hole.team_a_score < hole.team_c_score) {
+              teamAvsC.teamAWins++;
+            } else if (hole.team_c_score < hole.team_a_score) {
+              teamAvsC.teamCWins++;
+            }
+          }
+
+          // Team B vs Team C
+          if (hole.team_b_score && hole.team_c_score && hole.team_b_score > 0 && hole.team_c_score > 0) {
+            teamBvsC.holesPlayed++;
+            if (hole.team_b_score < hole.team_c_score) {
+              teamBvsC.teamBWins++;
+            } else if (hole.team_c_score < hole.team_b_score) {
+              teamBvsC.teamCWins++;
+            }
           }
         });
 
-        const holesRemaining = 18 - holesPlayed;
+        // Calculate individual match results
+        const teamAWins = (teamAvsB.teamAWins > teamAvsB.teamBWins ? 1 : 0) + 
+                         (teamAvsC.teamAWins > teamAvsC.teamCWins ? 1 : 0);
+        const teamBWins = (teamAvsB.teamBWins > teamAvsB.teamAWins ? 1 : 0) + 
+                         (teamBvsC.teamBWins > teamBvsC.teamCWins ? 1 : 0);
+        const teamCWins = (teamAvsC.teamCWins > teamAvsC.teamAWins ? 1 : 0) + 
+                         (teamBvsC.teamCWins > teamBvsC.teamBWins ? 1 : 0);
+
+        // Match is complete when all individual matches are complete
+        const maxHolesPlayed = Math.max(teamAvsB.holesPlayed, teamAvsC.holesPlayed, teamBvsC.holesPlayed);
+        isMatchComplete = maxHolesPlayed === 18;
         
-        // Find the leading team and margin
-        const scores = [
-          { team: 'teamA', holesWon: teamAHolesWon },
-          { team: 'teamB', holesWon: teamBHolesWon },
-          { team: 'teamC', holesWon: teamCHolesWon }
-        ];
-        
-        scores.sort((a, b) => b.holesWon - a.holesWon);
-        
-        const leaderHolesWon = scores[0].holesWon;
-        const secondPlaceHolesWon = scores[1].holesWon;
-        
-        // Check if match is completed
-        // Match ends when: 1) All 18 holes played, OR 2) Team is up by more holes than remain
-        const holesDifference = leaderHolesWon - secondPlaceHolesWon;
-        isMatchComplete = holesPlayed === 18 || holesDifference > holesRemaining;
-        
-        console.log(`3-way match completion check: holesPlayed=${holesPlayed}, leader=${scores[0].team} (${leaderHolesWon}), second=${scores[1].team} (${secondPlaceHolesWon}), difference=${holesDifference}, remaining=${holesRemaining}, complete=${isMatchComplete}`);
+        console.log(`3-way match completion check: maxHolesPlayed=${maxHolesPlayed}, teamA=${teamAWins} wins, teamB=${teamBWins} wins, teamC=${teamCWins} wins, complete=${isMatchComplete}`);
         
       } else {
         // 2-way match play logic (existing code)

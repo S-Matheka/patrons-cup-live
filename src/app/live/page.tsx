@@ -155,19 +155,85 @@ export default function LiveScoring() {
         return 'Not Started';
       }
       
-      // Use the result from calculateThreeWayResult which now returns match play results
-      if (result.leader === 'tied') {
-        // All teams tied or two teams tied for lead
-        return result.result;
-      } else {
-        // Single leader
-        const leaderName = result.leader === 'teamA' ? teamA?.name : 
-                          result.leader === 'teamB' ? teamB?.name : 
-                          teamC?.name;
+      // For 3-way Foursomes, show individual match results with proper match play scores
+      // Calculate individual head-to-head results
+      const holesData = match.holes.map(hole => ({
+        holeNumber: hole.number,
+        par: hole.par || 4,
+        teamAScore: hole.teamAScore,
+        teamBScore: hole.teamBScore,
+        teamCScore: hole.teamCScore
+      }));
+
+      // Calculate individual matches
+      let teamAvsB = { teamAWins: 0, teamBWins: 0, holesPlayed: 0 };
+      let teamAvsC = { teamAWins: 0, teamCWins: 0, holesPlayed: 0 };
+      let teamBvsC = { teamBWins: 0, teamCWins: 0, holesPlayed: 0 };
+
+      holesData.forEach(hole => {
+        // Team A vs Team B
+        if (hole.teamAScore && hole.teamBScore && hole.teamAScore > 0 && hole.teamBScore > 0) {
+          teamAvsB.holesPlayed++;
+          if (hole.teamAScore < hole.teamBScore) {
+            teamAvsB.teamAWins++;
+          } else if (hole.teamBScore < hole.teamAScore) {
+            teamAvsB.teamBWins++;
+          }
+        }
+
+        // Team A vs Team C
+        if (hole.teamAScore && hole.teamCScore && hole.teamAScore > 0 && hole.teamCScore > 0) {
+          teamAvsC.holesPlayed++;
+          if (hole.teamAScore < hole.teamCScore) {
+            teamAvsC.teamAWins++;
+          } else if (hole.teamCScore < hole.teamAScore) {
+            teamAvsC.teamCWins++;
+          }
+        }
+
+        // Team B vs Team C
+        if (hole.teamBScore && hole.teamCScore && hole.teamBScore > 0 && hole.teamCScore > 0) {
+          teamBvsC.holesPlayed++;
+          if (hole.teamBScore < hole.teamCScore) {
+            teamBvsC.teamBWins++;
+          } else if (hole.teamCScore < hole.teamBScore) {
+            teamBvsC.teamCWins++;
+          }
+        }
+      });
+
+      // Format individual match results
+      const formatMatchResult = (teamAWins: number, teamBWins: number, holesPlayed: number, teamAName: string, teamBName: string) => {
+        if (holesPlayed === 0) return 'Not Started';
         
-        if (match.status === 'completed') {
-          return `${leaderName} won ${result.result}`;
+        const holesRemaining = 18 - holesPlayed;
+        const holesDifference = Math.abs(teamAWins - teamBWins);
+        
+        if (teamAWins > teamBWins) {
+          const resultFormat = holesPlayed === 18 ? `${holesDifference}up` : `${holesDifference}/${holesRemaining}`;
+          return `${teamAName} won ${resultFormat}`;
+        } else if (teamBWins > teamAWins) {
+          const resultFormat = holesPlayed === 18 ? `${holesDifference}up` : `${holesDifference}/${holesRemaining}`;
+          return `${teamBName} won ${resultFormat}`;
         } else {
+          return `${teamAName} & ${teamBName} halved`;
+        }
+      };
+
+      const teamAvsBResult = formatMatchResult(teamAvsB.teamAWins, teamAvsB.teamBWins, teamAvsB.holesPlayed, teamA?.name || 'Team A', teamB?.name || 'Team B');
+      const teamAvsCResult = formatMatchResult(teamAvsC.teamAWins, teamAvsC.teamCWins, teamAvsC.holesPlayed, teamA?.name || 'Team A', teamC?.name || 'Team C');
+      const teamBvsCResult = formatMatchResult(teamBvsC.teamBWins, teamBvsC.teamCWins, teamBvsC.holesPlayed, teamB?.name || 'Team B', teamC?.name || 'Team C');
+
+      if (match.status === 'completed') {
+        return `${teamAvsBResult}, ${teamAvsCResult}, ${teamBvsCResult}`;
+      } else {
+        // For in-progress matches, show current leader
+        if (result.leader === 'tied') {
+          return result.result; // "All Teams Tied" or "Teams Tied for Lead"
+        } else {
+          const leaderName = result.leader === 'teamA' ? teamA?.name : 
+                            result.leader === 'teamB' ? teamB?.name : 
+                            teamC?.name;
           return `${leaderName} leads ${result.result}`;
         }
       }

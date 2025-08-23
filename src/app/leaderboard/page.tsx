@@ -41,42 +41,38 @@ export default function LeaderboardPage() {
           <TournamentCountdown />
         </div>
 
-        {/* Tournament Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center">
-              <CheckCircle className="w-8 h-8 text-green-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Completed</p>
-                <p className="text-2xl font-bold text-gray-900">{tournamentStats.completed}</p>
-              </div>
-            </div>
+        {/* Tournament Progress */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium text-gray-900">Tournament Progress</h3>
+            <span className="text-2xl font-bold text-green-600">
+              {tournamentStats.total > 0 ? Math.round((tournamentStats.completed / tournamentStats.total) * 100) : 0}%
+            </span>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center">
-              <Clock className="w-8 h-8 text-yellow-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Live</p>
-                <p className="text-2xl font-bold text-gray-900">{tournamentStats.inProgress}</p>
-              </div>
-            </div>
+          <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+            <div 
+              className="bg-green-600 h-2 rounded-full transition-all duration-300"
+              style={{ 
+                width: `${tournamentStats.total > 0 ? (tournamentStats.completed / tournamentStats.total) * 100 : 0}%` 
+              }}
+            ></div>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center">
-              <Clock className="w-8 h-8 text-gray-400" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Scheduled</p>
-                <p className="text-2xl font-bold text-gray-900">{tournamentStats.scheduled}</p>
-              </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div>
+              <div className="text-xl font-bold text-gray-600">{tournamentStats.completed}</div>
+              <div className="text-xs text-gray-500">Completed</div>
             </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center">
-              <Trophy className="w-8 h-8 text-blue-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total</p>
-                <p className="text-2xl font-bold text-gray-900">{tournamentStats.total}</p>
-              </div>
+            <div>
+              <div className="text-xl font-bold text-green-600">{tournamentStats.inProgress}</div>
+              <div className="text-xs text-gray-500">Live</div>
+            </div>
+            <div>
+              <div className="text-xl font-bold text-blue-600">{tournamentStats.scheduled}</div>
+              <div className="text-xs text-gray-500">Scheduled</div>
+            </div>
+            <div>
+              <div className="text-xl font-bold text-purple-600">{tournamentStats.total}</div>
+              <div className="text-xs text-gray-500">Total</div>
             </div>
           </div>
         </div>

@@ -265,7 +265,9 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
       if (match.status === 'completed') {
         results.push(`${winnerName} won ${resultFormat}`);
       } else {
-        results.push(`${winnerName} leads ${resultFormat}`);
+        // For in-progress matches, show simple "1up", "2up" format
+        const simpleFormat = holesDifference === 0 ? 'AS' : `${holesDifference}up`;
+        results.push(`${winnerName} ${simpleFormat}`);
       }
     }
     
@@ -291,7 +293,9 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
       if (match.status === 'completed') {
         results.push(`${winnerName} won ${resultFormatAC}`);
       } else {
-        results.push(`${winnerName} leads ${resultFormatAC}`);
+        // For in-progress matches, show simple "1up", "2up" format
+        const simpleFormat = holesDifferenceAC === 0 ? 'AS' : `${holesDifferenceAC}up`;
+        results.push(`${winnerName} ${simpleFormat}`);
       }
     }
     
@@ -311,13 +315,15 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
     
     if (teamBWinsC === teamCWinsB) {
       results.push(`${teamB?.name} & ${teamC.name} halved`);
-    } else {
+      } else {
       const resultFormatBC = formatValidatedResult(holesPlayed, holesDifferenceBC, isClinchedBC);
       const winnerName = teamBWinsC > teamCWinsB ? teamB?.name : teamC.name;
       if (match.status === 'completed') {
         results.push(`${winnerName} won ${resultFormatBC}`);
       } else {
-        results.push(`${winnerName} leads ${resultFormatBC}`);
+        // For in-progress matches, show simple "1up", "2up" format
+        const simpleFormat = holesDifferenceBC === 0 ? 'AS' : `${holesDifferenceBC}up`;
+        results.push(`${winnerName} ${simpleFormat}`);
       }
     }
     
@@ -380,8 +386,9 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
         return `${teamA.name} & ${teamB?.name} halved`;
       } else {
         const leaderName = result.teamAHolesWon > result.teamBHolesWon ? teamA.name : teamB?.name;
-        const trailingName = result.teamAHolesWon > result.teamBHolesWon ? teamB?.name : teamA.name;
-        return `${leaderName} leads ${score}`;
+        // For in-progress matches, show simple "1up", "2up" format
+        const simpleFormat = result.result === 'AS' ? 'AS' : result.result;
+        return `${leaderName} ${simpleFormat}`;
       }
     }
   };

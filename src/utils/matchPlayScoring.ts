@@ -311,11 +311,18 @@ export function calculateThreeWayResult(
   const teamCWins = (teamAvsC.teamCWins > teamAvsC.teamAWins ? 1 : 0) + 
                    (teamBvsC.teamCWins > teamBvsC.teamBWins ? 1 : 0);
 
-  // Determine match completion - match is complete when all individual matches are complete
-  const maxHolesPlayed = Math.max(teamAvsB.holesPlayed, teamAvsC.holesPlayed, teamBvsC.holesPlayed);
-  const isMatchComplete = maxHolesPlayed === totalHoles;
+  // Determine individual matchup completion
+  const isTeamAvsBComplete = teamAvsB.holesPlayed === totalHoles || Math.abs(teamAvsB.teamAWins - teamAvsB.teamBWins) > (totalHoles - teamAvsB.holesPlayed);
+  const isTeamAvsCComplete = teamAvsC.holesPlayed === totalHoles || Math.abs(teamAvsC.teamAWins - teamAvsC.teamCWins) > (totalHoles - teamAvsC.holesPlayed);
+  const isTeamBvsCComplete = teamBvsC.holesPlayed === totalHoles || Math.abs(teamBvsC.teamBWins - teamBvsC.teamCWins) > (totalHoles - teamBvsC.holesPlayed);
+  
+  // Overall match is complete when ALL individual matchups are complete
+  const isMatchComplete = isTeamAvsBComplete && isTeamAvsCComplete && isTeamBvsCComplete;
   
   const status: 'in-progress' | 'completed' = isMatchComplete ? 'completed' : 'in-progress';
+  
+  // Calculate maximum holes played across all matchups
+  const maxHolesPlayed = Math.max(teamAvsB.holesPlayed, teamAvsC.holesPlayed, teamBvsC.holesPlayed);
   
   // Determine result string
   let leader: 'teamA' | 'teamB' | 'teamC' | 'tied' | null = null;

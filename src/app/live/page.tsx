@@ -139,17 +139,12 @@ export default function LiveScoring() {
     if (match.isThreeWay) {
       // 3-team match play scoring (hole-by-hole wins)
       const holesData = match.holes.map(hole => {
-        // Handle both camelCase and snake_case property names for compatibility
-        const teamAScore = hole.teamAScore !== undefined ? hole.teamAScore : (hole.team_a_score !== undefined ? hole.team_a_score : null);
-        const teamBScore = hole.teamBScore !== undefined ? hole.teamBScore : (hole.team_b_score !== undefined ? hole.team_b_score : null);
-        const teamCScore = hole.teamCScore !== undefined ? hole.teamCScore : (hole.team_c_score !== undefined ? hole.team_c_score : null);
-        
         return {
           holeNumber: hole.number,
           par: hole.par || 4,
-          teamAScore: teamAScore,
-          teamBScore: teamBScore,
-          teamCScore: teamCScore
+          teamAScore: hole.teamAScore,
+          teamBScore: hole.teamBScore,
+          teamCScore: hole.teamCScore || null
         };
       });
 
@@ -162,10 +157,7 @@ export default function LiveScoring() {
       
       // Check if there are any scores at all
       const hasAnyScores = match.holes.some(hole => {
-        const teamAScore = hole.teamAScore !== undefined ? hole.teamAScore : (hole.team_a_score !== undefined ? hole.team_a_score : null);
-        const teamBScore = hole.teamBScore !== undefined ? hole.teamBScore : (hole.team_b_score !== undefined ? hole.team_b_score : null);
-        const teamCScore = hole.teamCScore !== undefined ? hole.teamCScore : (hole.team_c_score !== undefined ? hole.team_c_score : null);
-        return teamAScore !== null || teamBScore !== null || teamCScore !== null;
+        return hole.teamAScore !== null || hole.teamBScore !== null || hole.teamCScore !== null;
       });
       
       if (!hasAnyScores) {
@@ -441,19 +433,58 @@ export default function LiveScoring() {
       const teamAvsCFormatted = calculateHeadToHead(holesWithScores, 'teamA', 'teamC', teamA?.name || 'Team A', teamC?.name || 'Team C');
       const teamBvsCFormatted = calculateHeadToHead(holesWithScores, 'teamB', 'teamC', teamB?.name || 'Team B', teamC?.name || 'Team C');
 
-      if (match.status === 'completed') {
-        return `${teamAvsBFormatted}, ${teamAvsCFormatted}, ${teamBvsCFormatted}`;
+      // Always show detailed head-to-head results for both completed and in-progress matches
+      const results = [];
+      
+      // Team A vs Team B
+      const teamAvsBResult = calculateHeadToHead(holesWithScores, 'teamA', 'teamB', teamA?.name || 'Team A', teamB?.name || 'Team B');
+      if (teamAvsBResult.includes('halved')) {
+        results.push(`${teamA?.name || 'Team A'} & ${teamB?.name || 'Team B'} halved`);
       } else {
-        // For in-progress matches, show current leader
-        if (result.leader === 'tied') {
-          return result.result; // "All Teams Tied" or "Teams Tied for Lead"
+        const winnerName = teamAvsBResult.split(' ')[0];
+        const score = teamAvsBResult.split(' ').slice(-1)[0];
+        const loserName = winnerName === (teamA?.name || 'Team A') ? (teamB?.name || 'Team B') : (teamA?.name || 'Team A');
+        // Replace "AS" with "halved" format
+        if (score === 'AS') {
+          results.push(`${winnerName} & ${loserName} halved`);
         } else {
-          const leaderName = result.leader === 'teamA' ? teamA?.name : 
-                            result.leader === 'teamB' ? teamB?.name : 
-                            teamC?.name;
-          return `${leaderName} leads ${result.result}`;
+          results.push(`${winnerName} ${score} against ${loserName}`);
         }
       }
+      
+      // Team A vs Team C
+      const teamAvsCResult = calculateHeadToHead(holesWithScores, 'teamA', 'teamC', teamA?.name || 'Team A', teamC?.name || 'Team C');
+      if (teamAvsCResult.includes('halved')) {
+        results.push(`${teamA?.name || 'Team A'} & ${teamC?.name || 'Team C'} halved`);
+      } else {
+        const winnerName = teamAvsCResult.split(' ')[0];
+        const score = teamAvsCResult.split(' ').slice(-1)[0];
+        const loserName = winnerName === (teamA?.name || 'Team A') ? (teamC?.name || 'Team C') : (teamA?.name || 'Team A');
+        // Replace "AS" with "halved" format
+        if (score === 'AS') {
+          results.push(`${winnerName} & ${loserName} halved`);
+        } else {
+          results.push(`${winnerName} ${score} against ${loserName}`);
+        }
+      }
+      
+      // Team B vs Team C
+      const teamBvsCResult = calculateHeadToHead(holesWithScores, 'teamB', 'teamC', teamB?.name || 'Team B', teamC?.name || 'Team C');
+      if (teamBvsCResult.includes('halved')) {
+        results.push(`${teamB?.name || 'Team B'} & ${teamC?.name || 'Team C'} halved`);
+      } else {
+        const winnerName = teamBvsCResult.split(' ')[0];
+        const score = teamBvsCResult.split(' ').slice(-1)[0];
+        const loserName = winnerName === (teamB?.name || 'Team B') ? (teamC?.name || 'Team C') : (teamB?.name || 'Team B');
+        // Replace "AS" with "halved" format
+        if (score === 'AS') {
+          results.push(`${winnerName} & ${loserName} halved`);
+        } else {
+          results.push(`${winnerName} ${score} against ${loserName}`);
+        }
+      }
+      
+      return results.join(' • ');
     } else {
       // 2-team match play scoring
       let teamAWins = 0;
@@ -795,7 +826,7 @@ export default function LiveScoring() {
                             </div>
                             <div className="grid grid-cols-1 gap-2 text-xs">
                               <div className="min-w-0">
-                                <div className="font-medium text-gray-700 truncate">{teamA?.name}</div>
+                                <div className="font-medium text-gray-700">{teamA?.name}</div>
                                 {teamAPlayers.map(player => (
                                   <div key={player.id} className="text-gray-600 text-xs sm:text-sm truncate">
                                     {player.name}
@@ -804,7 +835,7 @@ export default function LiveScoring() {
                                 ))}
                               </div>
                               <div className="min-w-0">
-                                <div className="font-medium text-gray-700 truncate">{teamB?.name}</div>
+                                <div className="font-medium text-gray-700">{teamB?.name}</div>
                                 {teamBPlayers.map(player => (
                                   <div key={player.id} className="text-gray-600 text-xs sm:text-sm truncate">
                                     {player.name}
@@ -813,7 +844,7 @@ export default function LiveScoring() {
                                 ))}
                               </div>
                               <div className="min-w-0">
-                                <div className="font-medium text-gray-700 truncate">{teamC?.name}</div>
+                                <div className="font-medium text-gray-700">{teamC?.name}</div>
                                 {teamCPlayers.map(player => (
                                   <div key={player.id} className="text-gray-600 text-xs sm:text-sm truncate">
                                     {player.name}
@@ -830,7 +861,7 @@ export default function LiveScoring() {
                             </div>
                             <div className="grid grid-cols-1 gap-2 text-xs">
                               <div className="min-w-0">
-                                <div className="font-medium text-gray-700 truncate">{teamA?.name}</div>
+                                <div className="font-medium text-gray-700">{teamA?.name}</div>
                                 {teamAPlayers.map(player => (
                                   <div key={player.id} className="text-gray-600 text-xs sm:text-sm truncate">
                                     {player.name}
@@ -840,7 +871,7 @@ export default function LiveScoring() {
                                 ))}
                               </div>
                               <div className="min-w-0">
-                                <div className="font-medium text-gray-700 truncate">{teamB?.name}</div>
+                                <div className="font-medium text-gray-700">{teamB?.name}</div>
                                 {teamBPlayers.map(player => (
                                   <div key={player.id} className="text-gray-600 text-xs sm:text-sm truncate">
                                     {player.name}
@@ -934,4 +965,4 @@ export default function LiveScoring() {
       </div>
     </div>
   );
-} 
+}

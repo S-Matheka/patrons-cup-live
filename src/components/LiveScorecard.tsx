@@ -238,92 +238,89 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
     
     if (holesWithScores.length === 0) return null;
     
-    // Calculate head-to-head results for each pair using sacred logic
+    // Use the exact same logic as the live page for consistency
+    const calculateHeadToHead = (holes: Hole[], team1: string, team2: string, team1Name: string, team2Name: string) => {
+      let team1Wins = 0;
+      let team2Wins = 0;
+      
+      holes.forEach(hole => {
+        const team1Score = team1 === 'teamA' ? hole.teamAScore : 
+                          team1 === 'teamB' ? hole.teamBScore : 
+                          hole.teamCScore;
+        const team2Score = team2 === 'teamA' ? hole.teamAScore : 
+                          team2 === 'teamB' ? hole.teamBScore : 
+                          hole.teamCScore;
+        
+        if (team1Score! < team2Score!) {
+          team1Wins++;
+        } else if (team2Score! < team1Score!) {
+          team2Wins++;
+        }
+      });
+      
+      const holesPlayed = holes.length;
+      const holesDifference = Math.abs(team1Wins - team2Wins);
+      const holesRemaining = 18 - holesPlayed;
+      const isClinched = holesDifference > holesRemaining;
+      
+      if (team1Wins === team2Wins) {
+        return `${team1Name} & ${team2Name} halved`;
+      } else if (team1Wins > team2Wins) {
+        const result = formatValidatedResult(holesPlayed, holesDifference, isClinched);
+        return `${team1Name} won ${result}`;
+      } else {
+        const result = formatValidatedResult(holesPlayed, holesDifference, isClinched);
+        return `${team2Name} won ${result}`;
+      }
+    };
+    
     const results = [];
     
     // Team A vs Team B
-    let teamAWins = 0;
-    let teamBWins = 0;
-    holesWithScores.forEach(hole => {
-      if (hole.teamAScore! < hole.teamBScore!) {
-        teamAWins++;
-      } else if (hole.teamBScore! < hole.teamAScore!) {
-        teamBWins++;
-      }
-    });
-    
-    const holesPlayed = holesWithScores.length;
-    const holesDifference = Math.abs(teamAWins - teamBWins);
-    const holesRemaining = 18 - holesPlayed;
-    const isClinched = holesDifference > holesRemaining;
-    
-    if (teamAWins === teamBWins) {
+    const teamAvsBResult = calculateHeadToHead(holesWithScores, 'teamA', 'teamB', teamA.name, teamB?.name || 'Team B');
+    if (teamAvsBResult.includes('halved')) {
       results.push(`${teamA.name} & ${teamB?.name} halved`);
     } else {
-      const resultFormat = formatValidatedResult(holesPlayed, holesDifference, isClinched);
-      const winnerName = teamAWins > teamBWins ? teamA.name : teamB?.name;
-      if (match.status === 'completed') {
-        results.push(`${winnerName} won ${resultFormat}`);
+      const winnerName = teamAvsBResult.split(' ')[0];
+      const score = teamAvsBResult.split(' ').slice(-1)[0];
+      const loserName = winnerName === teamA.name ? (teamB?.name || 'Team B') : teamA.name;
+      // Replace "AS" with "halved" format
+      if (score === 'AS') {
+        results.push(`${winnerName} & ${loserName} halved`);
       } else {
-        // For in-progress matches, show simple "1up", "2up" format
-        const simpleFormat = holesDifference === 0 ? 'AS' : `${holesDifference}up`;
-        results.push(`${winnerName} ${simpleFormat}`);
+        results.push(`${winnerName} ${score} against ${loserName}`);
       }
     }
     
     // Team A vs Team C
-    let teamAWinsC = 0;
-    let teamCWins = 0;
-    holesWithScores.forEach(hole => {
-      if (hole.teamAScore! < hole.teamCScore!) {
-        teamAWinsC++;
-      } else if (hole.teamCScore! < hole.teamAScore!) {
-        teamCWins++;
-      }
-    });
-    
-    const holesDifferenceAC = Math.abs(teamAWinsC - teamCWins);
-    const isClinchedAC = holesDifferenceAC > holesRemaining;
-    
-    if (teamAWinsC === teamCWins) {
+    const teamAvsCResult = calculateHeadToHead(holesWithScores, 'teamA', 'teamC', teamA.name, teamC.name);
+    if (teamAvsCResult.includes('halved')) {
       results.push(`${teamA.name} & ${teamC.name} halved`);
     } else {
-      const resultFormatAC = formatValidatedResult(holesPlayed, holesDifferenceAC, isClinchedAC);
-      const winnerName = teamAWinsC > teamCWins ? teamA.name : teamC.name;
-      if (match.status === 'completed') {
-        results.push(`${winnerName} won ${resultFormatAC}`);
+      const winnerName = teamAvsCResult.split(' ')[0];
+      const score = teamAvsCResult.split(' ').slice(-1)[0];
+      const loserName = winnerName === teamA.name ? teamC.name : teamA.name;
+      // Replace "AS" with "halved" format
+      if (score === 'AS') {
+        results.push(`${winnerName} & ${loserName} halved`);
       } else {
-        // For in-progress matches, show simple "1up", "2up" format
-        const simpleFormat = holesDifferenceAC === 0 ? 'AS' : `${holesDifferenceAC}up`;
-        results.push(`${winnerName} ${simpleFormat}`);
+        results.push(`${winnerName} ${score} against ${loserName}`);
       }
     }
     
     // Team B vs Team C
-    let teamBWinsC = 0;
-    let teamCWinsB = 0;
-    holesWithScores.forEach(hole => {
-      if (hole.teamBScore! < hole.teamCScore!) {
-        teamBWinsC++;
-      } else if (hole.teamCScore! < hole.teamBScore!) {
-        teamCWinsB++;
-      }
-    });
-    
-    const holesDifferenceBC = Math.abs(teamBWinsC - teamCWinsB);
-    const isClinchedBC = holesDifferenceBC > holesRemaining;
-    
-    if (teamBWinsC === teamCWinsB) {
+    const teamBvsCResult = calculateHeadToHead(holesWithScores, 'teamB', 'teamC', teamB?.name || 'Team B', teamC.name);
+    if (teamBvsCResult.includes('halved')) {
       results.push(`${teamB?.name} & ${teamC.name} halved`);
+    } else {
+      const winnerName = teamBvsCResult.split(' ')[0];
+      const score = teamBvsCResult.split(' ').slice(-1)[0];
+      const loserName = winnerName === (teamB?.name || 'Team B') ? teamC.name : (teamB?.name || 'Team B');
+      // Replace "AS" with "halved" format
+      if (score === 'AS') {
+        results.push(`${winnerName} & ${loserName} halved`);
       } else {
-      const resultFormatBC = formatValidatedResult(holesPlayed, holesDifferenceBC, isClinchedBC);
-      const winnerName = teamBWinsC > teamCWinsB ? teamB?.name : teamC.name;
-      if (match.status === 'completed') {
-        results.push(`${winnerName} won ${resultFormatBC}`);
-      } else {
-        // For in-progress matches, show simple "1up", "2up" format
-        const simpleFormat = holesDifferenceBC === 0 ? 'AS' : `${holesDifferenceBC}up`;
-        results.push(`${winnerName} ${simpleFormat}`);
+        results.push(`${winnerName} ${score} against ${loserName}`);
       }
     }
     
@@ -488,7 +485,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
                 {teamA.logo}
               </div>
               <div className="min-w-0">
-                <h3 className="font-bold text-gray-900 text-sm truncate">{teamA.name}</h3>
+                <h3 className="font-bold text-gray-900 text-sm">{teamA.name}</h3>
                 <p className="text-xs text-gray-600 truncate">{teamA.description}</p>
               </div>
             </div>
@@ -509,7 +506,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
                 {teamB.logo}
               </div>
               <div className="min-w-0">
-                <h3 className="font-bold text-gray-900 text-sm truncate">{teamB.name}</h3>
+                <h3 className="font-bold text-gray-900 text-sm">{teamB.name}</h3>
                 <p className="text-xs text-gray-600 truncate">{teamB.description}</p>
               </div>
             </div>
@@ -531,7 +528,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
                   {teamC.logo}
                 </div>
                 <div className="min-w-0">
-                  <h3 className="font-bold text-gray-900 text-sm truncate">{teamC.name}</h3>
+                  <h3 className="font-bold text-gray-900 text-sm">{teamC.name}</h3>
                   <p className="text-xs text-gray-600 truncate">{teamC.description}</p>
                 </div>
               </div>

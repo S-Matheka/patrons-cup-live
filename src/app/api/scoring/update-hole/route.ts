@@ -127,11 +127,15 @@ export async function POST(request: NextRequest) {
         const teamCWins = (teamAvsC.teamCWins > teamAvsC.teamAWins ? 1 : 0) + 
                          (teamBvsC.teamCWins > teamBvsC.teamBWins ? 1 : 0);
 
-        // Match is complete when all individual matches are complete
-        const maxHolesPlayed = Math.max(teamAvsB.holesPlayed, teamAvsC.holesPlayed, teamBvsC.holesPlayed);
-        isMatchComplete = maxHolesPlayed === 18;
+        // Determine individual matchup completion
+        const isTeamAvsBComplete = teamAvsB.holesPlayed === 18 || Math.abs(teamAvsB.teamAWins - teamAvsB.teamBWins) > (18 - teamAvsB.holesPlayed);
+        const isTeamAvsCComplete = teamAvsC.holesPlayed === 18 || Math.abs(teamAvsC.teamAWins - teamAvsC.teamCWins) > (18 - teamAvsC.holesPlayed);
+        const isTeamBvsCComplete = teamBvsC.holesPlayed === 18 || Math.abs(teamBvsC.teamBWins - teamBvsC.teamCWins) > (18 - teamBvsC.holesPlayed);
         
-        console.log(`3-way match completion check: maxHolesPlayed=${maxHolesPlayed}, teamA=${teamAWins} wins, teamB=${teamBWins} wins, teamC=${teamCWins} wins, complete=${isMatchComplete}`);
+        // Overall match is complete when ALL individual matchups are complete
+        isMatchComplete = isTeamAvsBComplete && isTeamAvsCComplete && isTeamBvsCComplete;
+        
+        console.log(`3-way match completion check: A vs B (${isTeamAvsBComplete ? 'COMPLETE' : 'IN PROGRESS'}), A vs C (${isTeamAvsCComplete ? 'COMPLETE' : 'IN PROGRESS'}), B vs C (${isTeamBvsCComplete ? 'COMPLETE' : 'IN PROGRESS'}), overall complete=${isMatchComplete}`);
         
       } else {
         // 2-way match play logic (4BBB, Singles) - using the same validation logic

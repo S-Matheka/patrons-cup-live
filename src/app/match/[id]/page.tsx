@@ -160,7 +160,7 @@ export default function MatchDetail() {
                   {teamA.logo}
                 </div>
                 <div className="min-w-0">
-                  <div className="font-bold text-white text-lg truncate">{teamA.name}</div>
+                  <div className="font-bold text-white text-lg">{teamA.name}</div>
                   <div className="text-green-100 text-sm truncate">{teamA.description}</div>
                   <div className="text-green-100 text-xs mt-1">
                     {teamAPlayers.length > 0 
@@ -187,7 +187,7 @@ export default function MatchDetail() {
                   {teamB.logo}
                 </div>
                 <div className="min-w-0">
-                  <div className="font-bold text-white text-lg truncate">{teamB.name}</div>
+                  <div className="font-bold text-white text-lg">{teamB.name}</div>
                   <div className="text-green-100 text-sm truncate">{teamB.description}</div>
                   <div className="text-green-100 text-xs mt-1">
                     {teamBPlayers.length > 0 
@@ -215,7 +215,7 @@ export default function MatchDetail() {
                       {teamC.logo}
                     </div>
                     <div className="min-w-0">
-                      <div className="font-bold text-white text-lg truncate">{teamC.name}</div>
+                      <div className="font-bold text-white text-lg">{teamC.name}</div>
                       <div className="text-green-100 text-sm truncate">{teamC.description}</div>
                       <div className="text-green-100 text-xs mt-1">
                         {match.teamCId && getMatchPlayers(match.teamCId, match.type === 'Singles' ? 1 : 2).length > 0 
@@ -247,7 +247,7 @@ export default function MatchDetail() {
                   {teamA.logo}
                 </div>
                 <div className="min-w-0">
-                  <div className="font-bold text-white text-xl truncate">{teamA.name}</div>
+                  <div className="font-bold text-white text-xl">{teamA.name}</div>
                   <div className="text-green-100 text-sm truncate">{teamA.description}</div>
                   <div className="text-green-100 text-xs mt-1">
                     {teamAPlayers.length > 0 
@@ -264,7 +264,7 @@ export default function MatchDetail() {
               
               <div className="flex items-center space-x-4">
                 <div className={`${match.isThreeWay ? 'text-center' : 'text-right'} min-w-0`}>
-                  <div className="font-bold text-white text-xl truncate">{teamB.name}</div>
+                  <div className="font-bold text-white text-xl">{teamB.name}</div>
                   <div className="text-green-100 text-sm truncate">{teamB.description}</div>
                   <div className="text-green-100 text-xs mt-1">
                     {teamBPlayers.length > 0 
@@ -290,7 +290,7 @@ export default function MatchDetail() {
                   
                   <div className="flex items-center space-x-4">
                     <div className="text-center min-w-0">
-                      <div className="font-bold text-white text-xl truncate">{teamC.name}</div>
+                      <div className="font-bold text-white text-xl">{teamC.name}</div>
                       <div className="text-green-100 text-sm truncate">{teamC.description}</div>
                       <div className="text-green-100 text-xs mt-1">
                         {match.teamCId && getMatchPlayers(match.teamCId, match.type === 'Singles' ? 1 : 2).length > 0 

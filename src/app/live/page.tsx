@@ -27,56 +27,53 @@ export default function LiveScoring() {
     match.isThreeWay && (match.type === 'Foursomes' || match.match_type === 'Foursomes')
   );
 
-  // Show loading state while data is being fetched (only on client)
-  if (isMounted && loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <div className="text-lg font-medium text-gray-900 mb-2">Loading tournament data...</div>
-            <div className="text-sm text-gray-500">Please wait while we fetch the latest scores and standings.</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Show error state if no data is loaded (only on client)
-  if (isMounted && (teams.length === 0 || matches.length === 0)) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <div className="text-red-600 mb-4">
-              <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
-            </div>
-            <div className="text-lg font-medium text-gray-900 mb-2">Unable to load tournament data</div>
-            <div className="text-sm text-gray-500 mb-4">Please check your connection and refresh the page.</div>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-            >
-              Refresh Page
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Show loading state during initial mount to prevent hydration mismatch
+  // Show minimal loading state during initial mount to prevent hydration mismatch
   if (!isMounted) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <div className="text-lg font-medium text-gray-900 mb-2">Loading tournament data...</div>
-            <div className="text-sm text-gray-500">Please wait while we fetch the latest scores and standings.</div>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Live Tournament Scoring</h1>
+              <p className="text-gray-600 mt-1">Real-time updates from the course</p>
+            </div>
           </div>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Division</label>
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                <option value="all">All Divisions</option>
+              </select>
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                <option value="all">All Status</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Matches Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Placeholder cards */}
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="bg-white rounded-lg shadow-md p-6">
+              <div className="animate-pulse">
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
+                <div className="space-y-2">
+                  <div className="h-3 bg-gray-200 rounded"></div>
+                  <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );

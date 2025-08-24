@@ -38,13 +38,49 @@ export default function Dashboard() {
     };
   }, [isClient, matches]);
 
-  // Show loading state during SSR
+  // Show minimal loading state during SSR
   if (!isClient) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading tournament data...</p>
+      <div className="space-y-6">
+        {/* Tournament Countdown */}
+        <div className="max-w-6xl mx-auto px-4">
+          <TournamentCountdown />
+        </div>
+
+        {/* Tournament Progress */}
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-gray-900">Tournament Progress</h3>
+              <span className="text-2xl font-bold text-green-600">0%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+              <div className="bg-green-600 h-2 rounded-full transition-all duration-300" style={{ width: '0%' }}></div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+              <div>
+                <div className="text-xl font-bold text-gray-600">0</div>
+                <div className="text-xs text-gray-500">Completed</div>
+              </div>
+              <div>
+                <div className="text-xl font-bold text-green-600">0</div>
+                <div className="text-xs text-gray-500">Live</div>
+              </div>
+              <div>
+                <div className="text-xl font-bold text-blue-600">0</div>
+                <div className="text-xs text-gray-500">Scheduled</div>
+              </div>
+              <div>
+                <div className="text-xl font-bold text-purple-600">0</div>
+                <div className="text-xs text-gray-500">Total</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Leaderboard Section */}
+        <div className="max-w-6xl mx-auto">
+          <FinalLeaderboard />
         </div>
       </div>
     );

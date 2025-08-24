@@ -262,7 +262,7 @@ export default function AdminScoring() {
                               {teamA?.logo}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <div className="font-medium text-gray-900 truncate">{teamA?.name}</div>
+                              <div className="font-medium text-gray-900">{teamA?.name}</div>
                               <div className="text-sm text-gray-600 truncate">{teamA?.description}</div>
                             </div>
                           </div>
@@ -280,7 +280,7 @@ export default function AdminScoring() {
                           {/* Team B */}
                           <div className="flex items-center space-x-3 sm:justify-end">
                             <div className="min-w-0 flex-1 sm:text-right">
-                              <div className="font-medium text-gray-900 truncate">{teamB?.name}</div>
+                              <div className="font-medium text-gray-900">{teamB?.name}</div>
                               <div className="text-sm text-gray-600 truncate">{teamB?.description}</div>
                             </div>
                             <div 

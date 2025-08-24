@@ -27,8 +27,8 @@ export default function LiveScoring() {
     match.isThreeWay && (match.type === 'Foursomes' || match.match_type === 'Foursomes')
   );
 
-  // Show minimal loading state during initial mount to prevent hydration mismatch
-  if (!isMounted) {
+  // Show loading state during initial mount or while data is loading
+  if (!isMounted || loading) {
     return (
       <div className="space-y-6">
         {/* Header */}

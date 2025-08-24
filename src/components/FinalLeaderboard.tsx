@@ -18,7 +18,7 @@ export default function FinalLeaderboard({
   showTabs = true,
   showDebug = false
 }: FinalLeaderboardProps) {
-  const { teams, matches } = useTournament();
+  const { teams, matches, loading } = useTournament();
   const [activeDivision, setActiveDivision] = useState<'Trophy' | 'Shield' | 'Plaque' | 'Bowl' | 'Mug'>(defaultDivision);
   const [isClient, setIsClient] = useState(false);
 
@@ -52,8 +52,8 @@ export default function FinalLeaderboard({
     return calculateFinalLeaderboard(matches, teams, activeDivision);
   }, [isClient, teams, matches, activeDivision]);
 
-  // Don't render anything until client-side
-  if (!isClient) {
+  // Don't render anything until client-side and data is loaded
+  if (!isClient || loading) {
     return (
       <div className={`bg-white rounded-lg shadow-md ${className}`}>
         <div className="px-6 py-4 bg-gradient-to-r from-green-600 to-green-700">
@@ -159,7 +159,7 @@ export default function FinalLeaderboard({
                         {getDivisionIcon(entry.team.division)}
                       </div>
                       <div className="min-w-0">
-                        <div className="font-medium text-gray-900 text-xs sm:text-sm truncate">{entry.team.name}</div>
+                        <div className="font-medium text-gray-900 text-xs sm:text-sm">{entry.team.name}</div>
                         <div className="text-xs text-gray-500 hidden sm:block">Seed #{entry.team.seed}</div>
                       </div>
                     </div>

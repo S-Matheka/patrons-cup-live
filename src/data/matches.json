@@ -16297,6 +16297,7 @@
   },
   {
     "id": 88,
+    "teamAId": 4,
     "teamBId": 5,
     "division": "Shield",
     "date": "2025-08-23",
@@ -16305,7 +16306,7 @@
     "course": "Muthaiga Golf Club",
     "type": "Foursomes",
     "session": "PM",
-    "status": "scheduled",
+    "status": "completed",
     "players": {
       "teamA": [
         "Vet Lab 2"
@@ -16322,92 +16323,112 @@
       {
         "number": 1,
         "par": 4,
-        "teamAScore": null,
-        "teamBScore": null,
+        "teamAScore": 5,
+        "teamBScore": 4,
+        "teamCScore": 4,
         "teamAStrokes": null,
         "teamBStrokes": null,
-        "status": "not-started"
+        "teamCStrokes": null,
+        "status": "completed"
       },
       {
         "number": 2,
         "par": 3,
-        "teamAScore": null,
-        "teamBScore": null,
+        "teamAScore": 4,
+        "teamBScore": 3,
+        "teamCScore": 3,
         "teamAStrokes": null,
         "teamBStrokes": null,
-        "status": "not-started"
+        "teamCStrokes": null,
+        "status": "completed"
       },
       {
         "number": 3,
         "par": 4,
-        "teamAScore": null,
-        "teamBScore": null,
+        "teamAScore": 3,
+        "teamBScore": 5,
+        "teamCScore": 5,
         "teamAStrokes": null,
         "teamBStrokes": null,
-        "status": "not-started"
+        "teamCStrokes": null,
+        "status": "completed"
       },
       {
         "number": 4,
         "par": 5,
-        "teamAScore": null,
-        "teamBScore": null,
+        "teamAScore": 3,
+        "teamBScore": 5,
+        "teamCScore": 5,
         "teamAStrokes": null,
         "teamBStrokes": null,
-        "status": "not-started"
+        "teamCStrokes": null,
+        "status": "completed"
       },
       {
         "number": 5,
         "par": 3,
-        "teamAScore": null,
-        "teamBScore": null,
+        "teamAScore": 3,
+        "teamBScore": 3,
+        "teamCScore": 5,
         "teamAStrokes": null,
         "teamBStrokes": null,
-        "status": "not-started"
+        "teamCStrokes": null,
+        "status": "completed"
       },
       {
         "number": 6,
         "par": 4,
-        "teamAScore": null,
-        "teamBScore": null,
+        "teamAScore": 6,
+        "teamBScore": 6,
+        "teamCScore": 5,
         "teamAStrokes": null,
         "teamBStrokes": null,
-        "status": "not-started"
+        "teamCStrokes": null,
+        "status": "completed"
       },
       {
         "number": 7,
         "par": 5,
-        "teamAScore": null,
-        "teamBScore": null,
+        "teamAScore": 5,
+        "teamBScore": 6,
+        "teamCScore": 5,
         "teamAStrokes": null,
         "teamBStrokes": null,
-        "status": "not-started"
+        "teamCStrokes": null,
+        "status": "completed"
       },
       {
         "number": 8,
         "par": 4,
-        "teamAScore": null,
-        "teamBScore": null,
+        "teamAScore": 5,
+        "teamBScore": 6,
+        "teamCScore": 5,
         "teamAStrokes": null,
         "teamBStrokes": null,
-        "status": "not-started"
+        "teamCStrokes": null,
+        "status": "completed"
       },
       {
         "number": 9,
         "par": 4,
-        "teamAScore": null,
-        "teamBScore": null,
+        "teamAScore": 5,
+        "teamBScore": 4,
+        "teamCScore": 4,
         "teamAStrokes": null,
         "teamBStrokes": null,
-        "status": "not-started"
+        "teamCStrokes": null,
+        "status": "completed"
       },
       {
         "number": 10,
         "par": 5,
-        "teamAScore": null,
-        "teamBScore": null,
+        "teamAScore": 5,
+        "teamBScore": 7,
+        "teamCScore": 6,
         "teamAStrokes": null,
         "teamBStrokes": null,
-        "status": "not-started"
+        "teamCStrokes": null,
+        "status": "completed"
       },
       {
         "number": 11,

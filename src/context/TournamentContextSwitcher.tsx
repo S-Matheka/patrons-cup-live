@@ -4,6 +4,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { TournamentProvider as LocalStorageProvider, useTournament as useLocalStorageTournament } from './TournamentContext';
 import { TournamentProvider as SupabaseProvider, useTournament as useSupabaseTournament } from './SupabaseTournamentContext';
 import { TournamentContextType } from '@/types';
+import { isSupabaseConfigured } from '@/lib/supabase';
 
 interface TournamentContextSwitcherProps {
   children: React.ReactNode;
@@ -27,7 +28,7 @@ export const useTournament = (): TournamentContextType => {
 
 export const TournamentContextSwitcher: React.FC<TournamentContextSwitcherProps> = ({ 
   children, 
-  useSupabase = true  // Default to true to always use Supabase
+  useSupabase = true  // Force Supabase usage
 }) => {
   const [isClient, setIsClient] = useState(false);
 
@@ -35,22 +36,23 @@ export const TournamentContextSwitcher: React.FC<TournamentContextSwitcherProps>
     setIsClient(true);
   }, []);
 
-  // Check if Supabase is configured
-  const supabaseConfigured = typeof window !== 'undefined' && 
-    process.env.NEXT_PUBLIC_SUPABASE_URL && 
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
-    process.env.NEXT_PUBLIC_SUPABASE_URL !== 'your_supabase_url_here';
+  // Force Supabase usage when client is ready
+  const supabaseConfigured = typeof window !== 'undefined' && isSupabaseConfigured();
+  const shouldUseSupabase = useSupabase && (isClient || supabaseConfigured);
+  
+  console.log('🔧 TournamentContextSwitcher Debug:');
+  console.log('  isClient:', isClient);
+  console.log('  useSupabase:', useSupabase);
+  console.log('  supabaseConfigured:', supabaseConfigured);
+  console.log('  shouldUseSupabase:', shouldUseSupabase);
 
-  // Use Supabase if configured and requested, otherwise fallback to localStorage
-  const shouldUseSupabase = useSupabase && supabaseConfigured;
-
-  // Always provide a context, but switch the implementation consistently
-  if (shouldUseSupabase) {
-    console.log('Using Supabase provider for tournament data');
+  // Force Supabase usage when client is ready
+  if (isClient && useSupabase) {
+    console.log('✅ Using Supabase provider for tournament data (forced)');
     return <SupabaseProvider>{children}</SupabaseProvider>;
   }
 
-  // Default to localStorage provider (works for SSR and fallback)
-  console.log('Using localStorage provider for tournament data (fallback)');
+  // Fallback to localStorage only during SSR or when not ready
+  console.log('⚠️ Using localStorage provider for tournament data (fallback)');
   return <LocalStorageProvider>{children}</LocalStorageProvider>;
 };

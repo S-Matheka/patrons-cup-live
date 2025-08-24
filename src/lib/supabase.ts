@@ -16,6 +16,17 @@ export const supabase = supabaseUrl && supabaseAnonKey
 
 // Helper function to check if Supabase is configured
 export const isSupabaseConfigured = () => {
+  // In the browser, NEXT_PUBLIC_ environment variables should be available
+  if (typeof window !== 'undefined') {
+    const browserUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const browserKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    return !!(browserUrl && 
+             browserKey && 
+             browserUrl !== 'your_supabase_url_here' &&
+             browserKey !== 'your_supabase_anon_key_here');
+  }
+  
+  // Server-side check
   return !!(supabaseUrl && 
            supabaseAnonKey && 
            supabaseUrl !== 'your_supabase_url_here' &&

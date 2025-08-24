@@ -264,7 +264,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
       const isClinched = holesDifference > holesRemaining;
       
       if (team1Wins === team2Wins) {
-        return `${team1Name} & ${team2Name} halved`;
+        return 'AS';
       } else if (team1Wins > team2Wins) {
         const result = formatValidatedResult(holesPlayed, holesDifference, isClinched);
         return `${team1Name} won ${result}`;
@@ -279,27 +279,27 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
     // Team A vs Team B
     const teamAvsBResult = calculateHeadToHead(holesWithScores, 'teamA', 'teamB', teamA.name, teamB?.name || 'Team B');
     const [winnerAvsB, scoreAvsB] = teamAvsBResult.split(' won ');
-    if (teamAvsBResult.includes('halved')) {
-      results.push(`${teamA.name} & ${teamB?.name} halved`);
-    } else {
+          if (teamAvsBResult === 'AS') {
+        results.push('AS');
+      } else {
       results.push(`${winnerAvsB} ${scoreAvsB} against ${winnerAvsB === teamA.name ? teamB?.name : teamA.name}`);
     }
     
     // Team A vs Team C
     const teamAvsCResult = calculateHeadToHead(holesWithScores, 'teamA', 'teamC', teamA.name, teamC.name);
     const [winnerAvsC, scoreAvsC] = teamAvsCResult.split(' won ');
-    if (teamAvsCResult.includes('halved')) {
-      results.push(`${teamA.name} & ${teamC.name} halved`);
-    } else {
+          if (teamAvsCResult === 'AS') {
+        results.push('AS');
+      } else {
       results.push(`${winnerAvsC} ${scoreAvsC} against ${winnerAvsC === teamA.name ? teamC.name : teamA.name}`);
     }
     
     // Team B vs Team C
     const teamBvsCResult = calculateHeadToHead(holesWithScores, 'teamB', 'teamC', teamB?.name || 'Team B', teamC.name);
     const [winnerBvsC, scoreBvsC] = teamBvsCResult.split(' won ');
-    if (teamBvsCResult.includes('halved')) {
-      results.push(`${teamB?.name} & ${teamC.name} halved`);
-    } else {
+          if (teamBvsCResult === 'AS') {
+        results.push('AS');
+      } else {
       results.push(`${winnerBvsC} ${scoreBvsC} against ${winnerBvsC === teamB?.name ? teamC.name : teamB?.name}`);
     }
     

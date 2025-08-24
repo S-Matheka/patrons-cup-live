@@ -278,50 +278,29 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
     
     // Team A vs Team B
     const teamAvsBResult = calculateHeadToHead(holesWithScores, 'teamA', 'teamB', teamA.name, teamB?.name || 'Team B');
+    const [winnerAvsB, scoreAvsB] = teamAvsBResult.split(' won ');
     if (teamAvsBResult.includes('halved')) {
       results.push(`${teamA.name} & ${teamB?.name} halved`);
     } else {
-      const winnerName = teamAvsBResult.split(' ')[0];
-      const score = teamAvsBResult.split(' ').slice(-1)[0];
-      const loserName = winnerName === teamA.name ? (teamB?.name || 'Team B') : teamA.name;
-      // Replace "AS" with "halved" format
-      if (score === 'AS') {
-        results.push(`${winnerName} & ${loserName} halved`);
-      } else {
-        results.push(`${winnerName} ${score} against ${loserName}`);
-      }
+      results.push(`${winnerAvsB} ${scoreAvsB} against ${winnerAvsB === teamA.name ? teamB?.name : teamA.name}`);
     }
     
     // Team A vs Team C
     const teamAvsCResult = calculateHeadToHead(holesWithScores, 'teamA', 'teamC', teamA.name, teamC.name);
+    const [winnerAvsC, scoreAvsC] = teamAvsCResult.split(' won ');
     if (teamAvsCResult.includes('halved')) {
       results.push(`${teamA.name} & ${teamC.name} halved`);
     } else {
-      const winnerName = teamAvsCResult.split(' ')[0];
-      const score = teamAvsCResult.split(' ').slice(-1)[0];
-      const loserName = winnerName === teamA.name ? teamC.name : teamA.name;
-      // Replace "AS" with "halved" format
-      if (score === 'AS') {
-        results.push(`${winnerName} & ${loserName} halved`);
-      } else {
-        results.push(`${winnerName} ${score} against ${loserName}`);
-      }
+      results.push(`${winnerAvsC} ${scoreAvsC} against ${winnerAvsC === teamA.name ? teamC.name : teamA.name}`);
     }
     
     // Team B vs Team C
     const teamBvsCResult = calculateHeadToHead(holesWithScores, 'teamB', 'teamC', teamB?.name || 'Team B', teamC.name);
+    const [winnerBvsC, scoreBvsC] = teamBvsCResult.split(' won ');
     if (teamBvsCResult.includes('halved')) {
       results.push(`${teamB?.name} & ${teamC.name} halved`);
     } else {
-      const winnerName = teamBvsCResult.split(' ')[0];
-      const score = teamBvsCResult.split(' ').slice(-1)[0];
-      const loserName = winnerName === (teamB?.name || 'Team B') ? teamC.name : (teamB?.name || 'Team B');
-      // Replace "AS" with "halved" format
-      if (score === 'AS') {
-        results.push(`${winnerName} & ${loserName} halved`);
-      } else {
-        results.push(`${winnerName} ${score} against ${loserName}`);
-      }
+      results.push(`${winnerBvsC} ${scoreBvsC} against ${winnerBvsC === teamB?.name ? teamC.name : teamB?.name}`);
     }
     
     return results;

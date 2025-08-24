@@ -23,7 +23,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Tournament Official Credentials (in production, this would be in a secure backend)
 const OFFICIAL_CREDENTIALS = {
   'admin': 'MuthaigaTournament#Director$2025',
-  'scorer': 'PatronsCupScorer2025!'
+  'scorer': '1234567890'
 };
 
 const getRoleDisplayName = (username: string): string => {

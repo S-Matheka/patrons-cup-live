@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Trophy, Calendar, Zap, BarChart3, TrendingUp, Menu } from 'lucide-react';
+import { Trophy, Calendar, Zap, BarChart3, TrendingUp, Menu, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 
 const Navbar = () => {
@@ -14,6 +14,7 @@ const Navbar = () => {
     { name: 'Schedule', href: '/schedule', icon: Calendar },
     { name: 'Live Scoring', href: '/live', icon: Zap },
     { name: 'Standings', href: '/standings', icon: TrendingUp },
+    { name: 'My Golf Hub', href: 'https://mygolfhub.africa/', icon: ExternalLink, external: true },
   ];
 
   const isActive = (href: string) => {
@@ -53,6 +54,20 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-8">
             {navigation.map((item) => {
               const Icon = item.icon;
+              if (item.external) {
+                return (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors text-green-100 hover:bg-green-600 hover:text-white"
+                  >
+                    <Icon className="w-4 h-4 mr-2" />
+                    {item.name}
+                  </a>
+                );
+              }
               return (
                 <Link
                   key={item.name}
@@ -68,8 +83,6 @@ const Navbar = () => {
                 </Link>
               );
             })}
-            
-
           </div>
 
           {/* Mobile menu button */}
@@ -90,6 +103,21 @@ const Navbar = () => {
           <div className="px-2 pt-2 pb-3 space-y-1">
             {navigation.map((item) => {
               const Icon = item.icon;
+              if (item.external) {
+                return (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors text-green-100 hover:bg-green-600 hover:text-white"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Icon className="w-5 h-5 mr-3" />
+                    {item.name}
+                  </a>
+                );
+              }
               return (
                 <Link
                   key={item.name}
@@ -106,7 +134,6 @@ const Navbar = () => {
                 </Link>
               );
             })}
-
           </div>
         </div>
       )}

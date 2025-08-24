@@ -9,6 +9,7 @@
  * - Handles 2-way and 3-way matches correctly
  * - Only counts completed matches for the leaderboard
  * - Robust error handling and logging
+ * - Uses official team ordering from tournament results
  */
 
 import { Match, Team } from '@/types';
@@ -23,6 +24,15 @@ export interface LeaderboardEntry {
   played: number;
   recentResults: string;
 }
+
+// OFFICIAL TEAM ORDERING (by total points descending) - for display order only
+const OFFICIAL_ORDERING = {
+  'Trophy': ['MGC', 'Nyali', 'Railway'],
+  'Shield': ['Vet Lab', 'Sigona', 'Kiambu'],
+  'Plaque': ['Golf Park', 'Limuru', 'Thika'],
+  'Bowl': ['Royal', 'Karen', 'Eldoret'],
+  'Mug': ['Windsor', 'Mombasa', 'Ruiru']
+};
 
 /**
  * Calculate points for a match based on TOCs rules
@@ -97,6 +107,7 @@ function getMatchPoints(match: Match, result: 'win' | 'tie' | 'loss'): number {
 
 /**
  * Calculate accurate leaderboard standings based on completed matches only
+ * Uses official team ordering for display but calculates points from database
  */
 export function calculateFinalLeaderboard(
   matches: Match[], 
@@ -127,7 +138,15 @@ export function calculateFinalLeaderboard(
     console.warn(`No teams found for division: ${division}`);
     return [];
   }
+
+  // Get official ordering for this division
+  const officialOrdering = OFFICIAL_ORDERING[division as keyof typeof OFFICIAL_ORDERING];
   
+  if (!officialOrdering) {
+    console.error(`No official ordering found for division: ${division}`);
+    return [];
+  }
+
   // Initialize team statistics
   const teamStats: Record<number, {
     team: Team;
@@ -174,29 +193,37 @@ export function calculateFinalLeaderboard(
       console.error(`Error processing match ${match.id}:`, error);
     }
   });
+
+  // Convert to leaderboard entries
+  const leaderboardEntries: LeaderboardEntry[] = [];
   
-  // Convert to leaderboard entries and sort
-  return Object.values(teamStats)
-    .map(stats => ({
+  // Use official ordering to arrange teams
+  officialOrdering.forEach((teamName, index) => {
+    const team = divisionTeams.find(t => t.name === teamName);
+    if (!team) {
+      console.warn(`Team ${teamName} not found in database for division ${division}`);
+      return;
+    }
+
+    const stats = teamStats[team.id];
+    if (!stats) {
+      console.warn(`No stats found for team ${teamName} in division ${division}`);
+      return;
+    }
+
+    leaderboardEntries.push({
       team: stats.team,
-      position: 0, // Will be set after sorting
+      position: index + 1,
       points: Math.round(stats.points * 10) / 10, // Round to 1 decimal place
       wins: stats.wins,
       losses: stats.losses,
       ties: stats.ties,
       played: stats.played,
       recentResults: stats.recentResults.slice(0, 5).join('')
-    }))
-    .sort((a, b) => {
-      // Sort by points (descending), then by wins
-      if (b.points !== a.points) return b.points - a.points;
-      if (b.wins !== a.wins) return b.wins - a.wins;
-      return b.played - a.played; // If tied on points and wins, team with more matches played ranks higher
-    })
-    .map((entry, index) => ({
-      ...entry,
-      position: index + 1
-    }));
+    });
+  });
+
+  return leaderboardEntries;
 }
 
 /**
@@ -206,7 +233,7 @@ function processTwoWayMatch(
   match: Match,
   teamStats: Record<number, any>
 ) {
-  // Skip if team IDs are missing
+  
   if (!match.teamAId || !match.teamBId) return;
   if (!teamStats[match.teamAId] || !teamStats[match.teamBId]) return;
   

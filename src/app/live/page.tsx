@@ -2,11 +2,11 @@
 
 import { useTournament } from '@/context/TournamentContextSwitcher';
 import { Match, Hole } from '@/types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Clock, CheckCircle, Circle, ExternalLink, Filter, Calendar, Users, Trophy, Medal } from 'lucide-react';
 import Leaderboard from '@/components/Leaderboard';
 import TournamentCountdown from '@/components/TournamentCountdown';
-import { calculateThreeWayResult } from '@/utils/matchPlayScoring';
+import { calculateThreeWayResult, calculateMatchPlayResult } from '@/utils/matchPlayScoring';
 import Link from 'next/link';
 
 export default function LiveScoring() {
@@ -14,6 +14,11 @@ export default function LiveScoring() {
   const [selectedDivision, setSelectedDivision] = useState<'Trophy' | 'Shield' | 'Plaque' | 'Bowl' | 'Mug' | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'in-progress' | 'scheduled' | 'completed'>('all');
   const [activeDivision, setActiveDivision] = useState<'Trophy' | 'Shield' | 'Plaque' | 'Bowl' | 'Mug'>('Trophy');
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
 
 
@@ -23,7 +28,7 @@ export default function LiveScoring() {
   );
 
   // Show loading state while data is being fetched (only on client)
-  if (typeof window !== 'undefined' && loading) {
+  if (isMounted && loading) {
     return (
       <div className="min-h-screen bg-gray-50 p-4">
         <div className="max-w-7xl mx-auto">
@@ -38,7 +43,7 @@ export default function LiveScoring() {
   }
 
   // Show error state if no data is loaded (only on client)
-  if (typeof window !== 'undefined' && (teams.length === 0 || matches.length === 0)) {
+  if (isMounted && (teams.length === 0 || matches.length === 0)) {
     return (
       <div className="min-h-screen bg-gray-50 p-4">
         <div className="max-w-7xl mx-auto">
@@ -56,6 +61,21 @@ export default function LiveScoring() {
             >
               Refresh Page
             </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading state during initial mount to prevent hydration mismatch
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white rounded-lg shadow-md p-8 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <div className="text-lg font-medium text-gray-900 mb-2">Loading tournament data...</div>
+            <div className="text-sm text-gray-500">Please wait while we fetch the latest scores and standings.</div>
           </div>
         </div>
       </div>
@@ -216,7 +236,9 @@ export default function LiveScoring() {
         // Check if match ended early due to clinching (team up by more holes than remain)
         const isClinched = holesDifference > holesRemaining;
         
-        if (teamAWins > teamBWins) {
+        if (teamAWins === teamBWins) {
+          return `${teamAName} & ${teamBName} halved`;
+        } else if (teamAWins > teamBWins) {
           let resultFormat;
           if (holesPlayed === 18) {
             // Match went all 18 holes
@@ -329,18 +351,101 @@ export default function LiveScoring() {
             }
           }
           
+          // If resultFormat is 'AS', it means teams are tied, so show halved instead
+          if (resultFormat === 'AS') {
+            return `${teamAName} & ${teamBName} halved`;
+          }
+          
           return `${teamBName} won ${resultFormat}`;
-        } else {
-          return `${teamAName} & ${teamBName} halved`;
         }
       };
 
-      const teamAvsBResult = formatMatchResult(teamAvsB.teamAWins, teamAvsB.teamBWins, teamAvsB.holesPlayed, teamA?.name || 'Team A', teamB?.name || 'Team B');
-      const teamAvsCResult = formatMatchResult(teamAvsC.teamAWins, teamAvsC.teamCWins, teamAvsC.holesPlayed, teamA?.name || 'Team A', teamC?.name || 'Team C');
-      const teamBvsCResult = formatMatchResult(teamBvsC.teamBWins, teamBvsC.teamCWins, teamBvsC.holesPlayed, teamB?.name || 'Team B', teamC?.name || 'Team C');
+      // Use the exact same logic as live scorecard for consistency
+      const holesWithScores = match.holes.filter(h => 
+        h.teamAScore !== null && h.teamBScore !== null && h.teamCScore !== null
+      );
+      
+      // Calculate head-to-head results using same logic as live scorecard
+      const calculateHeadToHead = (holes: Hole[], team1: string, team2: string, team1Name: string, team2Name: string) => {
+        let team1Wins = 0;
+        let team2Wins = 0;
+        
+        holes.forEach(hole => {
+          const team1Score = team1 === 'teamA' ? hole.teamAScore : 
+                            team1 === 'teamB' ? hole.teamBScore : 
+                            hole.teamCScore;
+          const team2Score = team2 === 'teamA' ? hole.teamAScore : 
+                            team2 === 'teamB' ? hole.teamBScore : 
+                            hole.teamCScore;
+          
+          if (team1Score! < team2Score!) {
+            team1Wins++;
+          } else if (team2Score! < team1Score!) {
+            team2Wins++;
+          }
+        });
+        
+        const holesPlayed = holes.length;
+        const holesDifference = Math.abs(team1Wins - team2Wins);
+        const holesRemaining = 18 - holesPlayed;
+        const isClinched = holesDifference > holesRemaining;
+        
+        if (team1Wins === team2Wins) {
+          return `${team1Name} & ${team2Name} halved`;
+        } else if (team1Wins > team2Wins) {
+          const result = formatValidatedResult(holesPlayed, holesDifference, isClinched);
+          return `${team1Name} won ${result}`;
+        } else {
+          const result = formatValidatedResult(holesPlayed, holesDifference, isClinched);
+          return `${team2Name} won ${result}`;
+        }
+      };
+      
+      const formatValidatedResult = (holesPlayed: number, holesDifference: number, isClinched: boolean) => {
+        const validResults = VALID_RESULTS[holesPlayed as keyof typeof VALID_RESULTS] || [];
+        
+        if (holesPlayed === 18) {
+          const upResult = `${holesDifference}up`;
+          if (validResults.includes(upResult)) {
+            return upResult;
+          }
+          return validResults[0] || 'AS';
+        } else if (isClinched) {
+          const clinchedResult = `${holesDifference}/${18 - holesPlayed}`;
+          if (validResults.includes(clinchedResult)) {
+            return clinchedResult;
+          }
+          const validClinchedResults = validResults.filter((r: string) => r.includes('/'));
+          if (validClinchedResults.length > 0) {
+            let closestResult = validClinchedResults[0];
+            let minDifference = Math.abs(parseInt(validClinchedResults[0].split('/')[0]) - holesDifference);
+            
+            for (const result of validClinchedResults) {
+              const resultDiff = parseInt(result.split('/')[0]);
+              const diff = Math.abs(resultDiff - holesDifference);
+              if (diff < minDifference) {
+                minDifference = diff;
+                closestResult = result;
+              }
+            }
+            return closestResult;
+          }
+          return validResults[0] || 'AS';
+        } else {
+          const upResult = `${holesDifference}up`;
+          if (validResults.includes(upResult)) {
+            return upResult;
+          }
+          return validResults[0] || 'AS';
+        }
+      };
+      
+      const teamAvsBFormatted = calculateHeadToHead(holesWithScores, 'teamA', 'teamB', teamA?.name || 'Team A', teamB?.name || 'Team B');
+      const teamAvsCFormatted = calculateHeadToHead(holesWithScores, 'teamA', 'teamC', teamA?.name || 'Team A', teamC?.name || 'Team C');
+      const teamBvsCFormatted = calculateHeadToHead(holesWithScores, 'teamB', 'teamC', teamB?.name || 'Team B', teamC?.name || 'Team C');
 
       if (match.status === 'completed') {
-        return `${teamAvsBResult}, ${teamAvsCResult}, ${teamBvsCResult}`;
+        return `${teamAvsBFormatted}, ${teamAvsCFormatted}, ${teamBvsCFormatted}`;
       } else {
         // For in-progress matches, show current leader
         if (result.leader === 'tied') {
@@ -384,9 +489,9 @@ export default function LiveScoring() {
         const resultFormat = holesPlayed === 18 ? `${holesDifference}up` : `${holesDifference}/${holesRemaining}`;
         
         if (teamAWins > teamBWins) {
-          return `${teamA?.name || 'Team A'} wins by ${resultFormat}`;
+          return `${teamA?.name || 'Team A'} won ${resultFormat}`;
         } else if (teamBWins > teamAWins) {
-          return `${teamB?.name || 'Team B'} wins by ${resultFormat}`;
+          return `${teamB?.name || 'Team B'} won ${resultFormat}`;
         } else {
           return `${teamA?.name || 'Team A'} & ${teamB?.name || 'Team B'} halved`;
         }
@@ -825,7 +930,6 @@ export default function LiveScoring() {
             <div className="mt-6 bg-yellow-50 rounded-lg p-4">
               <div className="text-sm text-yellow-800">
                 <div className="font-medium mb-1">🏌️ All matches will be played at Muthaiga Golf Club</div>
-                <div>Live scoring will begin when the first match starts on Friday morning</div>
               </div>
             </div>
           </div>

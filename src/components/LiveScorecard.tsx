@@ -12,6 +12,19 @@ interface LiveScorecardProps {
 }
 
 const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, teamC }) => {
+  // Sacred validation logic - same as summary cards
+  const VALID_RESULTS = {
+    18: ['AS', '1up', '2up'],
+    17: ['2/1', '2up', '3/1'],
+    16: ['3/2', '4/2'],
+    15: ['4/3', '5/3'],
+    14: ['5/4', '6/4'],
+    13: ['6/5', '7/5'],
+    12: ['7/6', '8/6'],
+    11: ['8/7', '9/7'],
+    10: ['9/8', '10/8']
+  };
+
   const getScoreIndicator = (strokes: number | null, par: number) => {
     if (strokes === null) return null;
     
@@ -43,7 +56,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
     holes.forEach(hole => {
       const strokes = teamKey === 'teamA' ? hole.teamAScore : 
                      teamKey === 'teamB' ? hole.teamBScore : 
-                     hole.teamCScore;
+                     hole.teamCScore || null;
       if (strokes !== null && strokes !== undefined) {
         totalStrokes += strokes;
         totalPar += hole.par;
@@ -54,6 +67,152 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
     const diff = totalStrokes - totalPar;
     if (diff === 0) return 'E';
     return diff > 0 ? `+${diff}` : `${diff}`;
+  };
+
+  // For match play (Foursomes), calculate match play results instead of stroke differential
+  const calculateMatchPlayStatus = (teamKey: 'teamA' | 'teamB' | 'teamC') => {
+    if (!match.isThreeWay) {
+      // 2-way match play
+      const holesWithScores = match.holes.filter(h => h.teamAScore !== null && h.teamBScore !== null);
+      let teamAWins = 0;
+      let teamBWins = 0;
+      
+      holesWithScores.forEach(hole => {
+        if (hole.teamAScore! < hole.teamBScore!) {
+          teamAWins++;
+        } else if (hole.teamBScore! < hole.teamAScore!) {
+          teamBWins++;
+        }
+      });
+      
+      const holesPlayed = holesWithScores.length;
+      const holesDifference = Math.abs(teamAWins - teamBWins);
+      const holesRemaining = 18 - holesPlayed;
+      const isClinched = holesDifference > holesRemaining;
+      
+      if (teamAWins === teamBWins) {
+        return 'AS';
+      } else {
+        const result = formatValidatedResult(holesPlayed, holesDifference, isClinched);
+        return result;
+      }
+    } else {
+      // 3-way match play - calculate this team's wins against others
+      const holesWithScores = match.holes.filter(h => 
+        h.teamAScore !== null && h.teamBScore !== null && h.teamCScore !== null
+      );
+      
+      let wins = 0;
+      let totalMatches = 0;
+      
+      if (teamKey === 'teamA') {
+        // Team A vs Team B
+        let teamAWins = 0;
+        let teamBWins = 0;
+        holesWithScores.forEach(hole => {
+          if (hole.teamAScore! < hole.teamBScore!) teamAWins++;
+          else if (hole.teamBScore! < hole.teamAScore!) teamBWins++;
+        });
+        if (teamAWins > teamBWins) wins++;
+        totalMatches++;
+        
+        // Team A vs Team C
+        let teamAWinsC = 0;
+        let teamCWins = 0;
+        holesWithScores.forEach(hole => {
+          if (hole.teamAScore! < hole.teamCScore!) teamAWinsC++;
+          else if (hole.teamCScore! < hole.teamAScore!) teamCWins++;
+        });
+        if (teamAWinsC > teamCWins) wins++;
+        totalMatches++;
+      } else if (teamKey === 'teamB') {
+        // Team B vs Team A
+        let teamBWins = 0;
+        let teamAWins = 0;
+        holesWithScores.forEach(hole => {
+          if (hole.teamBScore! < hole.teamAScore!) teamBWins++;
+          else if (hole.teamAScore! < hole.teamBScore!) teamAWins++;
+        });
+        if (teamBWins > teamAWins) wins++;
+        totalMatches++;
+        
+        // Team B vs Team C
+        let teamBWinsC = 0;
+        let teamCWins = 0;
+        holesWithScores.forEach(hole => {
+          if (hole.teamBScore! < hole.teamCScore!) teamBWinsC++;
+          else if (hole.teamCScore! < hole.teamBScore!) teamCWins++;
+        });
+        if (teamBWinsC > teamCWins) wins++;
+        totalMatches++;
+      } else if (teamKey === 'teamC') {
+        // Team C vs Team A
+        let teamCWins = 0;
+        let teamAWins = 0;
+        holesWithScores.forEach(hole => {
+          if (hole.teamCScore! < hole.teamAScore!) teamCWins++;
+          else if (hole.teamAScore! < hole.teamCScore!) teamAWins++;
+        });
+        if (teamCWins > teamAWins) wins++;
+        totalMatches++;
+        
+        // Team C vs Team B
+        let teamCWinsB = 0;
+        let teamBWins = 0;
+        holesWithScores.forEach(hole => {
+          if (hole.teamCScore! < hole.teamBScore!) teamCWinsB++;
+          else if (hole.teamBScore! < hole.teamCScore!) teamBWins++;
+        });
+        if (teamCWinsB > teamBWins) wins++;
+        totalMatches++;
+      }
+      
+      return `${wins}-${totalMatches - wins}`;
+    }
+  };
+
+  // Use the same sacred validation logic as summary cards
+  const formatValidatedResult = (holesPlayed: number, holesDifference: number, isClinched: boolean) => {
+    const validResults = VALID_RESULTS[holesPlayed as keyof typeof VALID_RESULTS] || [];
+    
+    if (holesPlayed === 18) {
+      // 18 holes - should be Xup format
+      const upResult = `${holesDifference}up`;
+      if (validResults.includes(upResult)) {
+        return upResult;
+      }
+      return validResults[0] || 'AS';
+    } else if (isClinched) {
+      // Match clinched early - use X/Y format
+      const clinchedResult = `${holesDifference}/${18 - holesPlayed}`;
+      if (validResults.includes(clinchedResult)) {
+        return clinchedResult;
+      }
+      // Find closest valid clinched result
+      const validClinchedResults = validResults.filter((r: string) => r.includes('/'));
+      if (validClinchedResults.length > 0) {
+        let closestResult = validClinchedResults[0];
+        let minDifference = Math.abs(parseInt(validClinchedResults[0].split('/')[0]) - holesDifference);
+        
+        for (const result of validClinchedResults) {
+          const resultDiff = parseInt(result.split('/')[0]);
+          const diff = Math.abs(resultDiff - holesDifference);
+          if (diff < minDifference) {
+            minDifference = diff;
+            closestResult = result;
+          }
+        }
+        return closestResult;
+      }
+      return validResults[0] || 'AS';
+    } else {
+      // Non-clinched match - use Xup format
+      const upResult = `${holesDifference}up`;
+      if (validResults.includes(upResult)) {
+        return upResult;
+      }
+      return validResults[0] || 'AS';
+    }
   };
 
   const getMatchPlayResult = () => {
@@ -79,7 +238,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
     
     if (holesWithScores.length === 0) return null;
     
-    // Calculate head-to-head results for each pair
+    // Calculate head-to-head results for each pair using sacred logic
     const results = [];
     
     // Team A vs Team B
@@ -94,18 +253,19 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
     });
     
     const holesPlayed = holesWithScores.length;
-    const holesRemaining = 18 - holesPlayed;
     const holesDifference = Math.abs(teamAWins - teamBWins);
-    const resultFormat = holesPlayed === 18 ? `${holesDifference}up` : `${holesDifference}/${holesRemaining}`;
+    const holesRemaining = 18 - holesPlayed;
+    const isClinched = holesDifference > holesRemaining;
     
     if (teamAWins === teamBWins) {
-      results.push(`${teamA.name} vs ${teamB?.name}: AS`);
+      results.push(`${teamA.name} & ${teamB?.name} halved`);
     } else {
-      const leaderName = teamAWins > teamBWins ? teamA.name : teamB?.name;
+      const resultFormat = formatValidatedResult(holesPlayed, holesDifference, isClinched);
+      const winnerName = teamAWins > teamBWins ? teamA.name : teamB?.name;
       if (match.status === 'completed') {
-        results.push(`${teamA.name} vs ${teamB?.name}: ${leaderName} wins ${resultFormat}`);
+        results.push(`${winnerName} won ${resultFormat}`);
       } else {
-        results.push(`${teamA.name} vs ${teamB?.name}: ${leaderName} leads ${resultFormat}`);
+        results.push(`${winnerName} leads ${resultFormat}`);
       }
     }
     
@@ -121,16 +281,17 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
     });
     
     const holesDifferenceAC = Math.abs(teamAWinsC - teamCWins);
-    const resultFormatAC = holesPlayed === 18 ? `${holesDifferenceAC}up` : `${holesDifferenceAC}/${holesRemaining}`;
+    const isClinchedAC = holesDifferenceAC > holesRemaining;
     
     if (teamAWinsC === teamCWins) {
-      results.push(`${teamA.name} vs ${teamC.name}: AS`);
+      results.push(`${teamA.name} & ${teamC.name} halved`);
     } else {
-      const leaderName = teamAWinsC > teamCWins ? teamA.name : teamC.name;
+      const resultFormatAC = formatValidatedResult(holesPlayed, holesDifferenceAC, isClinchedAC);
+      const winnerName = teamAWinsC > teamCWins ? teamA.name : teamC.name;
       if (match.status === 'completed') {
-        results.push(`${teamA.name} vs ${teamC.name}: ${leaderName} wins ${resultFormatAC}`);
+        results.push(`${winnerName} won ${resultFormatAC}`);
       } else {
-        results.push(`${teamA.name} vs ${teamC.name}: ${leaderName} leads ${resultFormatAC}`);
+        results.push(`${winnerName} leads ${resultFormatAC}`);
       }
     }
     
@@ -146,16 +307,17 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
     });
     
     const holesDifferenceBC = Math.abs(teamBWinsC - teamCWinsB);
-    const resultFormatBC = holesPlayed === 18 ? `${holesDifferenceBC}up` : `${holesDifferenceBC}/${holesRemaining}`;
+    const isClinchedBC = holesDifferenceBC > holesRemaining;
     
     if (teamBWinsC === teamCWinsB) {
-      results.push(`${teamB?.name} vs ${teamC.name}: AS`);
+      results.push(`${teamB?.name} & ${teamC.name} halved`);
     } else {
-      const leaderName = teamBWinsC > teamCWinsB ? teamB?.name : teamC.name;
+      const resultFormatBC = formatValidatedResult(holesPlayed, holesDifferenceBC, isClinchedBC);
+      const winnerName = teamBWinsC > teamCWinsB ? teamB?.name : teamC.name;
       if (match.status === 'completed') {
-        results.push(`${teamB?.name} vs ${teamC.name}: ${leaderName} wins ${resultFormatBC}`);
+        results.push(`${winnerName} won ${resultFormatBC}`);
       } else {
-        results.push(`${teamB?.name} vs ${teamC.name}: ${leaderName} leads ${resultFormatBC}`);
+        results.push(`${winnerName} leads ${resultFormatBC}`);
       }
     }
     
@@ -181,11 +343,10 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
     
     if (result.status === 'completed') {
       if (result.winner === 'halved') {
-        return `${teamA.name} & ${teamB?.name} Match Halved (AS)`;
+        return `${teamA.name} & ${teamB?.name} halved`;
       } else {
         const winnerName = result.winner === 'teamA' ? teamA.name : teamB?.name;
-        const loserName = result.winner === 'teamA' ? teamB?.name : teamA.name;
-        return `${winnerName} wins by ${score}`;
+        return `${winnerName} won ${score}`;
       }
     } else if (match.status === 'completed') {
       // Fallback for completed matches when getMatchPlayResult fails
@@ -204,22 +365,23 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
       const holesPlayed = holesWithScores.length;
       const holesRemaining = 18 - holesPlayed;
       const holesDifference = Math.abs(teamAWins - teamBWins);
-      const resultFormat = holesPlayed === 18 ? `${holesDifference}up` : `${holesDifference}/${holesRemaining}`;
+      const isClinched = holesDifference > holesRemaining;
+      const resultFormat = formatValidatedResult(holesPlayed, holesDifference, isClinched);
       
       if (teamAWins === teamBWins) {
-        return `${teamA.name} & ${teamB?.name} Match Halved (AS)`;
+        return `${teamA.name} & ${teamB?.name} halved`;
       } else {
         const winnerName = teamAWins > teamBWins ? teamA.name : teamB?.name;
-        return `${winnerName} wins by ${resultFormat}`;
+        return `${winnerName} won ${resultFormat}`;
       }
     } else {
       // Match in progress
       if (result.result === 'AS') {
-        return `${teamA.name} & ${teamB?.name} All Square`;
+        return `${teamA.name} & ${teamB?.name} halved`;
       } else {
         const leaderName = result.teamAHolesWon > result.teamBHolesWon ? teamA.name : teamB?.name;
         const trailingName = result.teamAHolesWon > result.teamBHolesWon ? teamB?.name : teamA.name;
-        return `${leaderName} leads against ${trailingName} ${score}`;
+        return `${leaderName} leads ${score}`;
       }
     }
   };
@@ -265,12 +427,9 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
                 const nextHole = completedHoles + 1;
                 
                 if (match.status === 'completed') {
-                  // For 3-way matches, show head-to-head results
+                  // For 3-way matches, show the actual head-to-head matchups
                   if (match.isThreeWay && teamC) {
-                    const headToHeadResults = getThreeWayHeadToHeadResults();
-                    if (headToHeadResults) {
-                      return `Head-to-Head: ${headToHeadResults.join(' • ')}`;
-                    }
+                    return `${teamA.name} vs ${teamB?.name} • ${teamA.name} vs ${teamC.name} • ${teamB?.name} vs ${teamC.name}`;
                   }
                   
                   // For completed matches, show the result format (e.g., "4/3", "2/1", etc.)
@@ -328,9 +487,9 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
             </div>
             <div className="text-right">
               <div className="text-lg font-bold text-green-600">
-                {calculateStrokeDifferential(match.holes, 'teamA')}
+                {(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? calculateMatchPlayStatus('teamA') : calculateStrokeDifferential(match.holes, 'teamA')}
               </div>
-              <div className="text-xs text-gray-500">Score</div>
+              <div className="text-xs text-gray-500">{(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? 'Match' : 'Score'}</div>
             </div>
           </div>
           
@@ -349,9 +508,9 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
             </div>
             <div className="text-right">
               <div className="text-lg font-bold text-green-600">
-                {calculateStrokeDifferential(match.holes, 'teamB')}
+                {(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? calculateMatchPlayStatus('teamB') : calculateStrokeDifferential(match.holes, 'teamB')}
               </div>
-              <div className="text-xs text-gray-500">Score</div>
+              <div className="text-xs text-gray-500">{(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? 'Match' : 'Score'}</div>
             </div>
           </div>
           
@@ -371,9 +530,9 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
               </div>
               <div className="text-right">
                 <div className="text-lg font-bold text-green-600">
-                  {calculateStrokeDifferential(match.holes, 'teamC')}
+                  {(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? calculateMatchPlayStatus('teamC') : calculateStrokeDifferential(match.holes, 'teamC')}
                 </div>
-                <div className="text-xs text-gray-500">Score</div>
+                <div className="text-xs text-gray-500">{(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? 'Match' : 'Score'}</div>
               </div>
             </div>
           )}
@@ -391,9 +550,9 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
             <div className="min-w-0">
               <h3 className="font-bold text-gray-900">{teamA.name}</h3>
               <p className="text-sm text-gray-600 truncate">{teamA.description}</p>
-              <div className="text-xl font-bold text-green-600">
-                {calculateStrokeDifferential(match.holes, 'teamA')}
-              </div>
+                              <div className="text-xl font-bold text-green-600">
+                  {(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? calculateMatchPlayStatus('teamA') : calculateStrokeDifferential(match.holes, 'teamA')}
+                </div>
             </div>
           </div>
 
@@ -408,7 +567,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
               <h3 className="font-bold text-gray-900">{teamB.name}</h3>
               <p className="text-sm text-gray-600 truncate">{teamB.description}</p>
               <div className="text-xl font-bold text-green-600">
-                {calculateStrokeDifferential(match.holes, 'teamB')}
+                {(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? calculateMatchPlayStatus('teamB') : calculateStrokeDifferential(match.holes, 'teamB')}
               </div>
             </div>
           </div>
@@ -419,7 +578,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
                 <h3 className="font-bold text-gray-900">{teamC.name}</h3>
                 <p className="text-sm text-gray-600 truncate">{teamC.description}</p>
                 <div className="text-xl font-bold text-green-600">
-                  {calculateStrokeDifferential(match.holes, 'teamC')}
+                  {(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? calculateMatchPlayStatus('teamC') : calculateStrokeDifferential(match.holes, 'teamC')}
                 </div>
               </div>
               <div 
@@ -442,7 +601,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
           {match.holes.map((hole, index) => {
             const teamAIndicator = getScoreIndicator(hole.teamAScore, hole.par);
             const teamBIndicator = getScoreIndicator(hole.teamBScore, hole.par);
-            const teamCIndicator = teamC ? getScoreIndicator(hole.teamCScore, hole.par) : null;
+            const teamCIndicator = teamC ? getScoreIndicator(hole.teamCScore || null, hole.par) : null;
             
             return (
               <div key={hole.number} className="border rounded-lg p-3 bg-gray-50">
@@ -544,7 +703,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
                 .map((hole, index) => {
                 const teamAIndicator = getScoreIndicator(hole.teamAScore, hole.par);
                 const teamBIndicator = getScoreIndicator(hole.teamBScore, hole.par);
-                const teamCIndicator = teamC ? getScoreIndicator(hole.teamCScore, hole.par) : null;
+                const teamCIndicator = teamC ? getScoreIndicator(hole.teamCScore || null, hole.par) : null;
                 
                 return (
                   <tr key={hole.number} className="border-b border-gray-100 hover:bg-blue-50 transition-colors">

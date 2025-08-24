@@ -487,9 +487,9 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
             </div>
             <div className="text-right">
               <div className="text-lg font-bold text-green-600">
-                {(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? calculateMatchPlayStatus('teamA') : calculateStrokeDifferential(match.holes, 'teamA')}
+                {(match.match_type === 'Foursomes' || match.type === 'Foursomes' || match.match_type === 'Singles' || match.type === 'Singles') ? calculateMatchPlayStatus('teamA') : calculateStrokeDifferential(match.holes, 'teamA')}
               </div>
-              <div className="text-xs text-gray-500">{(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? 'Match' : 'Score'}</div>
+              <div className="text-xs text-gray-500">{(match.match_type === 'Foursomes' || match.type === 'Foursomes' || match.match_type === 'Singles' || match.type === 'Singles') ? 'Match' : 'Score'}</div>
             </div>
           </div>
           
@@ -508,9 +508,9 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
             </div>
             <div className="text-right">
               <div className="text-lg font-bold text-green-600">
-                {(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? calculateMatchPlayStatus('teamB') : calculateStrokeDifferential(match.holes, 'teamB')}
+                {(match.match_type === 'Foursomes' || match.type === 'Foursomes' || match.match_type === 'Singles' || match.type === 'Singles') ? calculateMatchPlayStatus('teamB') : calculateStrokeDifferential(match.holes, 'teamB')}
               </div>
-              <div className="text-xs text-gray-500">{(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? 'Match' : 'Score'}</div>
+              <div className="text-xs text-gray-500">{(match.match_type === 'Foursomes' || match.type === 'Foursomes' || match.match_type === 'Singles' || match.type === 'Singles') ? 'Match' : 'Score'}</div>
             </div>
           </div>
           
@@ -530,9 +530,9 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
               </div>
               <div className="text-right">
                 <div className="text-lg font-bold text-green-600">
-                  {(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? calculateMatchPlayStatus('teamC') : calculateStrokeDifferential(match.holes, 'teamC')}
+                  {(match.match_type === 'Foursomes' || match.type === 'Foursomes' || match.match_type === 'Singles' || match.type === 'Singles') ? calculateMatchPlayStatus('teamC') : calculateStrokeDifferential(match.holes, 'teamC')}
                 </div>
-                <div className="text-xs text-gray-500">{(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? 'Match' : 'Score'}</div>
+                <div className="text-xs text-gray-500">{(match.match_type === 'Foursomes' || match.type === 'Foursomes' || match.match_type === 'Singles' || match.type === 'Singles') ? 'Match' : 'Score'}</div>
               </div>
             </div>
           )}
@@ -551,7 +551,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
               <h3 className="font-bold text-gray-900">{teamA.name}</h3>
               <p className="text-sm text-gray-600 truncate">{teamA.description}</p>
                               <div className="text-xl font-bold text-green-600">
-                  {(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? calculateMatchPlayStatus('teamA') : calculateStrokeDifferential(match.holes, 'teamA')}
+                  {(match.match_type === 'Foursomes' || match.type === 'Foursomes' || match.match_type === 'Singles' || match.type === 'Singles') ? calculateMatchPlayStatus('teamA') : calculateStrokeDifferential(match.holes, 'teamA')}
                 </div>
             </div>
           </div>
@@ -567,7 +567,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
               <h3 className="font-bold text-gray-900">{teamB.name}</h3>
               <p className="text-sm text-gray-600 truncate">{teamB.description}</p>
               <div className="text-xl font-bold text-green-600">
-                {(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? calculateMatchPlayStatus('teamB') : calculateStrokeDifferential(match.holes, 'teamB')}
+                {(match.match_type === 'Foursomes' || match.type === 'Foursomes' || match.match_type === 'Singles' || match.type === 'Singles') ? calculateMatchPlayStatus('teamB') : calculateStrokeDifferential(match.holes, 'teamB')}
               </div>
             </div>
           </div>
@@ -578,7 +578,7 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
                 <h3 className="font-bold text-gray-900">{teamC.name}</h3>
                 <p className="text-sm text-gray-600 truncate">{teamC.description}</p>
                 <div className="text-xl font-bold text-green-600">
-                  {(match.match_type === 'Foursomes' || match.type === 'Foursomes') ? calculateMatchPlayStatus('teamC') : calculateStrokeDifferential(match.holes, 'teamC')}
+                  {(match.match_type === 'Foursomes' || match.type === 'Foursomes' || match.match_type === 'Singles' || match.type === 'Singles') ? calculateMatchPlayStatus('teamC') : calculateStrokeDifferential(match.holes, 'teamC')}
                 </div>
               </div>
               <div 

@@ -899,7 +899,7 @@ export default function LiveScoring() {
         <div className="p-6">
           <div className="text-center py-8">
             <Calendar className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Tournament Starts Soon!</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Tournament Dates</h3>
             
             <div className="grid gap-4 md:grid-cols-3">
               <div className="bg-blue-50 rounded-lg p-4">
@@ -929,7 +929,7 @@ export default function LiveScoring() {
             
             <div className="mt-6 bg-yellow-50 rounded-lg p-4">
               <div className="text-sm text-yellow-800">
-                <div className="font-medium mb-1">🏌️ All matches will be played at Muthaiga Golf Club</div>
+                <div className="font-medium mb-1">🏌️ All matches are being played at Muthaiga Golf Club</div>
               </div>
             </div>
           </div>

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { TournamentContextType, Team, Player, Match, Score, Hole } from '@/types';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured, getBrowserSupabaseClient } from '@/lib/supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { matchStatusManager } from '@/utils/matchStatusManager';
 
@@ -26,44 +26,52 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
   const [players, setPlayers] = useState<Player[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [scores, setScores] = useState<Score[]>([]);
-  const [loading, setLoading] = useState(false); // Start without loading to prevent hydration issues
+  const [loading, setLoading] = useState(true); // Start with loading to show loading state
   const [channels, setChannels] = useState<RealtimeChannel[]>([]);
 
   // Load initial data from Supabase
   useEffect(() => {
     // Only load data if Supabase is configured and we're on the client
-    if (typeof window !== 'undefined' && isSupabaseConfigured() && supabase) {
-      loadInitialData();
-      setupRealtimeSubscriptions();
-      
-      // Start automatic match status monitoring
-      matchStatusManager.startMonitoring();
-
-      // Cleanup subscriptions on unmount
-      return () => {
-        channels.forEach(channel => {
-          supabase.removeChannel(channel);
-        });
+    if (typeof window !== 'undefined' && isSupabaseConfigured()) {
+      const browserSupabase = getBrowserSupabaseClient();
+      if (browserSupabase) {
+        loadInitialData(browserSupabase);
+        setupRealtimeSubscriptions(browserSupabase);
         
-        // Stop match status monitoring
-        matchStatusManager.stopMonitoring();
-      };
+        // Start automatic match status monitoring
+        matchStatusManager.startMonitoring();
+
+        // Cleanup subscriptions on unmount
+        return () => {
+          channels.forEach(channel => {
+            browserSupabase.removeChannel(channel);
+          });
+          
+          // Stop match status monitoring
+          matchStatusManager.stopMonitoring();
+        };
+      } else {
+        setLoading(false);
+      }
+    } else {
+      setLoading(false);
     }
   }, []);
 
-  const loadInitialData = async () => {
-    if (!supabase || typeof window === 'undefined') {
-      console.log('Supabase not available or running on server');
+  const loadInitialData = async (supabaseClient = supabase) => {
+    if (!supabaseClient || typeof window === 'undefined') {
+      setLoading(false);
       return;
     }
     
+    setLoading(true);
     try {
 
       // Load all data in parallel
       const [teamsRes, playersRes, matchesRes, scoresRes] = await Promise.all([
-        supabase.from('teams').select('*').order('seed'),
-        supabase.from('players').select('*').order('name'),
-        supabase
+        supabaseClient.from('teams').select('*').order('seed'),
+        supabaseClient.from('players').select('*').order('name'),
+        supabaseClient
           .from('matches')
           .select(`
             *,
@@ -82,7 +90,7 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
           `)
           .order('game_number')
           .order('hole_number', { referencedTable: 'holes' }),
-        supabase.from('scores').select('*').order('points', { ascending: false })
+        supabaseClient.from('scores').select('*').order('points', { ascending: false })
       ]);
 
       if (teamsRes.error) {
@@ -216,17 +224,19 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
       setPlayers(transformedPlayers);
       setMatches(transformedMatches);
       setScores(transformedScores);
+      setLoading(false);
 
     } catch (error) {
       console.error('Error loading initial data:', error);
+      setLoading(false);
     }
   };
 
-  const setupRealtimeSubscriptions = () => {
+  const setupRealtimeSubscriptions = (supabaseClient = supabase) => {
     const newChannels: RealtimeChannel[] = [];
 
     // Subscribe to matches changes
-    const matchesChannel = supabase
+    const matchesChannel = supabaseClient
       .channel('matches-changes')
       .on('postgres_changes', 
         { event: '*', schema: 'public', table: 'matches' },
@@ -238,7 +248,7 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
       .subscribe();
 
     // Subscribe to holes changes
-    const holesChannel = supabase
+    const holesChannel = supabaseClient
       .channel('holes-changes')
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'holes' },
@@ -257,7 +267,7 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
       .subscribe();
 
     // Subscribe to scores changes
-    const scoresChannel = supabase
+    const scoresChannel = supabaseClient
       .channel('scores-changes')
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'scores' },

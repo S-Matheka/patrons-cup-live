@@ -38,21 +38,13 @@ export const TournamentContextSwitcher: React.FC<TournamentContextSwitcherProps>
 
   // Force Supabase usage when client is ready
   const supabaseConfigured = typeof window !== 'undefined' && isSupabaseConfigured();
-  const shouldUseSupabase = useSupabase && (isClient || supabaseConfigured);
-  
-  console.log('🔧 TournamentContextSwitcher Debug:');
-  console.log('  isClient:', isClient);
-  console.log('  useSupabase:', useSupabase);
-  console.log('  supabaseConfigured:', supabaseConfigured);
-  console.log('  shouldUseSupabase:', shouldUseSupabase);
+  const shouldUseSupabase = useSupabase && isClient;
 
   // Force Supabase usage when client is ready
-  if (isClient && useSupabase) {
-    console.log('✅ Using Supabase provider for tournament data (forced)');
+  if (shouldUseSupabase) {
     return <SupabaseProvider>{children}</SupabaseProvider>;
   }
 
   // Fallback to localStorage only during SSR or when not ready
-  console.log('⚠️ Using localStorage provider for tournament data (fallback)');
   return <LocalStorageProvider>{children}</LocalStorageProvider>;
 };

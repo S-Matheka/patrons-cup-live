@@ -794,14 +794,28 @@ export default function LiveScoring() {
                       <div className="space-y-2">
                         {match.isBye ? (
                           <div>
-                            <div className="text-sm font-semibold text-gray-900 mb-1">
-                              {teamA?.name || 'Team A'} - BYE Match
+                            <div className="text-sm font-semibold text-gray-900 mb-2">
+                              {teamA?.name ? `${teamA.name} - BYE Match` : teamB?.name ? `BYE vs ${teamB.name}` : 'BYE Match'}
+                            </div>
+                            <div className="text-xs text-gray-600">
+                              {teamA?.name && teamAPlayers.map(player => (
+                                <div key={player.id} className="text-gray-600">
+                                  {player.name}
+                                  {player.isPro && <span className="text-yellow-600 ml-1">(Pro)</span>}
+                                </div>
+                              ))}
+                              {teamB?.name && teamBPlayers.map(player => (
+                                <div key={player.id} className="text-gray-600">
+                                  {player.name}
+                                  {player.isPro && <span className="text-yellow-600 ml-1">(Pro)</span>}
+                                </div>
+                              ))}
                             </div>
                           </div>
                         ) : match.isThreeWay ? (
                           <div>
                             <div className="text-sm font-semibold text-gray-900 mb-2">
-                              {teamA?.name || 'Team A'} vs {teamB?.name || 'Team B'} vs {teamC?.name || 'Team C'}
+                              {teamA?.name || 'TBD'} vs {teamB?.name || 'TBD'} vs {teamC?.name || 'TBD'}
                             </div>
                             <div className="grid grid-cols-1 gap-2 text-xs">
                               <div className="min-w-0">
@@ -836,7 +850,7 @@ export default function LiveScoring() {
                         ) : (
                           <div>
                             <div className="text-sm font-semibold text-gray-900 mb-2">
-                              {teamA?.name || 'Team A'} vs {teamB?.name || 'Team B'}
+                              {teamA?.name || 'TBD'} vs {teamB?.name || 'TBD'}
                             </div>
                             <div className="grid grid-cols-1 gap-2 text-xs">
                               <div className="min-w-0">

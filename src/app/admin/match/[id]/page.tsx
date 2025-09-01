@@ -271,7 +271,7 @@ export default function AdminMatchDetail() {
                 )}
                 
                 <div className="text-left sm:text-right">
-                  <div className="text-sm text-gray-600">Match #{match.id}</div>
+                  <div className="text-sm text-gray-600">Game #{match.gameNumber}</div>
                   <div className="text-sm text-gray-600">{match.date} at {match.teeTime}</div>
                   {!timingInfo.canScore && timingInfo.timeUntilStart && (
                     <div className="text-xs text-gray-500">Starts in {timingInfo.timeUntilStart}</div>

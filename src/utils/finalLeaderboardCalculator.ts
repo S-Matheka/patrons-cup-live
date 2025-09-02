@@ -9,7 +9,7 @@
  * - Handles 2-way and 3-way matches correctly
  * - Only counts completed matches for the leaderboard
  * - Robust error handling and logging
- * - Uses official team ordering from tournament results
+ * - Uses team seed ordering (1, 2, 3) for display
  */
 
 import { Match, Team } from '@/types';
@@ -24,15 +24,6 @@ export interface LeaderboardEntry {
   played: number;
   recentResults: string;
 }
-
-// OFFICIAL TEAM ORDERING (by total points descending) - for display order only
-const OFFICIAL_ORDERING = {
-  'Trophy': ['MGC', 'Nyali', 'Railway'],
-  'Shield': ['Vet Lab', 'Sigona', 'Kiambu'],
-  'Plaque': ['Golf Park', 'Limuru', 'Thika'],
-  'Bowl': ['Royal', 'Karen', 'Eldoret'],
-  'Mug': ['Windsor', 'Mombasa', 'Ruiru']
-};
 
 /**
  * Calculate points for a match based on TOCs rules
@@ -139,14 +130,6 @@ export function calculateFinalLeaderboard(
     return [];
   }
 
-  // Get official ordering for this division
-  const officialOrdering = OFFICIAL_ORDERING[division as keyof typeof OFFICIAL_ORDERING];
-  
-  if (!officialOrdering) {
-    console.error(`No official ordering found for division: ${division}`);
-    return [];
-  }
-
   // Initialize team statistics
   const teamStats: Record<number, {
     team: Team;
@@ -194,20 +177,33 @@ export function calculateFinalLeaderboard(
     }
   });
 
-  // Convert to leaderboard entries
+  // Convert to leaderboard entries and sort by seed (1, 2, 3)
   const leaderboardEntries: LeaderboardEntry[] = [];
   
-  // Use official ordering to arrange teams
-  officialOrdering.forEach((teamName, index) => {
-    const team = divisionTeams.find(t => t.name === teamName);
-    if (!team) {
-      console.warn(`Team ${teamName} not found in database for division ${division}`);
-      return;
-    }
+  // Sort teams by seed (1, 2, 3) and then by points for tiebreakers
+  const sortedTeams = divisionTeams
+    .sort((a, b) => {
+      // First sort by seed (1, 2, 3)
+      const seedA = a.seed || 999;
+      const seedB = b.seed || 999;
+      if (seedA !== seedB) {
+        return seedA - seedB;
+      }
+      
+      // If same seed, sort by points (descending)
+      const statsA = teamStats[a.id];
+      const statsB = teamStats[b.id];
+      if (statsA && statsB) {
+        return statsB.points - statsA.points;
+      }
+      return 0;
+    });
 
+  // Create leaderboard entries in seed order
+  sortedTeams.forEach((team, index) => {
     const stats = teamStats[team.id];
     if (!stats) {
-      console.warn(`No stats found for team ${teamName} in division ${division}`);
+      console.warn(`No stats found for team ${team.name} in division ${division}`);
       return;
     }
 

@@ -336,7 +336,6 @@ export default function AdminLeaderboardPage() {
                             {getDivisionIcon(score.division)}
                             <div>
                               <div className="font-medium text-gray-900">{team?.name}</div>
-                              <div className="text-sm text-gray-500">Seed #{team?.seed}</div>
                             </div>
                           </div>
                         </td>

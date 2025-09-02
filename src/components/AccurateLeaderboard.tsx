@@ -33,19 +33,19 @@ export default function AccurateLeaderboard({
     
     // Add safety checks for teams and matches
     if (!teams || !Array.isArray(teams) || teams.length === 0) {
-      console.error("No teams loaded in Leaderboard component");
+      // Don't log error, just return empty array for loading state
       return [];
     }
     
     if (!matches || !Array.isArray(matches)) {
-      console.error("No matches loaded in Leaderboard component");
+      // Don't log error, just return empty array for loading state
       return [];
     }
     
     // Filter for teams in the active division
     const divisionTeams = teams.filter(team => team.division === activeDivision);
     if (divisionTeams.length === 0) {
-      console.warn(`No teams found for division: ${activeDivision}`);
+      // Don't log warning, just return empty array for empty state
       return [];
     }
     
@@ -74,6 +74,30 @@ export default function AccurateLeaderboard({
                 <div className="h-2 bg-slate-200 rounded"></div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if we have data to display
+  const hasData = teams && Array.isArray(teams) && teams.length > 0 && 
+                  matches && Array.isArray(matches) && matches.length > 0;
+  
+  // Show loading state if no data yet
+  if (!hasData) {
+    return (
+      <div className={`bg-white rounded-lg shadow-md ${className}`}>
+        <div className="px-6 py-4 bg-gradient-to-r from-green-600 to-green-700">
+          <h2 className="text-xl font-bold text-white flex items-center">
+            <Trophy className="w-5 h-5 mr-2" />
+            Tournament Leaderboard
+          </h2>
+        </div>
+        <div className="p-6">
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading tournament data...</p>
           </div>
         </div>
       </div>
@@ -159,7 +183,6 @@ export default function AccurateLeaderboard({
                       </div>
                       <div className="min-w-0">
                         <div className="font-medium text-gray-900 text-xs sm:text-sm">{entry.team.name}</div>
-                        <div className="text-xs text-gray-500 hidden sm:block">Seed #{entry.team.seed}</div>
                       </div>
                     </div>
                   </td>

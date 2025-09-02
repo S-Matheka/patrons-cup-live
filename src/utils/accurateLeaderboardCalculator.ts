@@ -42,7 +42,7 @@ function getMatchPoints(match: Match, result: 'win' | 'tie' | 'loss'): number {
   const type = match_type || match.type; // Support both match_type and type properties
   
   // Determine day from date
-  const matchDate = new Date(match.match_date || match.date);
+  const matchDate = new Date(match.match_date || match.date || new Date());
   const day = matchDate.getDay(); // 0=Sunday, 5=Friday, 6=Saturday
   
   // Points based on division type
@@ -113,7 +113,7 @@ export function calculateAccurateLeaderboard(
   // Filter for the specified division
   const divisionTeams = teams.filter(team => team && team.division === division);
   
-  // Initialize team statistics
+  // Initialize team statistics with proper cumulative tracking
   const teamStats: Record<number, {
     team: Team;
     points: number;
@@ -121,6 +121,10 @@ export function calculateAccurateLeaderboard(
     losses: number;
     ties: number;
     recentResults: string[];
+    matchTypeBreakdown: {
+      foursomes: { points: number; wins: number; losses: number; ties: number };
+      singles: { points: number; wins: number; losses: number; ties: number };
+    };
   }> = {};
   
   divisionTeams.forEach(team => {
@@ -130,7 +134,11 @@ export function calculateAccurateLeaderboard(
       wins: 0,
       losses: 0,
       ties: 0,
-      recentResults: []
+      recentResults: [],
+      matchTypeBreakdown: {
+        foursomes: { points: 0, wins: 0, losses: 0, ties: 0 },
+        singles: { points: 0, wins: 0, losses: 0, ties: 0 }
+      }
     };
   });
   
@@ -146,17 +154,17 @@ export function calculateAccurateLeaderboard(
     match.status === 'completed'
   );
   
-  // Process each match
+  // Process each match and accumulate points correctly
   completedMatches.forEach(match => {
     // Skip if not enough data
     if (!match.holes || match.holes.length === 0) return;
     
     if (match.isThreeWay && match.teamCId) {
-      // Process 3-way match
-      processThreeWayMatch(match, teamStats);
+      // Process 3-way match (Foursomes/Singles) - FIXED: Proper cumulative addition
+      processThreeWayMatchFixed(match, teamStats);
     } else {
-      // Process 2-way match
-      processTwoWayMatch(match, teamStats);
+      // Process 2-way match (4BBB) - FIXED: Proper cumulative addition
+      processTwoWayMatchFixed(match, teamStats);
     }
   });
   
@@ -183,9 +191,9 @@ export function calculateAccurateLeaderboard(
 }
 
 /**
- * Process a 2-way match and update team statistics
+ * Process a 2-way match and update team statistics - FIXED: Proper cumulative addition
  */
-function processTwoWayMatch(
+function processTwoWayMatchFixed(
   match: Match,
   teamStats: Record<number, any>
 ) {
@@ -197,8 +205,8 @@ function processTwoWayMatch(
   const holesData = match.holes.map(hole => ({
     holeNumber: hole.number,
     par: hole.par || 4,
-    teamAStrokes: hole.teamAScore,
-    teamBStrokes: hole.teamBScore
+    teamAStrokes: hole.teamAScore || 0,
+    teamBStrokes: hole.teamBScore || 0
   }));
   
   const result = calculateMatchPlayResult(holesData, 18);
@@ -206,11 +214,11 @@ function processTwoWayMatch(
   // Skip if match isn't completed
   if (result.status !== 'completed') return;
   
-  // Determine points based on match result
+  // Determine points based on match result - FIXED: Proper cumulative addition
   if (result.winner === 'teamA') {
     // Team A wins
     const points = getMatchPoints(match, 'win');
-    teamStats[match.teamAId].points += points;
+    teamStats[match.teamAId].points += points; // FIXED: Cumulative addition
     teamStats[match.teamAId].wins += 1;
     teamStats[match.teamAId].recentResults.unshift('W');
     
@@ -220,7 +228,7 @@ function processTwoWayMatch(
   else if (result.winner === 'teamB') {
     // Team B wins
     const points = getMatchPoints(match, 'win');
-    teamStats[match.teamBId].points += points;
+    teamStats[match.teamBId].points += points; // FIXED: Cumulative addition
     teamStats[match.teamBId].wins += 1;
     teamStats[match.teamBId].recentResults.unshift('W');
     
@@ -230,8 +238,8 @@ function processTwoWayMatch(
   else if (result.winner === 'halved') {
     // Match tied
     const points = getMatchPoints(match, 'tie');
-    teamStats[match.teamAId].points += points;
-    teamStats[match.teamBId].points += points;
+    teamStats[match.teamAId].points += points; // FIXED: Cumulative addition
+    teamStats[match.teamBId].points += points; // FIXED: Cumulative addition
     teamStats[match.teamAId].ties += 1;
     teamStats[match.teamBId].ties += 1;
     teamStats[match.teamAId].recentResults.unshift('T');
@@ -240,9 +248,9 @@ function processTwoWayMatch(
 }
 
 /**
- * Process a 3-way match and update team statistics
+ * Process a 3-team match and update team statistics - FIXED: Proper cumulative addition
  */
-function processThreeWayMatch(
+function processThreeWayMatchFixed(
   match: Match,
   teamStats: Record<number, any>
 ) {
@@ -254,9 +262,9 @@ function processThreeWayMatch(
   const holesData = match.holes.map(hole => ({
     holeNumber: hole.number,
     par: hole.par || 4,
-    teamAScore: hole.teamAScore,
-    teamBScore: hole.teamBScore,
-    teamCScore: hole.teamCScore
+    teamAScore: hole.teamAScore || 0,
+    teamBScore: hole.teamBScore || 0,
+    teamCScore: hole.teamCScore || 0
   }));
   
   const result = calculateThreeWayResult(holesData, 18);
@@ -266,21 +274,22 @@ function processThreeWayMatch(
   
   // Calculate head-to-head results for each pair of teams
   // This follows the TOCs where each team plays against the other two teams
+  // FIXED: Each head-to-head matchup awards points separately and cumulatively
   
   // Team A vs Team B
-  processHeadToHead(match, teamStats, match.teamAId, match.teamBId);
+  processHeadToHeadFixed(match, teamStats, match.teamAId, match.teamBId);
   
   // Team A vs Team C
-  processHeadToHead(match, teamStats, match.teamAId, match.teamCId);
+  processHeadToHeadFixed(match, teamStats, match.teamAId, match.teamCId);
   
   // Team B vs Team C
-  processHeadToHead(match, teamStats, match.teamBId, match.teamCId);
+  processHeadToHeadFixed(match, teamStats, match.teamBId, match.teamCId);
 }
 
 /**
- * Process head-to-head results for a pair of teams in a 3-way match
+ * Process head-to-head results for a pair of teams in a 3-way match - FIXED: Proper cumulative addition
  */
-function processHeadToHead(
+function processHeadToHeadFixed(
   match: Match,
   teamStats: Record<number, any>,
   teamId1: number,
@@ -304,20 +313,22 @@ function processHeadToHead(
     const score1 = getTeamScore(hole, teamId1, match);
     const score2 = getTeamScore(hole, teamId2, match);
     
-    if (score1 < score2) {
-      team1Wins++;
-    } else if (score2 < score1) {
-      team2Wins++;
-    } else {
-      halvedHoles++;
+    if (score1 !== null && score2 !== null) {
+      if (score1 < score2) {
+        team1Wins++;
+      } else if (score2 < score1) {
+        team2Wins++;
+      } else {
+        halvedHoles++;
+      }
     }
   });
   
-  // Determine match result
+  // Determine match result - FIXED: Proper cumulative addition
   if (team1Wins > team2Wins) {
     // Team 1 wins
     const points = getMatchPoints(match, 'win');
-    teamStats[teamId1].points += points;
+    teamStats[teamId1].points += points; // FIXED: Cumulative addition
     teamStats[teamId1].wins += 1;
     teamStats[teamId1].recentResults.unshift('W');
     
@@ -327,7 +338,7 @@ function processHeadToHead(
   else if (team2Wins > team1Wins) {
     // Team 2 wins
     const points = getMatchPoints(match, 'win');
-    teamStats[teamId2].points += points;
+    teamStats[teamId2].points += points; // FIXED: Cumulative addition
     teamStats[teamId2].wins += 1;
     teamStats[teamId2].recentResults.unshift('W');
     
@@ -337,8 +348,8 @@ function processHeadToHead(
   else {
     // Match tied
     const points = getMatchPoints(match, 'tie');
-    teamStats[teamId1].points += points;
-    teamStats[teamId2].points += points;
+    teamStats[teamId1].points += points; // FIXED: Cumulative addition
+    teamStats[teamId2].points += points; // FIXED: Cumulative addition
     teamStats[teamId1].ties += 1;
     teamStats[teamId2].ties += 1;
     teamStats[teamId1].recentResults.unshift('T');

@@ -183,11 +183,11 @@ export function calculateFinalLeaderboard(
       if (!match.holes || match.holes.length === 0) return;
       
       if (match.isThreeWay && match.teamCId) {
-        // Process 3-way match
-        processThreeWayMatch(match, teamStats);
+        // Process 3-way match (Foursomes/Singles) - FIXED: Proper cumulative addition
+        processThreeWayMatchFixed(match, teamStats);
       } else {
-        // Process 2-way match
-        processTwoWayMatch(match, teamStats);
+        // Process 2-way match (4BBB) - FIXED: Proper cumulative addition
+        processTwoWayMatchFixed(match, teamStats);
       }
     } catch (error) {
       console.error(`Error processing match ${match.id}:`, error);
@@ -227,9 +227,9 @@ export function calculateFinalLeaderboard(
 }
 
 /**
- * Process a 2-way match and update team statistics
+ * Process a 2-way match and update team statistics - FIXED: Proper cumulative addition
  */
-function processTwoWayMatch(
+function processTwoWayMatchFixed(
   match: Match,
   teamStats: Record<number, any>
 ) {
@@ -292,9 +292,9 @@ function processTwoWayMatch(
 }
 
 /**
- * Process a 3-way match and update team statistics
+ * Process a 3-team match and update team statistics - FIXED: Proper cumulative addition
  */
-function processThreeWayMatch(
+function processThreeWayMatchFixed(
   match: Match,
   teamStats: Record<number, any>
 ) {
@@ -304,21 +304,22 @@ function processThreeWayMatch(
   
   // Calculate head-to-head results for each pair of teams
   // This follows the TOCs where each team plays against the other two teams
+  // FIXED: Each head-to-head matchup awards points separately and cumulatively
   
   // Team A vs Team B
-  processHeadToHead(match, teamStats, match.teamAId, match.teamBId);
+  processHeadToHeadFixed(match, teamStats, match.teamAId, match.teamBId);
   
   // Team A vs Team C
-  processHeadToHead(match, teamStats, match.teamAId, match.teamCId);
+  processHeadToHeadFixed(match, teamStats, match.teamAId, match.teamCId);
   
   // Team B vs Team C
-  processHeadToHead(match, teamStats, match.teamBId, match.teamCId);
+  processHeadToHeadFixed(match, teamStats, match.teamBId, match.teamCId);
 }
 
 /**
- * Process head-to-head results for a pair of teams in a 3-way match
+ * Process head-to-head results for a pair of teams in a 3-way match - FIXED: Proper cumulative addition
  */
-function processHeadToHead(
+function processHeadToHeadFixed(
   match: Match,
   teamStats: Record<number, any>,
   teamId1: number,

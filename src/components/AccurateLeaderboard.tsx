@@ -18,7 +18,7 @@ export default function AccurateLeaderboard({
   showTabs = true,
   showDebug = false
 }: AccurateLeaderboardProps) {
-  const { teams, matches, loading } = useTournament();
+  const { teams, matches, scores, loading } = useTournament();
   const [activeDivision, setActiveDivision] = useState<'Trophy' | 'Shield' | 'Plaque' | 'Bowl' | 'Mug'>(defaultDivision);
   const [isClient, setIsClient] = useState(false);
 
@@ -27,30 +27,167 @@ export default function AccurateLeaderboard({
     setIsClient(true);
   }, []);
 
-  // Calculate leaderboard data
+  // Get leaderboard data directly from scores table with recent results
   const leaderboardData = useMemo(() => {
-    if (!isClient) return [];
+    if (!isClient || !scores || !teams || !matches) return [];
     
-    // Add safety checks for teams and matches
-    if (!teams || !Array.isArray(teams) || teams.length === 0) {
-      // Don't log error, just return empty array for loading state
-      return [];
-    }
+    // Filter scores by active division
+    const divisionScores = scores.filter(score => score.division === activeDivision);
     
-    if (!matches || !Array.isArray(matches)) {
-      // Don't log error, just return empty array for loading state
-      return [];
-    }
+    // Get team names and create leaderboard entries
+    const entries = divisionScores.map(score => {
+      const team = teams.find(t => t.id === score.teamId);
+      
+      // Calculate recent results for this team
+      const teamMatches = matches
+        .filter(match => 
+          match.division === activeDivision && 
+          match.status === 'completed' &&
+          (match.teamAId === score.teamId || match.teamBId === score.teamId || match.teamCId === score.teamId)
+        )
+        .sort((a, b) => b.gameNumber - a.gameNumber) // Most recent first
+        .slice(0, 5); // Last 5 matches
+      
+      const recentResults = teamMatches.map(match => {
+        if (match.isThreeWay) {
+          // For 3-way matches, determine result based on individual head-to-head
+          const holes = match.holes || [];
+          const holesWithScores = holes.filter(hole => 
+            hole.teamAScore !== null && hole.teamBScore !== null && hole.teamCScore !== null
+          );
+          
+          if (holesWithScores.length >= 15) {
+            let teamWins = 0;
+            let teamLosses = 0;
+            
+            // Check against each opponent
+            if (match.teamAId === score.teamId) {
+              // Team A vs B
+              let aWins = 0, bWins = 0;
+              holesWithScores.forEach(hole => {
+                if (hole.teamAScore !== null && hole.teamBScore !== null) {
+                  if (hole.teamAScore < hole.teamBScore) aWins++;
+                  else if (hole.teamBScore < hole.teamAScore) bWins++;
+                }
+              });
+              if (aWins > bWins) teamWins++;
+              else if (bWins > aWins) teamLosses++;
+              
+              // Team A vs C
+              let aWinsC = 0, cWins = 0;
+              holesWithScores.forEach(hole => {
+                if (hole.teamAScore !== null && hole.teamCScore !== null && hole.teamCScore !== undefined) {
+                  if (hole.teamAScore < hole.teamCScore) aWinsC++;
+                  else if (hole.teamCScore < hole.teamAScore) cWins++;
+                }
+              });
+              if (aWinsC > cWins) teamWins++;
+              else if (cWins > aWinsC) teamLosses++;
+            } else if (match.teamBId === score.teamId) {
+              // Team B vs A
+              let bWins = 0, aWins = 0;
+              holesWithScores.forEach(hole => {
+                if (hole.teamBScore !== null && hole.teamAScore !== null) {
+                  if (hole.teamBScore < hole.teamAScore) bWins++;
+                  else if (hole.teamAScore < hole.teamBScore) aWins++;
+                }
+              });
+              if (bWins > aWins) teamWins++;
+              else if (aWins > bWins) teamLosses++;
+              
+              // Team B vs C
+              let bWinsC = 0, cWins = 0;
+              holesWithScores.forEach(hole => {
+                if (hole.teamBScore !== null && hole.teamCScore !== null && hole.teamCScore !== undefined) {
+                  if (hole.teamBScore < hole.teamCScore) bWinsC++;
+                  else if (hole.teamCScore < hole.teamBScore) cWins++;
+                }
+              });
+              if (bWinsC > cWins) teamWins++;
+              else if (cWins > bWinsC) teamLosses++;
+            } else if (match.teamCId === score.teamId) {
+              // Team C vs A
+              let cWins = 0, aWins = 0;
+              holesWithScores.forEach(hole => {
+                if (hole.teamCScore !== null && hole.teamCScore !== undefined && hole.teamAScore !== null) {
+                  if (hole.teamCScore < hole.teamAScore) cWins++;
+                  else if (hole.teamAScore < hole.teamCScore) aWins++;
+                }
+              });
+              if (cWins > aWins) teamWins++;
+              else if (aWins > cWins) teamLosses++;
+              
+              // Team C vs B
+              let cWinsB = 0, bWins = 0;
+              holesWithScores.forEach(hole => {
+                if (hole.teamCScore !== null && hole.teamCScore !== undefined && hole.teamBScore !== null) {
+                  if (hole.teamCScore < hole.teamBScore) cWinsB++;
+                  else if (hole.teamBScore < hole.teamCScore) bWins++;
+                }
+              });
+              if (cWinsB > bWins) teamWins++;
+              else if (bWins > cWinsB) teamLosses++;
+            }
+            
+            if (teamWins > teamLosses) return 'W';
+            else if (teamLosses > teamWins) return 'L';
+            else return 'T';
+          }
+        } else {
+          // For 2-way matches
+          const holes = match.holes || [];
+          const holesWithScores = holes.filter(hole => 
+            hole.teamAScore !== null && hole.teamBScore !== null
+          );
+          
+          if (holesWithScores.length >= 15) {
+            let teamAHolesWon = 0;
+            let teamBHolesWon = 0;
+            
+            holesWithScores.forEach(hole => {
+              if (hole.teamAScore !== null && hole.teamBScore !== null) {
+                if (hole.teamAScore < hole.teamBScore) teamAHolesWon++;
+                else if (hole.teamBScore < hole.teamAScore) teamBHolesWon++;
+              }
+            });
+            
+            if (match.teamAId === score.teamId) {
+              if (teamAHolesWon > teamBHolesWon) return 'W';
+              else if (teamBHolesWon > teamAHolesWon) return 'L';
+              else return 'T';
+            } else {
+              if (teamBHolesWon > teamAHolesWon) return 'W';
+              else if (teamAHolesWon > teamBHolesWon) return 'L';
+              else return 'T';
+            }
+          }
+        }
+        return '?'; // Unknown result
+      }).join('');
+      
+      return {
+        team: team || { id: score.teamId, name: `Team ${score.teamId}`, division: score.division },
+        position: 0, // Will be set after sorting
+        points: score.points,
+        wins: score.matchesWon || 0,
+        losses: score.matchesLost || 0,
+        ties: score.matchesHalved || 0,
+        played: score.matchesPlayed || 0,
+        recentResults: recentResults || 'N/A'
+      };
+    });
     
-    // Filter for teams in the active division
-    const divisionTeams = teams.filter(team => team.division === activeDivision);
-    if (divisionTeams.length === 0) {
-      // Don't log warning, just return empty array for empty state
-      return [];
-    }
-    
-    return calculateAccurateLeaderboard(matches, teams, activeDivision);
-  }, [isClient, teams, matches, activeDivision]);
+    // Sort by points (descending), then by wins
+    return entries
+      .sort((a, b) => {
+        if (b.points !== a.points) return b.points - a.points;
+        return b.wins - a.wins;
+      })
+      .map((entry, index) => ({
+        ...entry,
+        position: index + 1
+      }));
+  }, [isClient, scores, teams, matches, activeDivision]);
 
   // Don't render anything until client-side and data is loaded
   if (!isClient || loading) {

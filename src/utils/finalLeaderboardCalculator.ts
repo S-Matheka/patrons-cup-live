@@ -13,6 +13,7 @@
  */
 
 import { Match, Team } from '@/types';
+import { calculateThreeWayResult } from './matchPlayScoring';
 
 export interface LeaderboardEntry {
   team: Team;
@@ -298,18 +299,174 @@ function processThreeWayMatchFixed(
   if (!match.teamAId || !match.teamBId || !match.teamCId) return;
   if (!teamStats[match.teamAId] || !teamStats[match.teamBId] || !teamStats[match.teamCId]) return;
   
-  // Calculate head-to-head results for each pair of teams
-  // This follows the TOCs where each team plays against the other two teams
-  // FIXED: Each head-to-head matchup awards points separately and cumulatively
+  // Calculate three-way match result using the three-way result calculator
+  const holesData = match.holes.map(hole => ({
+    holeNumber: hole.number,
+    par: hole.par || 4,
+    teamAScore: hole.teamAScore || 0,
+    teamBScore: hole.teamBScore || 0,
+    teamCScore: hole.teamCScore || 0
+  }));
+  
+  const result = calculateThreeWayResult(holesData, 18);
+  
+  // Skip if match isn't completed
+  if (result.status !== 'completed') return;
+  
+  // FIXED: Award points based on individual head-to-head matches (CORRECT TOCs approach)
+  
+  // Calculate individual head-to-head results
+  let teamAvsB = { teamAWins: 0, teamBWins: 0, holesPlayed: 0 };
+  let teamAvsC = { teamAWins: 0, teamCWins: 0, holesPlayed: 0 };
+  let teamBvsC = { teamBWins: 0, teamCWins: 0, holesPlayed: 0 };
+  
+  holesData.forEach(hole => {
+    // Team A vs Team B
+    if (hole.teamAScore !== null && hole.teamBScore !== null) {
+      teamAvsB.holesPlayed++;
+      if (hole.teamAScore < hole.teamBScore) {
+        teamAvsB.teamAWins++;
+      } else if (hole.teamBScore < hole.teamAScore) {
+        teamAvsB.teamBWins++;
+      }
+    }
+    
+    // Team A vs Team C
+    if (hole.teamAScore !== null && hole.teamCScore !== null) {
+      teamAvsC.holesPlayed++;
+      if (hole.teamAScore < hole.teamCScore) {
+        teamAvsC.teamAWins++;
+      } else if (hole.teamCScore < hole.teamAScore) {
+        teamAvsC.teamCWins++;
+      }
+    }
+    
+    // Team B vs Team C
+    if (hole.teamBScore !== null && hole.teamCScore !== null) {
+      teamBvsC.holesPlayed++;
+      if (hole.teamBScore < hole.teamCScore) {
+        teamBvsC.teamBWins++;
+      } else if (hole.teamCScore < hole.teamBScore) {
+        teamBvsC.teamCWins++;
+      }
+    }
+  });
+  
+  // Check if all individual matches are completed
+  const isTeamAvsBComplete = teamAvsB.holesPlayed === 18 || Math.abs(teamAvsB.teamAWins - teamAvsB.teamBWins) > (18 - teamAvsB.holesPlayed);
+  const isTeamAvsCComplete = teamAvsC.holesPlayed === 18 || Math.abs(teamAvsC.teamAWins - teamAvsC.teamCWins) > (18 - teamAvsC.holesPlayed);
+  const isTeamBvsCComplete = teamBvsC.holesPlayed === 18 || Math.abs(teamBvsC.teamBWins - teamBvsC.teamCWins) > (18 - teamBvsC.holesPlayed);
+  
+  // Skip if not all individual matches are completed
+  if (!isTeamAvsBComplete || !isTeamAvsCComplete || !isTeamBvsCComplete) return;
+  
+  // Get division from the match data
+  const division = match.division;
+  
+  if (!division) {
+    console.warn(`Could not determine division for match ${match.id}`);
+    return;
+  }
+  
+  const isBowlMug = division === 'Bowl' || division === 'Mug';
+  
+  // Determine points based on division and match type
+  let winPoints: number;
+  let tiePoints: number;
+  
+  if (match.match_type === 'Foursomes') {
+    winPoints = isBowlMug ? 4 : 3;  // Bowl/Mug: 4pts, Trophy/Shield/Plaque: 3pts
+    tiePoints = isBowlMug ? 2 : 1.5; // Bowl/Mug: 2pts, Trophy/Shield/Plaque: 1.5pts
+  } else if (match.match_type === 'Singles') {
+    winPoints = 3;   // All divisions: 3pts
+    tiePoints = 1.5; // All divisions: 1.5pts
+  } else {
+    console.warn(`Unknown 3-way match type: ${match.match_type}`);
+    return;
+  }
+  
+  // Award points based on individual head-to-head matches
   
   // Team A vs Team B
-  processHeadToHeadFixed(match, teamStats, match.teamAId, match.teamBId);
+  if (teamAvsB.teamAWins > teamAvsB.teamBWins) {
+    // Team A wins
+    teamStats[match.teamAId].points += winPoints;
+    teamStats[match.teamAId].wins += 1;
+    teamStats[match.teamAId].recentResults.unshift('W');
+    
+    teamStats[match.teamBId].losses += 1;
+    teamStats[match.teamBId].recentResults.unshift('L');
+  } else if (teamAvsB.teamBWins > teamAvsB.teamAWins) {
+    // Team B wins
+    teamStats[match.teamBId].points += winPoints;
+    teamStats[match.teamBId].wins += 1;
+    teamStats[match.teamBId].recentResults.unshift('W');
+    
+    teamStats[match.teamAId].losses += 1;
+    teamStats[match.teamAId].recentResults.unshift('L');
+  } else {
+    // Tie
+    teamStats[match.teamAId].points += tiePoints;
+    teamStats[match.teamBId].points += tiePoints;
+    teamStats[match.teamAId].ties += 1;
+    teamStats[match.teamBId].ties += 1;
+    teamStats[match.teamAId].recentResults.unshift('T');
+    teamStats[match.teamBId].recentResults.unshift('T');
+  }
   
   // Team A vs Team C
-  processHeadToHeadFixed(match, teamStats, match.teamAId, match.teamCId);
+  if (teamAvsC.teamAWins > teamAvsC.teamCWins) {
+    // Team A wins
+    teamStats[match.teamAId].points += winPoints;
+    teamStats[match.teamAId].wins += 1;
+    teamStats[match.teamAId].recentResults.unshift('W');
+    
+    teamStats[match.teamCId].losses += 1;
+    teamStats[match.teamCId].recentResults.unshift('L');
+  } else if (teamAvsC.teamCWins > teamAvsC.teamAWins) {
+    // Team C wins
+    teamStats[match.teamCId].points += winPoints;
+    teamStats[match.teamCId].wins += 1;
+    teamStats[match.teamCId].recentResults.unshift('W');
+    
+    teamStats[match.teamAId].losses += 1;
+    teamStats[match.teamAId].recentResults.unshift('L');
+  } else {
+    // Tie
+    teamStats[match.teamAId].points += tiePoints;
+    teamStats[match.teamCId].points += tiePoints;
+    teamStats[match.teamAId].ties += 1;
+    teamStats[match.teamCId].ties += 1;
+    teamStats[match.teamAId].recentResults.unshift('T');
+    teamStats[match.teamCId].recentResults.unshift('T');
+  }
   
   // Team B vs Team C
-  processHeadToHeadFixed(match, teamStats, match.teamBId, match.teamCId);
+  if (teamBvsC.teamBWins > teamBvsC.teamCWins) {
+    // Team B wins
+    teamStats[match.teamBId].points += winPoints;
+    teamStats[match.teamBId].wins += 1;
+    teamStats[match.teamBId].recentResults.unshift('W');
+    
+    teamStats[match.teamCId].losses += 1;
+    teamStats[match.teamCId].recentResults.unshift('L');
+  } else if (teamBvsC.teamCWins > teamBvsC.teamBWins) {
+    // Team C wins
+    teamStats[match.teamCId].points += winPoints;
+    teamStats[match.teamCId].wins += 1;
+    teamStats[match.teamCId].recentResults.unshift('W');
+    
+    teamStats[match.teamBId].losses += 1;
+    teamStats[match.teamBId].recentResults.unshift('L');
+  } else {
+    // Tie
+    teamStats[match.teamBId].points += tiePoints;
+    teamStats[match.teamCId].points += tiePoints;
+    teamStats[match.teamBId].ties += 1;
+    teamStats[match.teamCId].ties += 1;
+    teamStats[match.teamBId].recentResults.unshift('T');
+    teamStats[match.teamCId].recentResults.unshift('T');
+  }
 }
 
 /**

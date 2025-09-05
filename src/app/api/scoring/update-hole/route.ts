@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
         const teamCWins = (teamAvsC.teamCWins > teamAvsC.teamAWins ? 1 : 0) + 
                          (teamBvsC.teamCWins > teamBvsC.teamBWins ? 1 : 0);
 
-        // Determine individual matchup completion
+        // RESTORED: Match play can end early mathematically for 3-way matches
         const isTeamAvsBComplete = teamAvsB.holesPlayed === 18 || Math.abs(teamAvsB.teamAWins - teamAvsB.teamBWins) > (18 - teamAvsB.holesPlayed);
         const isTeamAvsCComplete = teamAvsC.holesPlayed === 18 || Math.abs(teamAvsC.teamAWins - teamAvsC.teamCWins) > (18 - teamAvsC.holesPlayed);
         const isTeamBvsCComplete = teamBvsC.holesPlayed === 18 || Math.abs(teamBvsC.teamBWins - teamBvsC.teamCWins) > (18 - teamBvsC.holesPlayed);
@@ -175,6 +175,7 @@ export async function POST(request: NextRequest) {
 
         const holesRemaining = 18 - holesPlayed;
         const holesDifference = Math.abs(teamAHolesWon - teamBHolesWon);
+        // RESTORED: Match play can end early mathematically
         isMatchComplete = holesPlayed === 18 || holesDifference > holesRemaining;
       }
 

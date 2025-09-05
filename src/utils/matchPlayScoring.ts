@@ -44,8 +44,10 @@ export function calculateMatchPlayResult(
 
   // Count holes won by each team
   for (const hole of holes) {
-    // Only count holes where both teams have valid scores (not null/undefined/0)
-    if (hole.teamAStrokes && hole.teamBStrokes && hole.teamAStrokes > 0 && hole.teamBStrokes > 0) {
+    // FIXED: In golf, scores of 0 and null are valid
+    // Only skip holes where scores are completely missing (undefined)
+    if (hole.teamAStrokes !== undefined && hole.teamBStrokes !== undefined && 
+        hole.teamAStrokes !== null && hole.teamBStrokes !== null) {
       holesPlayed++;
       
       if (hole.teamAStrokes < hole.teamBStrokes) {
@@ -63,9 +65,9 @@ export function calculateMatchPlayResult(
                      teamBHolesWon > teamAHolesWon ? 'teamB' : null;
   const holesDifference = Math.abs(teamAHolesWon - teamBHolesWon);
 
-  // Determine if match is completed
-  // Match ends when: 1) All 18 holes played, OR 2) Team is up by more holes than remain
-  const isMatchComplete = holesPlayed === totalHoles || holesDifference > holesRemaining;
+  // Determine if match is completed according to TOCs
+  // Match is won when a team is up by more holes than remaining holes
+  const isMatchComplete = holesDifference > holesRemaining || holesPlayed === totalHoles;
 
   let result: string;
   let winner: 'teamA' | 'teamB' | 'halved' | null = null;
@@ -273,7 +275,8 @@ export function calculateThreeWayResult(
     const teamCScore = hole.teamCScore !== undefined ? hole.teamCScore : (hole.team_c_score !== undefined ? hole.team_c_score : null);
     
     // Team A vs Team B
-    if (teamAScore && teamBScore && teamAScore > 0 && teamBScore > 0) {
+    if (teamAScore !== undefined && teamBScore !== undefined && 
+        teamAScore !== null && teamBScore !== null) {
       teamAvsB.holesPlayed++;
       if (teamAScore < teamBScore) {
         teamAvsB.teamAWins++;
@@ -283,7 +286,8 @@ export function calculateThreeWayResult(
     }
 
     // Team A vs Team C
-    if (teamAScore && teamCScore && teamAScore > 0 && teamCScore > 0) {
+    if (teamAScore !== undefined && teamCScore !== undefined && 
+        teamAScore !== null && teamCScore !== null) {
       teamAvsC.holesPlayed++;
       if (teamAScore < teamCScore) {
         teamAvsC.teamAWins++;
@@ -293,7 +297,8 @@ export function calculateThreeWayResult(
     }
 
     // Team B vs Team C
-    if (teamBScore && teamCScore && teamBScore > 0 && teamCScore > 0) {
+    if (teamBScore !== undefined && teamCScore !== undefined && 
+        teamBScore !== null && teamCScore !== null) {
       teamBvsC.holesPlayed++;
       if (teamBScore < teamCScore) {
         teamBvsC.teamBWins++;

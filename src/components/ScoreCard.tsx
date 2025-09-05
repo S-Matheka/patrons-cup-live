@@ -177,11 +177,11 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
       const updatedHoles = match.holes.map(hole => 
         hole.number === editingHole 
           ? {
-              ...hole,
-              teamAScore: tempScores.teamA,
-              teamBScore: tempScores.teamB,
-              ...(match.isThreeWay && { teamCScore: tempScores.teamC }),
-              status: 'completed' as const // Allow saving with null values for holes not played
+                          ...hole,
+            teamAScore: tempScores.teamA,
+            teamBScore: tempScores.teamB,
+            ...(match.isThreeWay && { teamCScore: tempScores.teamC }),
+            status: 'completed' as const
             }
           : hole
       );
@@ -242,6 +242,9 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ match, teamA, teamB, teamC, onSav
             team_a_score: tempScores.teamA,
             team_b_score: tempScores.teamB,
             team_c_score: match.isThreeWay ? tempScores.teamC : null,
+            team_a_strokes: tempScores.teamA, // Add strokes for match play calculation
+            team_b_strokes: tempScores.teamB, // Add strokes for match play calculation
+            team_c_strokes: match.isThreeWay ? tempScores.teamC : null, // Add strokes for match play calculation
             status: 'completed',
             last_updated: new Date().toISOString()
           }, {

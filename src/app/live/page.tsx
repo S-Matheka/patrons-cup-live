@@ -4,7 +4,7 @@ import { useTournament } from '@/context/TournamentContextSwitcher';
 import { Match, Hole } from '@/types';
 import { useState, useEffect } from 'react';
 import { Clock, CheckCircle, Circle, ExternalLink, Filter, Calendar, Users, Trophy, Medal } from 'lucide-react';
-import Leaderboard from '@/components/Leaderboard';
+import FinalLeaderboard from '@/components/FinalLeaderboard';
 import TournamentCountdown from '@/components/TournamentCountdown';
 import { calculateThreeWayResult, calculateMatchPlayResult } from '@/utils/matchPlayScoring';
 import Link from 'next/link';
@@ -172,7 +172,8 @@ export default function LiveScoring() {
 
       holesData.forEach(hole => {
         // Team A vs Team B
-        if (hole.teamAScore && hole.teamBScore && hole.teamAScore > 0 && hole.teamBScore > 0) {
+        if (hole.teamAScore !== null && hole.teamAScore !== undefined && 
+            hole.teamBScore !== null && hole.teamBScore !== undefined) {
           teamAvsB.holesPlayed++;
           if (hole.teamAScore < hole.teamBScore) {
             teamAvsB.teamAWins++;
@@ -182,7 +183,8 @@ export default function LiveScoring() {
         }
 
         // Team A vs Team C
-        if (hole.teamAScore && hole.teamCScore && hole.teamAScore > 0 && hole.teamCScore > 0) {
+        if (hole.teamAScore !== null && hole.teamAScore !== undefined && 
+            hole.teamCScore !== null && hole.teamCScore !== undefined) {
           teamAvsC.holesPlayed++;
           if (hole.teamAScore < hole.teamCScore) {
             teamAvsC.teamAWins++;
@@ -192,7 +194,8 @@ export default function LiveScoring() {
         }
 
         // Team B vs Team C
-        if (hole.teamBScore && hole.teamCScore && hole.teamBScore > 0 && hole.teamCScore > 0) {
+        if (hole.teamBScore !== null && hole.teamBScore !== undefined && 
+            hole.teamCScore !== null && hole.teamCScore !== undefined) {
           teamBvsC.holesPlayed++;
           if (hole.teamBScore < hole.teamCScore) {
             teamBvsC.teamBWins++;
@@ -736,7 +739,7 @@ export default function LiveScoring() {
           </div>
           
           {/* Active Division Leaderboard */}
-          <Leaderboard activeDivision={activeDivision} />
+          <FinalLeaderboard defaultDivision={activeDivision} showTabs={false} />
         </div>
       </div>
 

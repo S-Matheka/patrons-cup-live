@@ -27,23 +27,24 @@ export default function FinalLeaderboard({
     setIsClient(true);
   }, []);
 
-  // Get leaderboard data directly from scores table with recent results
+  // Get leaderboard data using the corrected calculation function
   const leaderboardData = useMemo(() => {
-    if (!isClient || !scores || !teams || !matches) return [];
+    if (!isClient || !teams || !matches) return [];
     
-    // Filter scores by active division
-    const divisionScores = scores.filter(score => score.division === activeDivision);
-    
-    // Get team names and create leaderboard entries
-    const entries = divisionScores.map(score => {
-      const team = teams.find(t => t.id === score.teamId);
+    try {
+      // Use the corrected calculation function instead of scores table
+      const entries = calculateFinalLeaderboard(matches, teams, activeDivision);
+      
+      // Add recent results to each entry
+      const entriesWithRecent = entries.map(entry => {
+      const team = entry.team;
       
       // Calculate recent results for this team
       const teamMatches = matches
         .filter(match => 
           match.division === activeDivision && 
           match.status === 'completed' &&
-          (match.teamAId === score.teamId || match.teamBId === score.teamId || match.teamCId === score.teamId)
+          (match.teamAId === entry.team.id || match.teamBId === entry.team.id || match.teamCId === entry.team.id)
         )
         .sort((a, b) => b.gameNumber - a.gameNumber) // Most recent first
         .slice(0, 5); // Last 5 matches
@@ -61,7 +62,7 @@ export default function FinalLeaderboard({
             let teamLosses = 0;
             
             // Check against each opponent
-            if (match.teamAId === score.teamId) {
+            if (match.teamAId === entry.team.id) {
               // Team A vs B
               let aWins = 0, bWins = 0;
               holesWithScores.forEach(hole => {
@@ -83,7 +84,7 @@ export default function FinalLeaderboard({
               });
               if (aWinsC > cWins) teamWins++;
               else if (cWins > aWinsC) teamLosses++;
-            } else if (match.teamBId === score.teamId) {
+            } else if (match.teamBId === entry.team.id) {
               // Team B vs A
               let bWins = 0, aWins = 0;
               holesWithScores.forEach(hole => {
@@ -105,7 +106,7 @@ export default function FinalLeaderboard({
               });
               if (bWinsC > cWins) teamWins++;
               else if (cWins > bWinsC) teamLosses++;
-            } else if (match.teamCId === score.teamId) {
+            } else if (match.teamCId === entry.team.id) {
               // Team C vs A
               let cWins = 0, aWins = 0;
               holesWithScores.forEach(hole => {
@@ -151,7 +152,7 @@ export default function FinalLeaderboard({
               }
             });
             
-            if (match.teamAId === score.teamId) {
+            if (match.teamAId === entry.team.id) {
               if (teamAHolesWon > teamBHolesWon) return 'W';
               else if (teamBHolesWon > teamAHolesWon) return 'L';
               else return 'T';
@@ -166,28 +167,32 @@ export default function FinalLeaderboard({
       }).join('');
       
       return {
-        team: team || { id: score.teamId, name: `Team ${score.teamId}`, division: score.division },
-        position: 0, // Will be set after sorting
-        points: score.points,
-        wins: score.matchesWon || 0,
-        losses: score.matchesLost || 0,
-        ties: score.matchesHalved || 0,
-        played: score.matchesPlayed || 0,
+        team: entry.team,
+        position: entry.position,
+        points: entry.points,
+        wins: entry.wins,
+        losses: entry.losses,
+        ties: entry.ties,
+        played: entry.wins + entry.losses + entry.ties,
         recentResults: recentResults || 'N/A'
       };
     });
     
-    // Sort by points (descending), then by wins
-    return entries
-      .sort((a, b) => {
-        if (b.points !== a.points) return b.points - a.points;
-        return b.wins - a.wins;
-      })
-      .map((entry, index) => ({
-        ...entry,
-        position: index + 1
-      }));
-  }, [isClient, scores, teams, matches, activeDivision]);
+      // Sort by points (descending), then by wins
+      return entriesWithRecent
+        .sort((a, b) => {
+          if (b.points !== a.points) return b.points - a.points;
+          return b.wins - a.wins;
+        })
+        .map((entry, index) => ({
+          ...entry,
+          position: index + 1
+        }));
+    } catch (error) {
+      console.error('❌ Error calculating leaderboard:', error);
+      return [];
+    }
+  }, [isClient, teams, matches, activeDivision]);
 
   // Don't render anything until client-side and data is loaded
   if (!isClient || loading) {

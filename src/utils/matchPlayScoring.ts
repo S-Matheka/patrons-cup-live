@@ -32,8 +32,8 @@ export function calculateMatchPlayResult(
   holes: Array<{
     holeNumber: number;
     par: number;
-    teamAStrokes: number;
-    teamBStrokes: number;
+    teamAStrokes: number | null;
+    teamBStrokes: number | null;
   }>,
   totalHoles: number = 18
 ): MatchPlayResult {

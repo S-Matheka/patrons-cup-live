@@ -178,6 +178,7 @@ export function calculateFinalLeaderboard(
     }
   });
 
+
   // Convert to leaderboard entries and sort by seed (1, 2, 3)
   const leaderboardEntries: LeaderboardEntry[] = [];
   
@@ -238,6 +239,7 @@ function processTwoWayMatchFixed(
   let teamAWins = 0;
   let teamBWins = 0;
   let halvedHoles = 0;
+  
   
   match.holes.forEach(hole => {
     if (hole.teamAScore === null || hole.teamBScore === null) return;
@@ -303,10 +305,11 @@ function processThreeWayMatchFixed(
   const holesData = match.holes.map(hole => ({
     holeNumber: hole.number,
     par: hole.par || 4,
-    teamAScore: hole.teamAScore || 0,
-    teamBScore: hole.teamBScore || 0,
-    teamCScore: hole.teamCScore || 0
+    teamAScore: hole.teamAScore,
+    teamBScore: hole.teamBScore,
+    teamCScore: hole.teamCScore || null
   }));
+  
   
   const result = calculateThreeWayResult(holesData, 18);
   
@@ -332,7 +335,7 @@ function processThreeWayMatchFixed(
     }
     
     // Team A vs Team C
-    if (hole.teamAScore !== null && hole.teamCScore !== null) {
+    if (hole.teamAScore !== null && hole.teamCScore !== null && hole.teamCScore !== undefined) {
       teamAvsC.holesPlayed++;
       if (hole.teamAScore < hole.teamCScore) {
         teamAvsC.teamAWins++;
@@ -340,9 +343,9 @@ function processThreeWayMatchFixed(
         teamAvsC.teamCWins++;
       }
     }
-    
+
     // Team B vs Team C
-    if (hole.teamBScore !== null && hole.teamCScore !== null) {
+    if (hole.teamBScore !== null && hole.teamCScore !== null && hole.teamCScore !== undefined) {
       teamBvsC.holesPlayed++;
       if (hole.teamBScore < hole.teamCScore) {
         teamBvsC.teamBWins++;
@@ -370,20 +373,9 @@ function processThreeWayMatchFixed(
   
   const isBowlMug = division === 'Bowl' || division === 'Mug';
   
-  // Determine points based on division and match type
-  let winPoints: number;
-  let tiePoints: number;
-  
-  if (match.match_type === 'Foursomes') {
-    winPoints = isBowlMug ? 4 : 3;  // Bowl/Mug: 4pts, Trophy/Shield/Plaque: 3pts
-    tiePoints = isBowlMug ? 2 : 1.5; // Bowl/Mug: 2pts, Trophy/Shield/Plaque: 1.5pts
-  } else if (match.match_type === 'Singles') {
-    winPoints = 3;   // All divisions: 3pts
-    tiePoints = 1.5; // All divisions: 1.5pts
-  } else {
-    console.warn(`Unknown 3-way match type: ${match.match_type}`);
-    return;
-  }
+  // FIXED: Use the correct TOCs point calculation function instead of hardcoded values
+  const winPoints = getMatchPoints(match, 'win');
+  const tiePoints = getMatchPoints(match, 'tie');
   
   // Award points based on individual head-to-head matches
   
@@ -467,6 +459,12 @@ function processThreeWayMatchFixed(
     teamStats[match.teamBId].recentResults.unshift('T');
     teamStats[match.teamCId].recentResults.unshift('T');
   }
+  
+  // CRITICAL FIX: Update played count for three-way matches
+  // Each team plays 2 head-to-head matches in a three-way match
+  teamStats[match.teamAId].played += 2;
+  teamStats[match.teamBId].played += 2;
+  teamStats[match.teamCId].played += 2;
 }
 
 /**

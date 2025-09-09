@@ -7,13 +7,35 @@ import TournamentCountdown from '@/components/TournamentCountdown';
 import FinalLeaderboard from '@/components/FinalLeaderboard';
 
 export default function LeaderboardPage() {
-  const { matches } = useTournament();
   const [isClient, setIsClient] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  let tournamentData;
+  try {
+    tournamentData = useTournament();
+  } catch (err) {
+    console.error('❌ Error in useTournament:', err);
+    setError(err instanceof Error ? err.message : 'Unknown error');
+  }
+  
+  const { matches } = tournamentData || { matches: [] };
 
   // Only run on client side to prevent hydration mismatch
   useEffect(() => {
+    console.log('🔄 LeaderboardPage: Setting isClient to true');
     setIsClient(true);
   }, []);
+  
+  // Debug logging
+  useEffect(() => {
+    if (isClient) {
+      console.log('📊 LeaderboardPage: Client-side data:', {
+        matches: matches?.length || 0,
+        error: error,
+        tournamentData: tournamentData ? 'loaded' : 'not loaded'
+      });
+    }
+  }, [isClient, matches, error, tournamentData]);
 
   // Get tournament statistics
   const tournamentStats = useMemo(() => {
@@ -38,6 +60,21 @@ export default function LeaderboardPage() {
       completionPercentage: totalMatches > 0 ? Math.round((completedMatches / totalMatches) * 100) : 0
     };
   }, [isClient, matches]);
+
+  // Show error if there's an issue
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <h3 className="text-lg font-medium text-red-800">Error Loading Tournament Data</h3>
+            <p className="text-red-600 mt-2">{error}</p>
+            <p className="text-sm text-red-500 mt-2">Please check the browser console for more details.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Show minimal loading state during SSR
   if (!isClient) {

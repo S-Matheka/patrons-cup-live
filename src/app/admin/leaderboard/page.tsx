@@ -97,13 +97,15 @@ export default function AdminLeaderboardPage() {
             let teamBHolesWon = 0;
 
             match.holes?.forEach((hole: any) => {
-              const teamAStrokes = hole.team_a_strokes || 0;
-              const teamBStrokes = hole.team_b_strokes || 0;
+              const teamAStrokes = hole.team_a_strokes;
+              const teamBStrokes = hole.team_b_strokes;
 
-              teamAStats.totalStrokes += teamAStrokes;
-              teamBStats.totalStrokes += teamBStrokes;
+              // Only count holes where both teams have valid scores
+              if (teamAStrokes !== null && teamAStrokes !== undefined && 
+                  teamBStrokes !== null && teamBStrokes !== undefined) {
+                teamAStats.totalStrokes += teamAStrokes;
+                teamBStats.totalStrokes += teamBStrokes;
 
-              if (teamAStrokes > 0 && teamBStrokes > 0) {
                 if (teamAStrokes < teamBStrokes) {
                   teamAHolesWon++;
                 } else if (teamBStrokes < teamAStrokes) {

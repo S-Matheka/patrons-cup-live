@@ -220,8 +220,8 @@ function processTwoWayMatchFixed(
   const holesData = match.holes.map(hole => ({
     holeNumber: hole.number,
     par: hole.par || 4,
-    teamAStrokes: hole.teamAScore || 0,
-    teamBStrokes: hole.teamBScore || 0
+    teamAStrokes: hole.teamAScore,
+    teamBStrokes: hole.teamBScore
   }));
   
   const result = calculateMatchPlayResult(holesData, 18);
@@ -277,9 +277,9 @@ function processThreeWayMatchFixed(
   const holesData = match.holes.map(hole => ({
     holeNumber: hole.number,
     par: hole.par || 4,
-    teamAScore: hole.teamAScore || 0,
-    teamBScore: hole.teamBScore || 0,
-    teamCScore: hole.teamCScore || 0
+    teamAScore: hole.teamAScore,
+    teamBScore: hole.teamBScore,
+    teamCScore: hole.teamCScore
   }));
   
   // Calculate individual head-to-head results
@@ -299,7 +299,7 @@ function processThreeWayMatchFixed(
     }
     
     // Team A vs Team C
-    if (hole.teamAScore !== null && hole.teamCScore !== null) {
+    if (hole.teamAScore !== null && hole.teamCScore !== null && hole.teamCScore !== undefined) {
       teamAvsC.holesPlayed++;
       if (hole.teamAScore < hole.teamCScore) {
         teamAvsC.teamAWins++;
@@ -309,7 +309,7 @@ function processThreeWayMatchFixed(
     }
     
     // Team B vs Team C
-    if (hole.teamBScore !== null && hole.teamCScore !== null) {
+    if (hole.teamBScore !== null && hole.teamCScore !== null && hole.teamCScore !== undefined) {
       teamBvsC.holesPlayed++;
       if (hole.teamBScore < hole.teamCScore) {
         teamBvsC.teamBWins++;
@@ -337,20 +337,9 @@ function processThreeWayMatchFixed(
   
   const isBowlMug = division === 'Bowl' || division === 'Mug';
   
-  // Determine points based on division and match type
-  let winPoints: number;
-  let tiePoints: number;
-  
-  if (match.match_type === 'Foursomes') {
-    winPoints = isBowlMug ? 4 : 3;  // Bowl/Mug: 4pts, Trophy/Shield/Plaque: 3pts
-    tiePoints = isBowlMug ? 2 : 1.5; // Bowl/Mug: 2pts, Trophy/Shield/Plaque: 1.5pts
-  } else if (match.match_type === 'Singles') {
-    winPoints = 3;   // All divisions: 3pts
-    tiePoints = 1.5; // All divisions: 1.5pts
-  } else {
-    console.warn(`Unknown 3-way match type: ${match.match_type}`);
-    return;
-  }
+  // FIXED: Use the correct TOCs point calculation function instead of hardcoded values
+  const winPoints = getMatchPoints(match, 'win');
+  const tiePoints = getMatchPoints(match, 'tie');
   
   // Award points based on individual head-to-head matches (CORRECT TOCs approach)
   

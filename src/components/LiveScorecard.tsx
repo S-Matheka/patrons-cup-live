@@ -73,19 +73,27 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
   const calculateMatchPlayStatus = (teamKey: 'teamA' | 'teamB' | 'teamC') => {
     if (!match.isThreeWay) {
       // 2-way match play
-      const holesWithScores = match.holes.filter(h => h.teamAScore !== null && h.teamBScore !== null);
+      // Use same logic as leaderboard calculation: count holes where both teams have scores
+      const holesWithScores = match.holes; // Process all holes, filter within the logic
       let teamAWins = 0;
       let teamBWins = 0;
       
       holesWithScores.forEach(hole => {
-        if (hole.teamAScore! < hole.teamBScore!) {
-          teamAWins++;
-        } else if (hole.teamBScore! < hole.teamAScore!) {
-          teamBWins++;
+        if (hole.teamAScore !== null && hole.teamAScore !== undefined && 
+            hole.teamBScore !== null && hole.teamBScore !== undefined) {
+          if (hole.teamAScore < hole.teamBScore) {
+            teamAWins++;
+          } else if (hole.teamBScore < hole.teamAScore) {
+            teamBWins++;
+          }
         }
       });
       
-      const holesPlayed = holesWithScores.length;
+      // Count only holes where both teams have scores
+      const holesPlayed = holesWithScores.filter(hole => 
+        hole.teamAScore !== null && hole.teamAScore !== undefined && 
+        hole.teamBScore !== null && hole.teamBScore !== undefined
+      ).length;
       const holesDifference = Math.abs(teamAWins - teamBWins);
       const holesRemaining = 18 - holesPlayed;
       const isClinched = holesDifference > holesRemaining;
@@ -98,9 +106,8 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
       }
     } else {
       // 3-way match play - calculate this team's wins against others
-      const holesWithScores = match.holes.filter(h => 
-        h.teamAScore !== null && h.teamBScore !== null && h.teamCScore !== null
-      );
+      // Use same logic as leaderboard calculation: count holes where any two teams have scores
+      const holesWithScores = match.holes; // Process all holes, filter within the logic
       
       let wins = 0;
       let totalMatches = 0;
@@ -110,8 +117,11 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
         let teamAWins = 0;
         let teamBWins = 0;
         holesWithScores.forEach(hole => {
-          if (hole.teamAScore! < hole.teamBScore!) teamAWins++;
-          else if (hole.teamBScore! < hole.teamAScore!) teamBWins++;
+          if (hole.teamAScore !== null && hole.teamAScore !== undefined && 
+              hole.teamBScore !== null && hole.teamBScore !== undefined) {
+            if (hole.teamAScore < hole.teamBScore) teamAWins++;
+            else if (hole.teamBScore < hole.teamAScore) teamBWins++;
+          }
         });
         if (teamAWins > teamBWins) wins++;
         totalMatches++;
@@ -120,8 +130,11 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
         let teamAWinsC = 0;
         let teamCWins = 0;
         holesWithScores.forEach(hole => {
-          if (hole.teamAScore! < hole.teamCScore!) teamAWinsC++;
-          else if (hole.teamCScore! < hole.teamAScore!) teamCWins++;
+          if (hole.teamAScore !== null && hole.teamAScore !== undefined && 
+              hole.teamCScore !== null && hole.teamCScore !== undefined) {
+            if (hole.teamAScore < hole.teamCScore) teamAWinsC++;
+            else if (hole.teamCScore < hole.teamAScore) teamCWins++;
+          }
         });
         if (teamAWinsC > teamCWins) wins++;
         totalMatches++;
@@ -130,8 +143,11 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
         let teamBWins = 0;
         let teamAWins = 0;
         holesWithScores.forEach(hole => {
-          if (hole.teamBScore! < hole.teamAScore!) teamBWins++;
-          else if (hole.teamAScore! < hole.teamBScore!) teamAWins++;
+          if (hole.teamBScore !== null && hole.teamBScore !== undefined && 
+              hole.teamAScore !== null && hole.teamAScore !== undefined) {
+            if (hole.teamBScore < hole.teamAScore) teamBWins++;
+            else if (hole.teamAScore < hole.teamBScore) teamAWins++;
+          }
         });
         if (teamBWins > teamAWins) wins++;
         totalMatches++;
@@ -140,8 +156,11 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
         let teamBWinsC = 0;
         let teamCWins = 0;
         holesWithScores.forEach(hole => {
-          if (hole.teamBScore! < hole.teamCScore!) teamBWinsC++;
-          else if (hole.teamCScore! < hole.teamBScore!) teamCWins++;
+          if (hole.teamBScore !== null && hole.teamBScore !== undefined && 
+              hole.teamCScore !== null && hole.teamCScore !== undefined) {
+            if (hole.teamBScore < hole.teamCScore) teamBWinsC++;
+            else if (hole.teamCScore < hole.teamBScore) teamCWins++;
+          }
         });
         if (teamBWinsC > teamCWins) wins++;
         totalMatches++;
@@ -150,8 +169,11 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
         let teamCWins = 0;
         let teamAWins = 0;
         holesWithScores.forEach(hole => {
-          if (hole.teamCScore! < hole.teamAScore!) teamCWins++;
-          else if (hole.teamAScore! < hole.teamCScore!) teamAWins++;
+          if (hole.teamCScore !== null && hole.teamCScore !== undefined && 
+              hole.teamAScore !== null && hole.teamAScore !== undefined) {
+            if (hole.teamCScore < hole.teamAScore) teamCWins++;
+            else if (hole.teamAScore < hole.teamCScore) teamAWins++;
+          }
         });
         if (teamCWins > teamAWins) wins++;
         totalMatches++;
@@ -160,8 +182,11 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
         let teamCWinsB = 0;
         let teamBWins = 0;
         holesWithScores.forEach(hole => {
-          if (hole.teamCScore! < hole.teamBScore!) teamCWinsB++;
-          else if (hole.teamBScore! < hole.teamCScore!) teamBWins++;
+          if (hole.teamCScore !== null && hole.teamCScore !== undefined && 
+              hole.teamBScore !== null && hole.teamBScore !== undefined) {
+            if (hole.teamCScore < hole.teamBScore) teamCWinsB++;
+            else if (hole.teamBScore < hole.teamCScore) teamBWins++;
+          }
         });
         if (teamCWinsB > teamBWins) wins++;
         totalMatches++;
@@ -332,19 +357,27 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
       }
     } else if (match.status === 'completed') {
       // Fallback for completed matches when getMatchPlayResult fails
-      const holesWithScores = match.holes.filter(h => h.teamAScore !== null && h.teamBScore !== null);
+      // Use same logic as leaderboard calculation: count holes where both teams have scores
+      const holesWithScores = match.holes; // Process all holes, filter within the logic
       let teamAWins = 0;
       let teamBWins = 0;
       
       holesWithScores.forEach(hole => {
-        if (hole.teamAScore! < hole.teamBScore!) {
-          teamAWins++;
-        } else if (hole.teamBScore! < hole.teamAScore!) {
-          teamBWins++;
+        if (hole.teamAScore !== null && hole.teamAScore !== undefined && 
+            hole.teamBScore !== null && hole.teamBScore !== undefined) {
+          if (hole.teamAScore < hole.teamBScore) {
+            teamAWins++;
+          } else if (hole.teamBScore < hole.teamAScore) {
+            teamBWins++;
+          }
         }
       });
       
-      const holesPlayed = holesWithScores.length;
+      // Count only holes where both teams have scores
+      const holesPlayed = holesWithScores.filter(hole => 
+        hole.teamAScore !== null && hole.teamAScore !== undefined && 
+        hole.teamBScore !== null && hole.teamBScore !== undefined
+      ).length;
       const holesRemaining = 18 - holesPlayed;
       const holesDifference = Math.abs(teamAWins - teamBWins);
       const isClinched = holesDifference > holesRemaining;
@@ -421,7 +454,8 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
                     return `Final Result: ${formatMatchPlayScore(result)}`;
                   } else {
                     // Fallback: calculate the result manually for completed matches
-                    const holesWithScores = match.holes.filter(h => h.teamAScore !== null && h.teamBScore !== null);
+                    // Use same logic as leaderboard calculation: count holes where both teams have scores
+      const holesWithScores = match.holes; // Process all holes, filter within the logic
                     let teamAWins = 0;
                     let teamBWins = 0;
                     
@@ -433,7 +467,11 @@ const LiveScorecard: React.FC<LiveScorecardProps> = ({ match, teamA, teamB, team
                       }
                     });
                     
-                    const holesPlayed = holesWithScores.length;
+                    // Count only holes where both teams have scores
+      const holesPlayed = holesWithScores.filter(hole => 
+        hole.teamAScore !== null && hole.teamAScore !== undefined && 
+        hole.teamBScore !== null && hole.teamBScore !== undefined
+      ).length;
                     const holesRemaining = 18 - holesPlayed;
                     const holesDifference = Math.abs(teamAWins - teamBWins);
                     const resultFormat = holesPlayed === 18 ? `${holesDifference}up` : `${holesDifference}/${holesRemaining}`;

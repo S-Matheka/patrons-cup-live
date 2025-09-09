@@ -352,12 +352,10 @@ export default function LiveScoring() {
         }
       };
 
-      // Use the exact same logic as live scorecard for consistency
-      const holesWithScores = match.holes.filter(h => 
-        h.teamAScore !== null && h.teamBScore !== null && h.teamCScore !== null
-      );
+      // Use the exact same logic as leaderboard calculation for consistency
+      // Count holes where ANY TWO teams have scores (not all three)
       
-      // Calculate head-to-head results using same logic as live scorecard
+      // Calculate head-to-head results using same logic as leaderboard
       const calculateHeadToHead = (holes: Hole[], team1: string, team2: string, team1Name: string, team2Name: string) => {
         let team1Wins = 0;
         let team2Wins = 0;
@@ -370,10 +368,14 @@ export default function LiveScoring() {
                             team2 === 'teamB' ? hole.teamBScore : 
                             hole.teamCScore;
           
-          if (team1Score! < team2Score!) {
-            team1Wins++;
-          } else if (team2Score! < team1Score!) {
-            team2Wins++;
+          // Only count holes where BOTH teams have scores (matching leaderboard logic)
+          if (team1Score !== null && team1Score !== undefined && 
+              team2Score !== null && team2Score !== undefined) {
+            if (team1Score < team2Score) {
+              team1Wins++;
+            } else if (team2Score < team1Score) {
+              team2Wins++;
+            }
           }
         });
         
@@ -432,15 +434,15 @@ export default function LiveScoring() {
         }
       };
       
-      const teamAvsBFormatted = calculateHeadToHead(holesWithScores, 'teamA', 'teamB', teamA?.name || 'Team A', teamB?.name || 'Team B');
-      const teamAvsCFormatted = calculateHeadToHead(holesWithScores, 'teamA', 'teamC', teamA?.name || 'Team A', teamC?.name || 'Team C');
-      const teamBvsCFormatted = calculateHeadToHead(holesWithScores, 'teamB', 'teamC', teamB?.name || 'Team B', teamC?.name || 'Team C');
+      const teamAvsBFormatted = calculateHeadToHead(match.holes, 'teamA', 'teamB', teamA?.name || 'Team A', teamB?.name || 'Team B');
+      const teamAvsCFormatted = calculateHeadToHead(match.holes, 'teamA', 'teamC', teamA?.name || 'Team A', teamC?.name || 'Team C');
+      const teamBvsCFormatted = calculateHeadToHead(match.holes, 'teamB', 'teamC', teamB?.name || 'Team B', teamC?.name || 'Team C');
 
       // Always show detailed head-to-head results for both completed and in-progress matches
       const results = [];
       
       // Team A vs Team B
-      const teamAvsBResult = calculateHeadToHead(holesWithScores, 'teamA', 'teamB', teamA?.name || 'Team A', teamB?.name || 'Team B');
+      const teamAvsBResult = calculateHeadToHead(match.holes, 'teamA', 'teamB', teamA?.name || 'Team A', teamB?.name || 'Team B');
       const [winnerAvsB, scoreAvsB] = teamAvsBResult.split(' won ');
       if (teamAvsBResult === 'AS') {
         results.push('AS');
@@ -449,7 +451,7 @@ export default function LiveScoring() {
       }
       
       // Team A vs Team C
-      const teamAvsCResult = calculateHeadToHead(holesWithScores, 'teamA', 'teamC', teamA?.name || 'Team A', teamC?.name || 'Team C');
+      const teamAvsCResult = calculateHeadToHead(match.holes, 'teamA', 'teamC', teamA?.name || 'Team A', teamC?.name || 'Team C');
       const [winnerAvsC, scoreAvsC] = teamAvsCResult.split(' won ');
       if (teamAvsCResult === 'AS') {
         results.push('AS');
@@ -458,7 +460,7 @@ export default function LiveScoring() {
       }
       
       // Team B vs Team C
-      const teamBvsCResult = calculateHeadToHead(holesWithScores, 'teamB', 'teamC', teamB?.name || 'Team B', teamC?.name || 'Team C');
+      const teamBvsCResult = calculateHeadToHead(match.holes, 'teamB', 'teamC', teamB?.name || 'Team B', teamC?.name || 'Team C');
       const [winnerBvsC, scoreBvsC] = teamBvsCResult.split(' won ');
       if (teamBvsCResult === 'AS') {
         results.push('AS');

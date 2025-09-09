@@ -53,9 +53,8 @@ export default function FinalLeaderboard({
         if (match.isThreeWay) {
           // For 3-way matches, determine result based on individual head-to-head
           const holes = match.holes || [];
-          const holesWithScores = holes.filter(hole => 
-            hole.teamAScore !== null && hole.teamBScore !== null && hole.teamCScore !== null
-          );
+          // Use same logic as leaderboard calculation: count holes where any two teams have scores
+          const holesWithScores = holes; // Process all holes, filter within the logic
           
           if (holesWithScores.length >= 15) {
             let teamWins = 0;
@@ -66,7 +65,8 @@ export default function FinalLeaderboard({
               // Team A vs B
               let aWins = 0, bWins = 0;
               holesWithScores.forEach(hole => {
-                if (hole.teamAScore !== null && hole.teamBScore !== null) {
+                if (hole.teamAScore !== null && hole.teamAScore !== undefined && 
+                    hole.teamBScore !== null && hole.teamBScore !== undefined) {
                   if (hole.teamAScore < hole.teamBScore) aWins++;
                   else if (hole.teamBScore < hole.teamAScore) bWins++;
                 }
@@ -77,7 +77,8 @@ export default function FinalLeaderboard({
               // Team A vs C
               let aWinsC = 0, cWins = 0;
               holesWithScores.forEach(hole => {
-                if (hole.teamAScore !== null && hole.teamCScore !== null && hole.teamCScore !== undefined) {
+                if (hole.teamAScore !== null && hole.teamAScore !== undefined && 
+                    hole.teamCScore !== null && hole.teamCScore !== undefined) {
                   if (hole.teamAScore < hole.teamCScore) aWinsC++;
                   else if (hole.teamCScore < hole.teamAScore) cWins++;
                 }
@@ -88,7 +89,8 @@ export default function FinalLeaderboard({
               // Team B vs A
               let bWins = 0, aWins = 0;
               holesWithScores.forEach(hole => {
-                if (hole.teamBScore !== null && hole.teamAScore !== null) {
+                if (hole.teamBScore !== null && hole.teamBScore !== undefined && 
+                    hole.teamAScore !== null && hole.teamAScore !== undefined) {
                   if (hole.teamBScore < hole.teamAScore) bWins++;
                   else if (hole.teamAScore < hole.teamBScore) aWins++;
                 }
@@ -99,7 +101,8 @@ export default function FinalLeaderboard({
               // Team B vs C
               let bWinsC = 0, cWins = 0;
               holesWithScores.forEach(hole => {
-                if (hole.teamBScore !== null && hole.teamCScore !== null && hole.teamCScore !== undefined) {
+                if (hole.teamBScore !== null && hole.teamBScore !== undefined && 
+                    hole.teamCScore !== null && hole.teamCScore !== undefined) {
                   if (hole.teamBScore < hole.teamCScore) bWinsC++;
                   else if (hole.teamCScore < hole.teamBScore) cWins++;
                 }
@@ -110,7 +113,8 @@ export default function FinalLeaderboard({
               // Team C vs A
               let cWins = 0, aWins = 0;
               holesWithScores.forEach(hole => {
-                if (hole.teamCScore !== null && hole.teamCScore !== undefined && hole.teamAScore !== null) {
+                if (hole.teamCScore !== null && hole.teamCScore !== undefined && 
+                    hole.teamAScore !== null && hole.teamAScore !== undefined) {
                   if (hole.teamCScore < hole.teamAScore) cWins++;
                   else if (hole.teamAScore < hole.teamCScore) aWins++;
                 }
@@ -121,7 +125,8 @@ export default function FinalLeaderboard({
               // Team C vs B
               let cWinsB = 0, bWins = 0;
               holesWithScores.forEach(hole => {
-                if (hole.teamCScore !== null && hole.teamCScore !== undefined && hole.teamBScore !== null) {
+                if (hole.teamCScore !== null && hole.teamCScore !== undefined && 
+                    hole.teamBScore !== null && hole.teamBScore !== undefined) {
                   if (hole.teamCScore < hole.teamBScore) cWinsB++;
                   else if (hole.teamBScore < hole.teamCScore) bWins++;
                 }
@@ -137,16 +142,16 @@ export default function FinalLeaderboard({
         } else {
           // For 2-way matches
           const holes = match.holes || [];
-          const holesWithScores = holes.filter(hole => 
-            hole.teamAScore !== null && hole.teamBScore !== null
-          );
+          // Use same logic as leaderboard calculation: count holes where both teams have scores
+          const holesWithScores = holes; // Process all holes, filter within the logic
           
           if (holesWithScores.length >= 15) {
             let teamAHolesWon = 0;
             let teamBHolesWon = 0;
             
             holesWithScores.forEach(hole => {
-              if (hole.teamAScore !== null && hole.teamBScore !== null) {
+              if (hole.teamAScore !== null && hole.teamAScore !== undefined && 
+                  hole.teamBScore !== null && hole.teamBScore !== undefined) {
                 if (hole.teamAScore < hole.teamBScore) teamAHolesWon++;
                 else if (hole.teamBScore < hole.teamAScore) teamBHolesWon++;
               }

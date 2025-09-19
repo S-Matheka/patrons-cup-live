@@ -15,7 +15,13 @@ interface TournamentContextSwitcherProps {
 export const useTournament = (): TournamentContextType => {
   // Try Supabase context first
   try {
-    return useSupabaseTournament();
+    const supabaseContext = useSupabaseTournament();
+    // Check if the context has tournament functionality
+    if (supabaseContext.currentTournament !== undefined) {
+      return supabaseContext;
+    }
+    // If no tournament functionality, fall back to localStorage
+    return useLocalStorageTournament();
   } catch (error) {
     // If Supabase context is not available, try localStorage context
     try {

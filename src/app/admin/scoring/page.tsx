@@ -10,10 +10,10 @@ import Link from 'next/link';
 
 export default function AdminScoring() {
   const { isAuthenticated, isOfficial, isAdmin } = useAuth();
-  const { teams, matches } = useTournament();
+  const { teams, matches, currentTournament } = useTournament();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDivision, setSelectedDivision] = useState<'all' | 'Trophy' | 'Shield' | 'Plaque' | 'Bowl' | 'Mug'>('all');
+  const [selectedDivision, setSelectedDivision] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'scheduled' | 'in-progress' | 'completed'>('all');
 
   useEffect(() => {
@@ -21,6 +21,33 @@ export default function AdminScoring() {
       router.push('/admin/login');
     }
   }, [isAuthenticated, isOfficial, router]);
+
+  // Get available divisions based on current tournament
+  const getAvailableDivisions = () => {
+    if (!teams || teams.length === 0) return [];
+    
+    // For Nancy Millar Trophy, show KAREN and VISITOR
+    if (currentTournament?.slug === 'nancy-millar-trophy-2025') {
+      const uniqueDivisions = [...new Set(teams.map(t => t.division))];
+      return uniqueDivisions.map(div => {
+        // Map database divisions to display names
+        if (div === 'Trophy') return { value: 'Trophy', label: 'KAREN' };
+        if (div === 'Shield') return { value: 'Shield', label: 'VISITOR' };
+        return { value: div, label: div };
+      });
+    }
+    
+    // For other tournaments, use standard divisions
+    return [
+      { value: 'Trophy', label: 'Trophy' },
+      { value: 'Shield', label: 'Shield' },
+      { value: 'Plaque', label: 'Plaque' },
+      { value: 'Bowl', label: 'Bowl' },
+      { value: 'Mug', label: 'Mug' }
+    ];
+  };
+
+  const availableDivisions = getAvailableDivisions();
 
   if (!isAuthenticated || !isOfficial) {
     return <div>Loading...</div>;
@@ -75,7 +102,10 @@ export default function AdminScoring() {
       match.id.toString().includes(searchTerm) ||
       match.gameNumber?.toString().includes(searchTerm) ||
       teams.find(t => t.id === match.teamAId)?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      teams.find(t => t.id === match.teamBId)?.name.toLowerCase().includes(searchTerm.toLowerCase());
+      teams.find(t => t.id === match.teamBId)?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      // Search by individual player names for Nancy Millar Trophy
+      ((match.tournamentId === 6 || match.tournament_id === 6) && match.players?.teamA?.[0]?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      ((match.tournamentId === 6 || match.tournament_id === 6) && match.players?.teamB?.[0]?.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesDivision = selectedDivision === 'all' || match.division === selectedDivision;
     const matchesStatus = selectedStatus === 'all' || match.status === selectedStatus;
@@ -126,7 +156,12 @@ export default function AdminScoring() {
             </div>
             <div className="flex items-center space-x-2">
               <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
-              <h1 className="text-lg sm:text-xl font-semibold text-gray-900">Live Scoring Management</h1>
+              <h1 className="text-lg sm:text-xl font-semibold text-gray-900">
+                {currentTournament?.slug === 'nancy-millar-trophy-2025' 
+                  ? 'Nancy Millar Trophy - Live Scoring Management' 
+                  : 'Live Scoring Management'
+                }
+              </h1>
             </div>
           </div>
         </div>
@@ -156,15 +191,15 @@ export default function AdminScoring() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Division</label>
               <select
                 value={selectedDivision}
-                onChange={(e) => setSelectedDivision(e.target.value as any)}
+                onChange={(e) => setSelectedDivision(e.target.value)}
                 className="w-full px-3 py-3 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 <option value="all">All Divisions</option>
-                <option value="Trophy">Trophy</option>
-                <option value="Shield">Shield</option>
-                <option value="Plaque">Plaque</option>
-                <option value="Bowl">Bowl</option>
-                <option value="Mug">Mug</option>
+                {availableDivisions.map((division) => (
+                  <option key={division.value} value={division.value}>
+                    {division.label}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -262,8 +297,16 @@ export default function AdminScoring() {
                               {teamA?.logo}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <div className="font-medium text-gray-900">{teamA?.name}</div>
-                              <div className="text-sm text-gray-600 truncate">{teamA?.description}</div>
+                              <div className="font-medium text-gray-900">
+                                {(match.tournamentId === 6 || match.tournament_id === 6) && match.players?.teamA?.[0] 
+                                  ? match.players.teamA[0] 
+                                  : teamA?.name}
+                              </div>
+                              <div className="text-sm text-gray-600 truncate">
+                                {(match.tournamentId === 6 || match.tournament_id === 6) && match.players?.teamA?.[0] 
+                                  ? `Player 1` 
+                                  : teamA?.description}
+                              </div>
                             </div>
                           </div>
 
@@ -273,15 +316,30 @@ export default function AdminScoring() {
                               <div className="font-bold text-gray-400 text-lg sm:text-base">
                                 {match.isThreeWay ? '3-WAY' : 'vs'}
                               </div>
-                              <div className="text-xs text-gray-500">{match.division}</div>
+                              <div className="text-xs text-gray-500">
+                                {match.division}
+                                {(match.tournamentId === 6 || match.tournament_id === 6) && match.session && (
+                                  <div className="text-xs text-blue-600 font-medium">
+                                    {match.session} • {match.date}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
 
                           {/* Team B */}
                           <div className="flex items-center space-x-3 sm:justify-end">
                             <div className="min-w-0 flex-1 sm:text-right">
-                              <div className="font-medium text-gray-900">{teamB?.name}</div>
-                              <div className="text-sm text-gray-600 truncate">{teamB?.description}</div>
+                              <div className="font-medium text-gray-900">
+                                {(match.tournamentId === 6 || match.tournament_id === 6) && match.players?.teamB?.[0] 
+                                  ? match.players.teamB[0] 
+                                  : teamB?.name}
+                              </div>
+                              <div className="text-sm text-gray-600 truncate">
+                                {(match.tournamentId === 6 || match.tournament_id === 6) && match.players?.teamB?.[0] 
+                                  ? `Player 2` 
+                                  : teamB?.description}
+                              </div>
                             </div>
                             <div 
                               className="w-10 h-10 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"

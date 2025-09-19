@@ -70,6 +70,49 @@ export const isSupabaseConfigured = () => {
 export interface Database {
   public: {
     Tables: {
+      tournaments: {
+        Row: {
+          id: number
+          name: string
+          slug: string
+          description: string | null
+          start_date: string
+          end_date: string
+          status: 'upcoming' | 'active' | 'completed' | 'archived'
+          format: 'patrons_cup' | 'custom' | 'stroke_play'
+          divisions: string[]
+          point_system: Record<string, any>
+          settings: Record<string, any>
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          name: string
+          slug: string
+          description?: string | null
+          start_date: string
+          end_date: string
+          status?: 'upcoming' | 'active' | 'completed' | 'archived'
+          format?: 'patrons_cup' | 'custom' | 'stroke_play'
+          divisions?: string[]
+          point_system?: Record<string, any>
+          settings?: Record<string, any>
+        }
+        Update: {
+          id?: number
+          name?: string
+          slug?: string
+          description?: string | null
+          start_date?: string
+          end_date?: string
+          status?: 'upcoming' | 'active' | 'completed' | 'archived'
+          format?: 'patrons_cup' | 'custom' | 'stroke_play'
+          divisions?: string[]
+          point_system?: Record<string, any>
+          settings?: Record<string, any>
+        }
+      }
       teams: {
         Row: {
           id: number
@@ -85,6 +128,7 @@ export interface Database {
           players_per_session: Record<string, number>
           resting_per_session: Record<string, number>
           points_per_match: Record<string, number>
+          tournament_id: number
           created_at: string
           updated_at: string
         }
@@ -102,6 +146,7 @@ export interface Database {
           players_per_session: Record<string, number>
           resting_per_session: Record<string, number>
           points_per_match: Record<string, number>
+          tournament_id: number
         }
         Update: {
           id?: number
@@ -117,6 +162,7 @@ export interface Database {
           players_per_session?: Record<string, number>
           resting_per_session?: Record<string, number>
           points_per_match?: Record<string, number>
+          tournament_id?: number
         }
       }
       players: {
@@ -130,6 +176,7 @@ export interface Database {
           is_pro: boolean
           is_ex_officio: boolean
           is_junior: boolean
+          tournament_id: number
           created_at: string
           updated_at: string
         }
@@ -143,6 +190,7 @@ export interface Database {
           is_pro?: boolean
           is_ex_officio?: boolean
           is_junior?: boolean
+          tournament_id: number
         }
         Update: {
           id?: number
@@ -154,6 +202,7 @@ export interface Database {
           is_pro?: boolean
           is_ex_officio?: boolean
           is_junior?: boolean
+          tournament_id?: number
         }
       }
       matches: {
@@ -175,6 +224,7 @@ export interface Database {
           is_three_way: boolean
           is_pro: boolean
           is_bye: boolean
+          tournament_id: number
           created_at: string
           updated_at: string
         }
@@ -196,6 +246,7 @@ export interface Database {
           is_three_way?: boolean
           is_pro?: boolean
           is_bye?: boolean
+          tournament_id: number
         }
         Update: {
           id?: number
@@ -215,6 +266,7 @@ export interface Database {
           is_three_way?: boolean
           is_pro?: boolean
           is_bye?: boolean
+          tournament_id?: number
         }
       }
       holes: {
@@ -225,10 +277,29 @@ export interface Database {
           par: number
           team_a_score: number | null
           team_b_score: number | null
+          team_c_score: number | null
           team_a_strokes: number | null
           team_b_strokes: number | null
+          team_c_strokes: number | null
           status: 'not-started' | 'in-progress' | 'completed'
           last_updated: string
+          // Individual player scoring for Nancy Millar Trophy
+          player1_score: number | null
+          player2_score: number | null
+          player3_score: number | null
+          player4_score: number | null
+          player1_handicap: number | null
+          player2_handicap: number | null
+          player3_handicap: number | null
+          player4_handicap: number | null
+          player1_points: number | null
+          player2_points: number | null
+          player3_points: number | null
+          player4_points: number | null
+          player1_id: number | null
+          player2_id: number | null
+          player3_id: number | null
+          player4_id: number | null
         }
         Insert: {
           id?: number
@@ -237,9 +308,28 @@ export interface Database {
           par: number
           team_a_score?: number | null
           team_b_score?: number | null
+          team_c_score?: number | null
           team_a_strokes?: number | null
           team_b_strokes?: number | null
+          team_c_strokes?: number | null
           status?: 'not-started' | 'in-progress' | 'completed'
+          // Individual player scoring for Nancy Millar Trophy
+          player1_score?: number | null
+          player2_score?: number | null
+          player3_score?: number | null
+          player4_score?: number | null
+          player1_handicap?: number | null
+          player2_handicap?: number | null
+          player3_handicap?: number | null
+          player4_handicap?: number | null
+          player1_points?: number | null
+          player2_points?: number | null
+          player3_points?: number | null
+          player4_points?: number | null
+          player1_id?: number | null
+          player2_id?: number | null
+          player3_id?: number | null
+          player4_id?: number | null
         }
         Update: {
           id?: number
@@ -248,9 +338,28 @@ export interface Database {
           par?: number
           team_a_score?: number | null
           team_b_score?: number | null
+          team_c_score?: number | null
           team_a_strokes?: number | null
           team_b_strokes?: number | null
+          team_c_strokes?: number | null
           status?: 'not-started' | 'in-progress' | 'completed'
+          // Individual player scoring for Nancy Millar Trophy
+          player1_score?: number | null
+          player2_score?: number | null
+          player3_score?: number | null
+          player4_score?: number | null
+          player1_handicap?: number | null
+          player2_handicap?: number | null
+          player3_handicap?: number | null
+          player4_handicap?: number | null
+          player1_points?: number | null
+          player2_points?: number | null
+          player3_points?: number | null
+          player4_points?: number | null
+          player1_id?: number | null
+          player2_id?: number | null
+          player3_id?: number | null
+          player4_id?: number | null
         }
       }
       scores: {
@@ -270,6 +379,7 @@ export interface Database {
           current_round: number
           position: number | null
           position_change: 'up' | 'down' | 'same'
+          tournament_id: number
           last_updated: string
         }
         Insert: {
@@ -288,6 +398,7 @@ export interface Database {
           current_round?: number
           position?: number | null
           position_change?: 'up' | 'down' | 'same'
+          tournament_id: number
         }
         Update: {
           id?: number
@@ -305,6 +416,7 @@ export interface Database {
           current_round?: number
           position?: number | null
           position_change?: 'up' | 'down' | 'same'
+          tournament_id?: number
         }
       }
     }

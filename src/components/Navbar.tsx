@@ -4,16 +4,37 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Trophy, Calendar, Zap, BarChart3, TrendingUp, Menu, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
+import { useTournament } from '@/context/TournamentContextSwitcher';
+import TournamentSelector from './TournamentSelector';
 
 const Navbar = () => {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  // Safely get tournament context with fallbacks
+  let tournaments, currentTournament, switchTournament, isSwitching;
+  try {
+    const context = useTournament();
+    tournaments = context.tournaments || [];
+    currentTournament = context.currentTournament || null;
+    switchTournament = context.switchTournament || (() => {});
+    isSwitching = context.isSwitching || false;
+    
+  } catch (error) {
+    // Fallback values if context is not available
+    console.log('❌ Navbar context error:', error);
+    tournaments = [];
+    currentTournament = null;
+    switchTournament = () => {};
+    isSwitching = false;
+  }
 
   const navigation = [
     { name: 'Leaderboard', href: '/leaderboard', icon: Trophy },
     { name: 'Schedule', href: '/schedule', icon: Calendar },
     { name: 'Live Scoring', href: '/live', icon: Zap },
     { name: 'Standings', href: '/standings', icon: TrendingUp },
+    { name: 'Nancy Millar Trophy', href: '/karen-stableford', icon: BarChart3 },
     { name: 'My Golf Hub', href: 'https://mygolfhub.africa/', icon: ExternalLink, external: true },
   ];
 
@@ -51,7 +72,20 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
+            {/* Tournament Selector */}
+            {tournaments && tournaments.length > 0 ? (
+              <div className="ml-6 mr-2">
+                <TournamentSelector
+                  tournaments={tournaments}
+                  currentTournament={currentTournament}
+                  onTournamentChange={switchTournament}
+                  isLoading={isSwitching}
+                  className="min-w-[160px] max-w-[200px]"
+                />
+              </div>
+            ) : null}
+            
             {navigation.map((item) => {
               const Icon = item.icon;
               if (item.external) {
@@ -61,9 +95,9 @@ const Navbar = () => {
                     href={item.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors text-green-100 hover:bg-green-600 hover:text-white"
+                    className="flex items-center px-2 py-2 rounded-md text-sm font-medium transition-colors text-green-100 hover:bg-green-600 hover:text-white whitespace-nowrap"
                   >
-                    <Icon className="w-4 h-4 mr-2" />
+                    <Icon className="w-4 h-4 mr-1.5" />
                     {item.name}
                   </a>
                 );
@@ -72,13 +106,13 @@ const Navbar = () => {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center px-2 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                     isActive(item.href)
                       ? 'bg-green-600 text-white'
                       : 'text-green-100 hover:bg-green-600 hover:text-white'
                   }`}
                 >
-                  <Icon className="w-4 h-4 mr-2" />
+                  <Icon className="w-4 h-4 mr-1.5" />
                   {item.name}
                 </Link>
               );
@@ -101,6 +135,19 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-green-700">
           <div className="px-2 pt-2 pb-3 space-y-1">
+            {/* Tournament Selector for Mobile */}
+            {tournaments && tournaments.length > 0 ? (
+              <div className="px-3 py-2">
+                <TournamentSelector
+                  tournaments={tournaments}
+                  currentTournament={currentTournament}
+                  onTournamentChange={switchTournament}
+                  isLoading={isSwitching}
+                  className="w-full"
+                />
+              </div>
+            ) : null}
+            
             {navigation.map((item) => {
               const Icon = item.icon;
               if (item.external) {
@@ -110,7 +157,7 @@ const Navbar = () => {
                     href={item.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors text-green-100 hover:bg-green-600 hover:text-white"
+                    className="flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors text-green-100 hover:bg-green-600 hover:text-white whitespace-nowrap"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <Icon className="w-5 h-5 mr-3" />
@@ -122,7 +169,7 @@ const Navbar = () => {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                  className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors whitespace-nowrap ${
                     isActive(item.href)
                       ? 'bg-green-600 text-white'
                       : 'text-green-100 hover:bg-green-600 hover:text-white'

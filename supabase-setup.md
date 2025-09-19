@@ -81,8 +81,10 @@ CREATE TABLE holes (
   par INTEGER NOT NULL CHECK (par BETWEEN 3 AND 5),
   team_a_score INTEGER,
   team_b_score INTEGER,
+  team_c_score INTEGER,
   team_a_strokes INTEGER,
   team_b_strokes INTEGER,
+  team_c_strokes INTEGER,
   status VARCHAR(20) DEFAULT 'not-started' CHECK (status IN ('not-started', 'in-progress', 'completed')),
   last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(match_id, hole_number)

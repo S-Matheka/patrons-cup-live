@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useTournament } from '@/context/TournamentContextSwitcher';
 import { 
   LayoutDashboard, 
   Users, 
@@ -14,6 +15,7 @@ import {
   X
 } from 'lucide-react';
 import { useState } from 'react';
+import TournamentSelector from '@/components/TournamentSelector';
 
 const getNavigationForRole = (isAdmin: boolean, isScorer: boolean) => {
   const baseNavigation = [
@@ -47,6 +49,7 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const { user, isAdmin, isScorer, logout } = useAuth();
+  const { tournaments, currentTournament, switchTournament } = useTournament();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
   const navigation = getNavigationForRole(isAdmin, isScorer);
@@ -82,6 +85,19 @@ export default function AdminLayout({
               </div>
               <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
             </div>
+            
+            {/* Tournament Selector for Mobile */}
+            {tournaments && tournaments.length > 1 && (
+              <div className="px-4 py-3 border-b border-gray-200">
+                <TournamentSelector
+                  tournaments={tournaments}
+                  currentTournament={currentTournament}
+                  onTournamentChange={switchTournament}
+                  className="w-full"
+                />
+              </div>
+            )}
+            
             <nav className="mt-5 px-2 space-y-1">
               {navigation.map((item) => {
                 const isActive = pathname === item.href;
@@ -130,6 +146,19 @@ export default function AdminLayout({
               </div>
               <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
             </div>
+            
+            {/* Tournament Selector */}
+            {tournaments && tournaments.length > 1 && (
+              <div className="px-4 py-3 border-b border-gray-200">
+                <TournamentSelector
+                  tournaments={tournaments}
+                  currentTournament={currentTournament}
+                  onTournamentChange={switchTournament}
+                  className="w-full"
+                />
+              </div>
+            )}
+            
             <nav className="mt-5 flex-1 px-2 space-y-1">
               {navigation.map((item) => {
                 const isActive = pathname === item.href;

@@ -7,7 +7,8 @@ import { useTournament } from '@/context/TournamentContextSwitcher';
 import { Match } from '@/types';
 import { ArrowLeft, AlertCircle, Shield, Lock, Clock, Play, CheckCircle } from 'lucide-react';
 import ScoreCard from '@/components/ScoreCard';
-import LiveScorecard from '@/components/LiveScorecard';
+import StablefordScoreCard from '@/components/StablefordScoreCard';
+import IndividualPlayerScoreCard from '@/components/IndividualPlayerScoreCard';
 import { canScoreMatch } from '@/utils/matchTiming';
 import Link from 'next/link';
 
@@ -20,12 +21,47 @@ export default function AdminMatchDetail() {
   const { 
     getMatchById, 
     getTeamById, 
-    updateMatch 
+    updateMatch,
+    refreshMatchData,
+    refreshAllTournamentData,
+    currentTournament
   } = useTournament();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isStartingMatch, setIsStartingMatch] = useState(false);
   const [localMatch, setLocalMatch] = useState<Match | null>(null);
+
+  // Refresh match data when component mounts, especially for Nancy Millar Trophy
+  useEffect(() => {
+    const refreshData = async () => {
+      if (currentTournament?.slug === 'nancy-millar-trophy-2025' && currentTournament?.id) {
+        console.log('🔄 Refreshing match data for Nancy Millar Trophy...');
+        try {
+          await refreshAllTournamentData();
+        } catch (error) {
+          console.log('⚠️ Refresh failed, but continuing with existing data:', error);
+        }
+      }
+    };
+    
+    refreshData();
+  }, [currentTournament, refreshAllTournamentData]);
+
+  // Additional refresh when matchId changes
+  useEffect(() => {
+    const refreshMatch = async () => {
+      if (matchId && currentTournament?.slug === 'nancy-millar-trophy-2025' && currentTournament?.id) {
+        console.log(`🔄 Refreshing specific match ${matchId} data...`);
+        try {
+          await refreshAllTournamentData();
+        } catch (error) {
+          console.log('⚠️ Refresh failed, but continuing with existing data:', error);
+        }
+      }
+    };
+    
+    refreshMatch();
+  }, [matchId, currentTournament, refreshAllTournamentData]);
 
   useEffect(() => {
     if (!isAuthenticated || !isOfficial) {
@@ -76,6 +112,8 @@ export default function AdminMatchDetail() {
 
   const contextMatch = getMatchById(matchId);
   const match = localMatch || contextMatch;
+  
+  
   
   if (!match) {
     return (
@@ -298,8 +336,16 @@ export default function AdminMatchDetail() {
                   {teamA.logo}
                 </div>
                 <div>
-                  <div className="font-bold text-base sm:text-lg">{teamA.name}</div>
-                  <div className="text-xs sm:text-sm opacity-90">{teamA.description}</div>
+                  <div className="font-bold text-base sm:text-lg">
+                    {(match.tournamentId === 6 || match.tournament_id === 6) && match.players?.teamA?.[0] 
+                      ? match.players.teamA[0] 
+                      : teamA.name}
+                  </div>
+                  <div className="text-xs sm:text-sm opacity-90">
+                    {(match.tournamentId === 6 || match.tournament_id === 6) && match.players?.teamA?.[0] 
+                      ? `Player 1` 
+                      : teamA.description}
+                  </div>
                 </div>
               </div>
               
@@ -309,8 +355,16 @@ export default function AdminMatchDetail() {
               
               <div className="flex items-center space-x-3 sm:space-x-4">
                 <div className="text-left sm:text-right">
-                  <div className="font-bold text-base sm:text-lg">{teamB.name}</div>
-                  <div className="text-xs sm:text-sm opacity-90">{teamB.description}</div>
+                  <div className="font-bold text-base sm:text-lg">
+                    {(match.tournamentId === 6 || match.tournament_id === 6) && match.players?.teamB?.[0] 
+                      ? match.players.teamB[0] 
+                      : teamB.name}
+                  </div>
+                  <div className="text-xs sm:text-sm opacity-90">
+                    {(match.tournamentId === 6 || match.tournament_id === 6) && match.players?.teamB?.[0] 
+                      ? `Player 2` 
+                      : teamB.description}
+                  </div>
                 </div>
                 <div 
                   className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white text-lg sm:text-xl font-bold"
@@ -327,11 +381,6 @@ export default function AdminMatchDetail() {
               <div className="text-xs sm:text-sm opacity-90">{match.session} Session</div>
             </div>
           </div>
-        </div>
-
-        {/* Live Scorecard (Read-only view) */}
-        <div className="mb-8">
-          <LiveScorecard match={match} teamA={teamA} teamB={teamB} />
         </div>
 
         {/* Mobile-Optimized Official Scoring Interface */}
@@ -359,13 +408,32 @@ export default function AdminMatchDetail() {
               </div>
             </div>
             
-            <ScoreCard 
-              match={match} 
-              teamA={teamA} 
-              teamB={teamB} 
-              teamC={teamC}
-              onSave={handleSaveMatch}
-            />
+            {(() => {
+              // Use IndividualPlayerScoreCard for Nancy Millar Trophy
+              // Multiple detection methods to ensure it works for all rounds
+              const isNancyMillar = match.tournamentId === 6 || 
+                                  match.tournament_id === 6 || 
+                                  currentTournament?.slug === 'nancy-millar-trophy-2025' ||
+                                  (match.players && match.players.teamA && match.players.teamB); // Individual player format
+              
+              
+              return isNancyMillar ? (
+                <IndividualPlayerScoreCard 
+                  match={match} 
+                  teamA={teamA} 
+                  teamB={teamB} 
+                  onSave={handleSaveMatch}
+                />
+              ) : (
+                <ScoreCard 
+                  match={match} 
+                  teamA={teamA} 
+                  teamB={teamB} 
+                  teamC={teamC}
+                  onSave={handleSaveMatch}
+                />
+              );
+            })()}
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { TournamentContextType, Team, Player, Match, Score, Hole } from '@/types';
+import { Tournament, TournamentContextType as MultiTournamentContextType } from '@/types/tournament';
 import { supabase, isSupabaseConfigured, getBrowserSupabaseClient } from '@/lib/supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { matchStatusManager } from '@/utils/matchStatusManager';
@@ -28,6 +29,11 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
   const [scores, setScores] = useState<Score[]>([]);
   const [loading, setLoading] = useState(true); // Start with loading to show loading state
   const [channels, setChannels] = useState<RealtimeChannel[]>([]);
+  
+  // Multi-tournament state
+  const [currentTournament, setCurrentTournament] = useState<Tournament | null>(null);
+  const [tournaments, setTournaments] = useState<Tournament[]>([]);
+  const [isSwitching, setIsSwitching] = useState(false);
 
   // Load initial data from Supabase
   useEffect(() => {
@@ -35,7 +41,10 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
     if (typeof window !== 'undefined' && isSupabaseConfigured()) {
       const browserSupabase = getBrowserSupabaseClient();
       if (browserSupabase) {
-        loadInitialData(browserSupabase);
+        // Load tournaments first, then tournament data
+        loadTournaments(browserSupabase).then(() => {
+          loadTournamentData(undefined, browserSupabase);
+        });
         setupRealtimeSubscriptions(browserSupabase);
         
         // Start automatic match status monitoring
@@ -58,58 +67,251 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
     }
   }, []);
 
-  const loadInitialData = async (supabaseClient = supabase) => {
+  // Load tournament data when current tournament changes
+  useEffect(() => {
+    if (currentTournament) {
+      loadTournamentData(currentTournament.id);
+    }
+  }, [currentTournament]);
+
+  // Restore last selected tournament from localStorage
+  useEffect(() => {
+    const savedTournamentId = localStorage.getItem('currentTournamentId');
+    if (savedTournamentId && tournaments.length > 0) {
+      const tournament = tournaments.find(t => t.id === parseInt(savedTournamentId));
+      if (tournament) {
+        setCurrentTournament(tournament);
+      }
+    }
+  }, [tournaments]);
+
+  // Load tournaments
+  const loadTournaments = async (supabaseClient = supabase) => {
     if (!supabaseClient || typeof window === 'undefined') {
+      console.log('No Supabase client or not in browser, creating default tournament...');
+      createDefaultTournament();
+      return;
+    }
+    
+    try {
+      const { data, error } = await supabaseClient
+        .from('tournaments')
+        .select('*')
+        .order('start_date', { ascending: false });
+
+      if (error) {
+        // If tournaments table doesn't exist, create a default tournament
+        if (error.message.includes('relation "tournaments" does not exist') || 
+            error.message.includes('does not exist')) {
+          console.log('Tournaments table not found, creating default tournament...');
+          createDefaultTournament();
+          return;
+        }
+        console.error('Error loading tournaments:', error);
+        // Fallback to default tournament on any error
+        createDefaultTournament();
+        return;
+      }
+
+      if (data && data.length > 0) {
+        const transformedTournaments = data.map(transformTournament);
+        setTournaments(transformedTournaments);
+
+        // Set current tournament to the first active one, or first available
+        const activeTournament = transformedTournaments.find(t => t.status === 'active');
+        if (activeTournament) {
+          setCurrentTournament(activeTournament);
+        } else if (transformedTournaments.length > 0) {
+          setCurrentTournament(transformedTournaments[0]);
+        }
+      } else {
+        // No tournaments found, create default
+        console.log('No tournaments found in database, creating default tournament...');
+        createDefaultTournament();
+      }
+    } catch (err) {
+      console.error('Error loading tournaments:', err);
+      // Fallback to default tournament on any error
+      createDefaultTournament();
+    }
+  };
+
+  // Create default tournament
+  const createDefaultTournament = () => {
+    const defaultTournament: Tournament = {
+      id: 1,
+      name: 'Patrons Cup 2025',
+      slug: 'patrons-cup-2025',
+      description: 'Annual Patrons Cup Tournament at Muthaiga Golf Club',
+      startDate: '2025-08-22',
+      endDate: '2025-08-24',
+      status: 'active',
+      format: 'patrons_cup',
+      divisions: ['Trophy', 'Shield', 'Plaque', 'Bowl', 'Mug'],
+      pointSystem: {
+        friAM4BBB: { win: 5, tie: 2.5 },
+        friPMFoursomes: { 
+          trophy: { win: 3, tie: 1.5 }, 
+          bowl: { win: 4, tie: 2 } 
+        },
+        satAM4BBB: { win: 5, tie: 2.5 },
+        satPMFoursomes: { 
+          trophy: { win: 3, tie: 1.5 }, 
+          bowl: { win: 4, tie: 2 } 
+        },
+        sunSingles: { win: 3, tie: 1.5 }
+      },
+      settings: {
+        course: 'Muthaiga Golf Club',
+        maxPlayersPerTeam: 12,
+        allowThreeWayMatches: true,
+        enableProMatches: true
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    console.log('Setting default tournament:', defaultTournament.name);
+    setTournaments([defaultTournament]);
+    setCurrentTournament(defaultTournament);
+  };
+
+  // Load tournament-specific data
+  const loadTournamentData = async (tournamentId?: number, supabaseClient = supabase) => {
+    const targetTournamentId = tournamentId || currentTournament?.id;
+    if (!targetTournamentId || !supabaseClient || typeof window === 'undefined') {
       setLoading(false);
       return;
     }
     
     setLoading(true);
     try {
-
-      // Load all data in parallel
-      const [teamsRes, playersRes, matchesRes, scoresRes] = await Promise.all([
-        supabaseClient.from('teams').select('*').order('seed'),
-        supabaseClient.from('players').select('*').order('name'),
+      // Try to load data with tournament filtering first
+      let [teamsRes, playersRes, matchesRes, scoresRes] = await Promise.all([
+        supabaseClient.from('teams').select('*').eq('tournament_id', targetTournamentId).order('seed'),
+        supabaseClient.from('players').select('*').eq('tournament_id', targetTournamentId).order('name'),
         supabaseClient
           .from('matches')
           .select(`
             *,
-            holes (
-              hole_number,
-              par,
-              team_a_score,
-              team_b_score,
-              team_c_score,
-              team_a_strokes,
-              team_b_strokes,
-              team_c_strokes,
-              status,
-              last_updated
-            )
+              holes (
+                hole_number,
+                par,
+                team_a_score,
+                team_b_score,
+                team_c_score,
+                team_a_strokes,
+                team_b_strokes,
+                team_c_strokes,
+                status,
+                last_updated,
+                player1_score,
+                player2_score,
+                player3_score,
+                player4_score,
+                player1_handicap,
+                player2_handicap,
+                player3_handicap,
+                player4_handicap,
+                player1_points,
+                player2_points,
+                player3_points,
+                player4_points,
+                player1_id,
+                player2_id,
+                player3_id,
+                player4_id
+              )
           `)
+          .eq('tournament_id', targetTournamentId)
           .order('game_number')
           .order('hole_number', { referencedTable: 'holes' }),
-        supabaseClient.from('scores').select('*').order('points', { ascending: false })
+        supabaseClient.from('scores').select('*').eq('tournament_id', targetTournamentId).order('points', { ascending: false })
       ]);
 
+      // If tournament_id column doesn't exist, fall back to loading all data
+      if (teamsRes.error && (teamsRes.error.message.includes('column "tournament_id" does not exist') || 
+                             teamsRes.error.message.includes('does not exist'))) {
+        console.log('tournament_id column not found, loading all data...');
+        [teamsRes, playersRes, matchesRes, scoresRes] = await Promise.all([
+          supabaseClient.from('teams').select('*').order('seed'),
+          supabaseClient.from('players').select('*').order('name'),
+          supabaseClient
+            .from('matches')
+            .select(`
+              *,
+              holes (
+                hole_number,
+                par,
+                team_a_score,
+                team_b_score,
+                team_c_score,
+                team_a_strokes,
+                team_b_strokes,
+                team_c_strokes,
+                status,
+                last_updated,
+                player1_score,
+                player2_score,
+                player3_score,
+                player4_score,
+                player1_handicap,
+                player2_handicap,
+                player3_handicap,
+                player4_handicap,
+                player1_points,
+                player2_points,
+                player3_points,
+                player4_points,
+                player1_id,
+                player2_id,
+                player3_id,
+                player4_id
+              )
+            `)
+            .order('game_number')
+            .order('hole_number', { referencedTable: 'holes' }),
+          supabaseClient.from('scores').select('*').order('points', { ascending: false })
+        ]);
+      }
+
       if (teamsRes.error) {
-        console.error('Error fetching teams:', teamsRes.error);
+        console.error('Error fetching teams:', {
+          message: teamsRes.error.message,
+          details: teamsRes.error.details,
+          hint: teamsRes.error.hint,
+          code: teamsRes.error.code
+        });
         throw teamsRes.error;
       }
       
       if (playersRes.error) {
-        console.error('Error fetching players:', playersRes.error);
+        console.error('Error fetching players:', {
+          message: playersRes.error.message,
+          details: playersRes.error.details,
+          hint: playersRes.error.hint,
+          code: playersRes.error.code
+        });
         throw playersRes.error;
       }
       
       if (matchesRes.error) {
-        console.error('Error fetching matches:', matchesRes.error);
+        console.error('Error fetching matches:', {
+          message: matchesRes.error.message,
+          details: matchesRes.error.details,
+          hint: matchesRes.error.hint,
+          code: matchesRes.error.code
+        });
         throw matchesRes.error;
       }
       
       if (scoresRes.error) {
-        console.error('Error fetching scores:', scoresRes.error);
+        console.error('Error fetching scores:', {
+          message: scoresRes.error.message,
+          details: scoresRes.error.details,
+          hint: scoresRes.error.hint,
+          code: scoresRes.error.code
+        });
         throw scoresRes.error;
       }
       
@@ -134,7 +336,9 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
         sessionPoints: team.session_points,
         playersPerSession: team.players_per_session,
         restingPerSession: team.resting_per_session,
-        pointsPerMatch: team.points_per_match
+        pointsPerMatch: team.points_per_match,
+        tournamentId: team.tournament_id,
+        tournament_id: team.tournament_id
       }));
 
       const transformedPlayers: Player[] = playersRes.data.map(player => ({
@@ -146,7 +350,9 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
         phone: player.phone || '',
         isPro: player.is_pro,
         isExOfficio: player.is_ex_officio,
-        isJunior: player.is_junior
+        isJunior: player.is_junior,
+        tournamentId: player.tournament_id,
+        tournament_id: player.tournament_id
       }));
 
       console.log('📊 Loading matches data:', {
@@ -232,6 +438,51 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
     }
   };
 
+  // Switch tournament
+  const switchTournament = async (tournamentId: number) => {
+    try {
+      setIsSwitching(true);
+      
+      console.log('🔄 Switching to tournament ID:', tournamentId);
+      console.log('📊 Available tournaments:', tournaments.map(t => ({ id: t.id, name: t.name, slug: t.slug })));
+      
+      const tournament = tournaments.find(t => t.id === tournamentId);
+      if (!tournament) {
+        console.error('❌ Tournament not found in tournaments array:', tournamentId);
+        throw new Error(`Tournament not found: ${tournamentId}`);
+      }
+
+      console.log('✅ Found tournament:', tournament.name);
+      setCurrentTournament(tournament);
+      await loadTournamentData(tournamentId);
+
+      // Store current tournament in localStorage for persistence
+      localStorage.setItem('currentTournamentId', tournamentId.toString());
+
+    } catch (err) {
+      console.error('Error switching tournament:', err);
+    } finally {
+      setIsSwitching(false);
+    }
+  };
+
+  // Tournament data transformation
+  const transformTournament = (data: any): Tournament => ({
+    id: data.id,
+    name: data.name,
+    slug: data.slug,
+    description: data.description,
+    startDate: data.start_date,
+    endDate: data.end_date,
+    status: data.status,
+    format: data.format,
+    divisions: data.divisions,
+    pointSystem: data.point_system,
+    settings: data.settings,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at
+  });
+
   const setupRealtimeSubscriptions = (supabaseClient = supabase) => {
     const newChannels: RealtimeChannel[] = [];
 
@@ -259,6 +510,7 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
             holeNumber: payload.new?.hole_number || payload.old?.hole_number,
             teamAScore: payload.new?.team_a_score,
             teamBScore: payload.new?.team_b_score,
+            teamCScore: payload.new?.team_c_score,
             status: payload.new?.status
           });
           handleHoleUpdate(payload);
@@ -412,6 +664,8 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
     isThreeWay: supabaseMatch.is_three_way,
     isPro: supabaseMatch.is_pro,
     isBye: supabaseMatch.is_bye,
+    tournamentId: supabaseMatch.tournament_id,
+    tournament_id: supabaseMatch.tournament_id,
     holes: [] // Holes are loaded separately
   });
 
@@ -425,7 +679,24 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
     teamBStrokes: supabaseHole.team_b_strokes,
     teamCStrokes: supabaseHole.team_c_strokes,
     status: supabaseHole.status,
-    lastUpdated: supabaseHole.last_updated
+    lastUpdated: supabaseHole.last_updated,
+    // Individual player scoring for Nancy Millar Trophy (with fallbacks for missing columns)
+    player1Score: supabaseHole.player1_score || null,
+    player2Score: supabaseHole.player2_score || null,
+    player3Score: supabaseHole.player3_score || null,
+    player4Score: supabaseHole.player4_score || null,
+    player1Handicap: supabaseHole.player1_handicap || null,
+    player2Handicap: supabaseHole.player2_handicap || null,
+    player3Handicap: supabaseHole.player3_handicap || null,
+    player4Handicap: supabaseHole.player4_handicap || null,
+    player1Points: supabaseHole.player1_points || null,
+    player2Points: supabaseHole.player2_points || null,
+    player3Points: supabaseHole.player3_points || null,
+    player4Points: supabaseHole.player4_points || null,
+    player1Id: supabaseHole.player1_id || null,
+    player2Id: supabaseHole.player2_id || null,
+    player3Id: supabaseHole.player3_id || null,
+    player4Id: supabaseHole.player4_id || null
   });
 
   const transformSupabaseScore = (supabaseScore: any): Score => ({
@@ -547,6 +818,25 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
     return scores.find(score => score.teamId === teamId);
   };
 
+  // Manual refresh function for all tournament data
+  const refreshAllTournamentData = async () => {
+    try {
+      console.log('🔄 Refreshing all tournament data...', {
+        currentTournamentId: currentTournament?.id,
+        currentTournamentSlug: currentTournament?.slug
+      });
+      await loadTournamentData(currentTournament?.id || 1);
+      console.log('✅ Tournament data refreshed successfully');
+    } catch (error) {
+      console.error('❌ Error refreshing tournament data:', {
+        error: error,
+        message: error?.message,
+        details: error?.details,
+        code: error?.code
+      });
+    }
+  };
+
   // Manual refresh function for when real-time fails
   const refreshMatchData = async (matchId: number) => {
     try {
@@ -556,18 +846,34 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
         .from('matches')
         .select(`
           *,
-          holes (
-            hole_number,
-            par,
-            team_a_score,
-            team_b_score,
-            team_c_score,
-            team_a_strokes,
-            team_b_strokes,
-            team_c_strokes,
-            status,
-            last_updated
-          )
+              holes (
+                hole_number,
+                par,
+                team_a_score,
+                team_b_score,
+                team_c_score,
+                team_a_strokes,
+                team_b_strokes,
+                team_c_strokes,
+                status,
+                last_updated,
+                player1_score,
+                player2_score,
+                player3_score,
+                player4_score,
+                player1_handicap,
+                player2_handicap,
+                player3_handicap,
+                player4_handicap,
+                player1_points,
+                player2_points,
+                player3_points,
+                player4_points,
+                player1_id,
+                player2_id,
+                player3_id,
+                player4_id
+              )
         `)
         .eq('id', matchId)
         .single();
@@ -615,10 +921,17 @@ export const TournamentProvider: React.FC<TournamentProviderProps> = ({ children
     updateMatch,
     updateScore,
     refreshMatchData,
+    refreshAllTournamentData,
     getTeamById,
     getPlayersByTeamId,
     getMatchById,
-    getScoreByTeamId
+    getScoreByTeamId,
+    
+    // Multi-tournament support
+    currentTournament,
+    tournaments,
+    isSwitching,
+    switchTournament
   };
 
   return (
